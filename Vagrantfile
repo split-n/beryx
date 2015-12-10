@@ -16,4 +16,6 @@ Vagrant.configure(2) do |config|
     ansible.host_key_checking = false # disable known_hosts check
     ansible.playbook = "provisioning/main.yml"
   end
+
+  config.vm.network "forwarded_port", guest:13000, host:13000
 end
