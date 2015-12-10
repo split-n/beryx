@@ -1,0 +1,32 @@
+---
+# vim:ft=ansible
+- name: Apt dist-upgrade
+  apt: upgrade=dist update_cache=yes
+  sudo: true
+- name: Install basic packages
+  apt: name={{ item }} state=latest update_cache=yes
+  sudo: true
+  with_items:
+    - build-essential
+    - zsh
+    - git
+    - tmux
+    - vim-nox
+    - htop
+- name: Install language-pack-ja
+  apt: name=language-pack-ja
+  sudo: true
+- name: Generate locale ja_JP.UTF-8
+  locale_gen: name=ja_JP.UTF-8
+- name: Set default locale
+  sudo: true
+  lineinfile: dest=/etc/default/locale
+    regexp="LANG"
+    line="LANG=ja_JP.utf8"
+- shell: "cat /etc/timezone"
+  register: current_timezone
+  changed_when: false
+- name: Set TZ to Asia/Tokyo
+  sudo: true
+  command: "timedatectl set-timezone Asia/Tokyo"
+  when: 'current_timezone.stdout.find("Asia/Tokyo") == -1'

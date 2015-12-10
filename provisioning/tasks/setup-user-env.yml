@@ -1,0 +1,13 @@
+---
+# vim:ft=ansible
+- name: clone dotfiles
+  git: repo=git@bitbucket.org:split-n/dotfiles.git
+    dest="/home/{{ ansible_ssh_user }}/dotfiles" 
+    accept_hostkey=yes
+    recursive=yes
+- name: chsh zsh
+  user: name={{ ansible_ssh_user }} shell=/usr/bin/zsh
+  sudo: yes
+- name: link dotfiles
+  command: /home/{{ ansible_ssh_user }}/dotfiles/init.sh
+    creates="/home/{{ ansible_ssh_user }}/.tmux.conf"

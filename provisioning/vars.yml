@@ -1,0 +1,9 @@
+---
+# vim:ft=ansible
+install_ruby_version: 2.2.3
+pg_db_names:
+  - development
+  - test
+  - production
+pg_db_user: nuser
+pg_db_password: reso24puse

@@ -1,0 +1,56 @@
+---
+# vim:ft=ansible
+- name: install rbenv deps
+  apt: name={{ item }} state=latest update_cache=yes
+  sudo: yes
+  with_items:
+    - autoconf
+    - bison
+    - libssl-dev
+    - libyaml-dev
+    - libreadline6-dev
+    - zlib1g-dev
+    - libncurses5-dev
+    - libffi-dev
+    - libgdbm3
+    - libgdbm-dev
+    - libsqlite3-dev
+- name: clone rbenv
+  git: repo=https://github.com/sstephenson/rbenv.git
+    dest="/home/{{ ansible_ssh_user }}/.rbenv"
+    accept_hostkey=yes
+- name: clone ruby-build
+  git: repo=https://github.com/sstephenson/ruby-build.git
+    dest="/home/{{ ansible_ssh_user }}/.rbenv/plugins/ruby-build"
+    accept_hostkey=yes
+- name: rbenv env vars
+  lineinfile:
+    dest="/home/{{ ansible_ssh_user }}/{{ item[0] }}"
+    line="{{ item[1] }}"
+    create=yes
+  with_nested:
+    - ['.zshenv', '.bash_profile']
+    - ['export PATH=\"$HOME/.rbenv/bin:$PATH\"', 'eval \"$(rbenv init -)\"']
+- name: rbenv install
+  args: 
+    creates: "/home/{{ ansible_ssh_user }}/.rbenv/versions/2.2.3/bin/ruby"
+  shell: /bin/bash -lc 'MAKE_OPTS="-j 3" rbenv install {{ install_ruby_version }}'
+- shell: "cat /home/{{ ansible_ssh_user }}/.rbenv/version"
+  register: prev_rbenv_global_version
+  changed_when: false
+  ignore_errors: true
+- name: rbenv global
+  when: "prev_rbenv_global_version.stdout.find(\"{{ install_ruby_version }}\") == -1"
+  shell: /bin/bash -lc 'rbenv global {{ install_ruby_version }} && rbenv rehash'
+- name: gem no-document
+  lineinfile:
+    dest="/home/{{ ansible_ssh_user }}/.gemrc"
+    line="{{ item.line }}"
+    create=yes
+  with_items:
+    - { line: "install: --no-document" }
+    - { line: "update: --no-document" }
+- name: install bundler
+  args:
+    creates: "/home/{{ ansible_ssh_user }}/.rbenv/versions/{{ install_ruby_version }}/bin/bundle"
+  shell: /bin/bash -lc 'gem install bundler && rbenv rehash'

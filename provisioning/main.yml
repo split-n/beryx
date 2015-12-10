@@ -1,0 +1,11 @@
+---
+# vim:ft=ansible
+- hosts: all
+  vars_files: 
+    - vars.yml
+  tasks:
+    - include: tasks/install-basic-packages.yml
+    - include: tasks/setup-user-env.yml
+    - include: tasks/install-ruby.yml
+    - include: tasks/setup-postgresql.yml
+    - include: tasks/setup-nginx.yml
