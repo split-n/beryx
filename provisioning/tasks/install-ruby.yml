@@ -15,6 +15,7 @@
     - libgdbm3
     - libgdbm-dev
     - libsqlite3-dev
+    - nodejs # for rails
 - name: clone rbenv
   git: repo=https://github.com/sstephenson/rbenv.git
     dest="/home/{{ ansible_ssh_user }}/.rbenv"
