@@ -9,6 +9,10 @@ Vagrant.configure(2) do |config|
     v.memory = 1024
   end
 
+  config.vm.network "private_network", ip: "192.168.235.10"
+  config.vm.synced_folder ".", "/vagrant", type: "nfs"
+  config.vm.network "forwarded_port", guest:13000, host:13000
+
   config.ssh.forward_agent = true
 
   config.vm.provision "ansible" do |ansible|
@@ -17,5 +21,4 @@ Vagrant.configure(2) do |config|
     ansible.playbook = "provisioning/main.yml"
   end
 
-  config.vm.network "forwarded_port", guest:13000, host:13000
 end
