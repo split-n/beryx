@@ -8,21 +8,10 @@
     - postgresql-contrib
     - python-psycopg2
     - libpq-dev
-- name: Pg db exists
-  sudo: yes
-  sudo_user: postgres
-  postgresql_db: name="{{ item }}"
-  with_items: "{{pg_db_names}}"
 - name: Pg user exists
   sudo: yes
   sudo_user: postgres
   postgresql_user:
-    db={{ item }}
     name={{ pg_db_user }}
     password={{ pg_db_password }}
-    priv=ALL
-  with_items: "{{pg_db_names}}"
-- name: Pg user does not have unnecessary privilege
-  sudo: yes
-  sudo_user: postgres
-  postgresql_user: name={{ pg_db_user }} role_attr_flags=NOSUPERUSER,NOCREATEDB
+    role_attr_flags=NOSUPERUSER,CREATEDB
