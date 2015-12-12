@@ -8,6 +8,17 @@
 - name: chsh zsh
   user: name={{ ansible_ssh_user }} shell=/usr/bin/zsh
   sudo: yes
+- name: mkdir ~/bin
+  file: path=/home/{{ ansible_ssh_user }}/bin state=directory
+- name: add ~/bin to PATH
+  lineinfile:
+    create=yes
+    dest="/home/{{ ansible_ssh_user }}/.zshenv"
+    line='export PATH="$HOME/bin:$PATH"'
+- name: Download peco
+  shell: "wget https://github.com/peco/peco/releases/download/v0.3.5/peco_linux_amd64.tar.gz -qO- | tar xzf - -C /tmp/ && cp /tmp/peco_linux_amd64/peco /home/{{ ansible_ssh_user }}/bin/peco && rm -r /tmp/peco_linux_amd64"
+  args:
+    creates: "/home/{{ ansible_ssh_user }}/bin/peco"
 - name: link dotfiles
   command: /home/{{ ansible_ssh_user }}/dotfiles/init.sh
     creates="/home/{{ ansible_ssh_user }}/.tmux.conf"
