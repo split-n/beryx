@@ -3,7 +3,9 @@ Video streaming media server
 
 # Dev provisioning
 ## Mac/Linux
-done by vagrant
+done by `vagrant up`  
+or  
+`ansible-playbook  -u vagrant -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory provisioning/main.yml -vvv`
 ### notice
 before `vagrant up`/`vagrant provision`
 ```
