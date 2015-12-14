@@ -1,5 +1,11 @@
 ---
 # vim:ft=ansible
+- name: replace apt repository to jp
+  sudo: true
+  replace:
+    dest=/etc/apt/sources.list
+    regexp='//archive\.ubuntu\.com/'
+    replace='//jp.archive.ubuntu.com/'
 - name: Apt dist-upgrade
   apt: upgrade=dist update_cache=yes
   sudo: true
