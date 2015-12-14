@@ -4,7 +4,7 @@
   vars_files: 
     - vars.yml
   tasks:
-    - include: tasks/install-basic-packages.yml
+    - include: tasks/setup-basic.yml
     - include: tasks/setup-user-env.yml
     - include: tasks/install-ruby.yml
     - include: tasks/setup-postgresql.yml
