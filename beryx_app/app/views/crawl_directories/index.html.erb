@@ -1,0 +1,20 @@
+<div>
+  <p>Directories</p>
+  <ul>
+    <% @crawl_directories.each do |dir| %>
+      <li><%= dir.path %></li>
+    <% end %>
+  </ul>
+</div>
+<div>
+  <p>new</p>
+  <%= form_for(@crawl_directory) do |f| %>
+    <% if @crawl_directory.errors.any? %>
+      <%= @crawl_directory.errors.inspect %>
+    <% end %>
+    <%= f.label :path %>
+    <%= f.text_field :path %>
+
+    <%= f.submit "Create" %>
+  <% end %>
+</div>
