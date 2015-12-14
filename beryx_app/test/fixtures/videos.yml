@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  crawl_directory_id: 
+  path: MyText
+  file_name: MyText
+  file_size: 1
+  deleted_at: 2015-12-14 23:51:18
+
+two:
+  crawl_directory_id: 
+  path: MyText
+  file_name: MyText
+  file_size: 1
+  deleted_at: 2015-12-14 23:51:18

@@ -1,6 +1,7 @@
 class CrawlDirectory < ActiveRecord::Base
   validates :path, presence: true
   validate :path_should_exists
+  has_many :videos
 
   private
   def path_should_exists
