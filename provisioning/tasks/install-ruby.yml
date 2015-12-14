@@ -55,3 +55,7 @@
   args:
     creates: "/home/{{ ansible_ssh_user }}/.rbenv/versions/{{ install_ruby_version }}/bin/bundle"
   shell: /bin/bash -lc 'gem install bundler && rbenv rehash'
+- name: install ruby-debug-ide, debase
+  args:
+    creates: "/home/{{ ansible_ssh_user }}/.rbenv/versions/{{ install_ruby_version }}/bin/rdebug-ide"
+  shell: /bin/bash -lc 'gem install ruby-debug-ide debase && rbenv rehash'
