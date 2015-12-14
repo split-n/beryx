@@ -5,7 +5,7 @@ class CrawlDirectory < ActiveRecord::Base
 
   private
   def path_should_exists
-    unless Dir.exists?(path)
+    unless path.present? && Dir.exists?(path)
       errors.add(:path, "Path directory not found.")
     end
   end

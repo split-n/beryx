@@ -8,6 +8,14 @@ class CrawlDirectoryTest < ActiveSupport::TestCase
     end
   end
 
+  test "invalid when path blank" do
+    cd = CrawlDirectory.create(path: " ")
+    assert cd.invalid?
+
+    cd = CrawlDirectory.create(path: "")
+    assert cd.invalid?
+  end
+
   test "valid with existed directory path" do
     Dir.stub(:exists?, true) do
       cd = CrawlDirectory.create(path: "/found")
