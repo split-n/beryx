@@ -4,6 +4,7 @@ rvm:
 cache: bundler
 services:
   - postgresql
+gemfile: beryx_app/Gemfile
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
   - cp beryx_app/config/database.yml.travis beryx_app/config/database.yml
