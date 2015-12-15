@@ -21,6 +21,8 @@ class CrawlDirectory < ActiveRecord::Base
   end
 
   def dir_includes?(d1, d2)
-    d1.path.start_with?(d2.path) || d2.path.start_with?(d1.path)
+    p1 = d1.path.downcase
+    p2 = d2.path.downcase
+    p1.start_with?(p2) || p2.start_with?(p1)
   end
 end

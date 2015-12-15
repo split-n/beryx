@@ -61,6 +61,23 @@ class CrawlDirectoryTest < ActiveSupport::TestCase
     end
   end
 
+  # 保存はcase sensitiveで行うが、case insensitiveで重複判定は行う
+  test "invalid when same directory found, case insensitive" do
+    stub_exist do
+      d1 = CrawlDirectory.create(path: "/foo/bAR/")
+      d2 = CrawlDirectory.create(path: "/foO/baR/")
+      assert d2.invalid?
+    end
+  end
+
+  test "store path as case sensitive" do
+    stub_exist do
+      path = "/Foo/bAr"
+      cd = CrawlDirectory.create(path: path)
+      assert_equal cd.path, path
+    end
+  end
+
   def stub_exist(result=true)
     Dir.stub(:exist?, result) do
       yield
