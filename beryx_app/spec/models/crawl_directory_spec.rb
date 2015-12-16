@@ -11,10 +11,19 @@ RSpec.describe CrawlDirectory, type: :model do
         it { is_expected.not_to be_valid }
       end
 
-      it "is invalid when path is blank" do
-        expect(CrawlDirectory.create(path: " ")).not_to be_valid
-        expect(CrawlDirectory.create(path: "")).not_to be_valid
-        expect(CrawlDirectory.create(path: nil)).not_to be_valid
+      context "path is blank" do
+        context "space" do
+          let(:path) { " " }
+          it { is_expected.not_to be_valid }
+        end
+        context "empty" do
+          let(:path) { "" }
+          it { is_expected.not_to be_valid }
+        end
+        context "nil" do
+          let(:path) { nil }
+          it { is_expected.not_to be_valid }
+        end
       end
 
       context "with existed directory path" do
