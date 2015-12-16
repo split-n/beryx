@@ -1,36 +1,40 @@
 require 'rails_helper'
 
 RSpec.describe CrawlDirectory, type: :model do
-  describe "Path" do
-    it "is invalid with not existed directory path" do
-      allow(Dir).to receive(:exist?).and_return(false)
-      expect(CrawlDirectory.create(path: "/nowhere/")).not_to be_valid
-    end
+  describe "path" do
+    context "single instance test" do
+      subject { CrawlDirectory.create(path: path) }
 
-    it "is valid with existed dorectory path" do
-      allow(Dir).to receive(:exist?).and_return(true)
-      expect(CrawlDirectory.create(path: "/found/")).to be_valid
-    end
-
-    it "is invalid when path is blank" do
-      expect(CrawlDirectory.create(path: " ")).not_to be_valid
-      expect(CrawlDirectory.create(path: "")).not_to be_valid
-      expect(CrawlDirectory.create(path: nil)).not_to be_valid
-    end
-
-    context "invalid path argument, but exists" do
-      before do
-        allow(Dir).to receive(:exist?).and_return(true)
+      context "with not existed directory path" do
+        before {allow(Dir).to receive(:exist?).and_return(false) }
+        let(:path) { "/nowhere/" }
+        it { is_expected.not_to be_valid }
       end
 
-      it "is invalid when path isn't ended with slash" do
-        expect(CrawlDirectory.create(path: "/found")).not_to be_valid
+      it "is invalid when path is blank" do
+        expect(CrawlDirectory.create(path: " ")).not_to be_valid
+        expect(CrawlDirectory.create(path: "")).not_to be_valid
+        expect(CrawlDirectory.create(path: nil)).not_to be_valid
       end
 
-      it "is invalid when path isn't started with slash" do
-        expect(CrawlDirectory.create(path: "found/")).not_to be_valid
+      context "with existed directory path" do
+        before { allow(Dir).to receive(:exist?).and_return(true) }
+        let(:path) { "/found/" }
+        it { is_expected.to be_valid }
+
+        context "when path isn't ended with slash" do
+          let(:path) { "/found" }
+          it { is_expected.not_to be_valid }
+        end
+
+        context "when path isn't started with slash" do
+          let(:path) { "found/" }
+          it { is_expected.not_to be_valid }
+        end
       end
+
     end
+
 
     context "duplicated, but exists" do
       before do
