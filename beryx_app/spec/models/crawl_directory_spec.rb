@@ -50,25 +50,29 @@ RSpec.describe CrawlDirectory, type: :model do
         allow(Dir).to receive(:exist?).and_return(true)
       end
 
-      it "is invalid when other directory is included" do
-        d1 = CrawlDirectory.create(path: "/foo/bar/")
-        expect(CrawlDirectory.create(path: "/foo/")).not_to be_valid
+      subject { CrawlDirectory.create(path: path) }
+
+      let!(:cd1) { CrawlDirectory.create(path: "/foo/bar/") }
+
+      context "when other directory is included" do
+        let(:path) { "/foo/" }
+        it{ is_expected.not_to be_valid}
       end
 
-      it "is invalid when other directory includes this" do
-        d1 = CrawlDirectory.create(path: "/foo/bar/")
-        expect(CrawlDirectory.create(path: "/foo/bar/baz/")).not_to be_valid
+      context "when other directory includes this" do
+        let(:path) { "/foo/bar/baz/" }
+        it{ is_expected.not_to be_valid}
       end
 
-      it "is invalid when same directory found" do
-        d1 = CrawlDirectory.create(path: "/foo/bar/")
-        expect(CrawlDirectory.create(path: "/foo/bar/")).not_to be_valid
+      context "when same directory exists" do
+        let(:path) { "/foo/bar/" }
+        it{ is_expected.not_to be_valid}
       end
 
       # 保存はcase sensitiveで行うが、case insensitiveで重複判定は行う
-      it "is invalid when same directory found, case insensitive" do
-        d1 = CrawlDirectory.create(path: "/foo/bAR/")
-        expect(CrawlDirectory.create(path: "/foO/baR/")).not_to be_valid
+      context "when same directory found, case insensitive" do
+        let(:path) { "/foO/baR/" }
+        it{ is_expected.not_to be_valid}
       end
     end
 
