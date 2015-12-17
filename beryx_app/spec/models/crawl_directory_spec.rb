@@ -31,6 +31,10 @@ RSpec.describe CrawlDirectory, type: :model do
         context "when valid path" do
           let(:path) { "/found/" }
           it { is_expected.to be_valid }
+          it "count correct" do
+            subject
+            expect(CrawlDirectory.count).to eq 1
+          end
         end
 
         context "when path isn't ended with slash" do
