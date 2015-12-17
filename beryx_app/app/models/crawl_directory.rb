@@ -4,6 +4,15 @@ class CrawlDirectory < ActiveRecord::Base
   validate :path_should_not_include_others
   has_many :videos, dependent: :destroy
 
+  def deleted?
+    deleted_at.present?
+  end
+
+  def mark_as_deleted
+    self.deleted_at = Time.current
+    save
+  end
+
   private
   def path_should_exists
     unless path.present? && Dir.exist?(path)

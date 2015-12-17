@@ -7,7 +7,7 @@ RSpec.describe CrawlDirectory, type: :model do
 
       context "with not existed directory path" do
         before {allow(Dir).to receive(:exist?).and_return(false) }
-        let(:path) { "/nowhere/" }
+        let(:path) { "/etc/" }
         it { is_expected.not_to be_valid }
       end
 
@@ -28,8 +28,10 @@ RSpec.describe CrawlDirectory, type: :model do
 
       context "with existed directory path" do
         before { allow(Dir).to receive(:exist?).and_return(true) }
-        let(:path) { "/found/" }
-        it { is_expected.to be_valid }
+        context "when valid path" do
+          let(:path) { "/found/" }
+          it { is_expected.to be_valid }
+        end
 
         context "when path isn't ended with slash" do
           let(:path) { "/found" }
@@ -45,7 +47,7 @@ RSpec.describe CrawlDirectory, type: :model do
     end
 
 
-    context "duplicated, but exists" do
+    context "both exists" do
       before do
         allow(Dir).to receive(:exist?).and_return(true)
       end
@@ -74,6 +76,26 @@ RSpec.describe CrawlDirectory, type: :model do
         let(:path) { "/foO/baR/" }
         it{ is_expected.not_to be_valid}
       end
+
+      context "when differ" do
+        let(:path) { "/foo/baz/" }
+        it{ is_expected.to be_valid }
+
+        it "count corrent" do
+          subject
+          expect(CrawlDirectory.count).to eq 2
+        end
+      end
+
+      context "when differ 2" do
+        let(:path) { "/gat/bar/" }
+        it{ is_expected.to be_valid }
+
+        it "count corrent" do
+          subject
+          expect(CrawlDirectory.count).to eq 2
+        end
+      end
     end
 
     it "stores path as case sensitive" do
@@ -81,6 +103,21 @@ RSpec.describe CrawlDirectory, type: :model do
       path = "/Foo/bAr"
       cd = CrawlDirectory.create(path: path)
       expect(cd.path).to eq path
+    end
+  end
+
+  describe "#mark_as_deleted" do
+    let(:cd) { CrawlDirectory.create(path: "/valid") }
+    describe "deleted_at" do
+      before { cd.mark_as_deleted }
+      subject { cd.deleted_at}
+      it { is_expected.to be_within(1.minutes).of(Time.current) }
+    end
+
+    describe "#deleted?" do
+      before { cd.mark_as_deleted }
+      subject { cd.deleted?}
+      it { is_expected.to eq true }
     end
   end
 
