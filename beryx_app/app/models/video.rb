@@ -12,7 +12,7 @@ class Video < ActiveRecord::Base
 
   private
   def path_should_exists
-    unless File.exists?(path)
+    unless path.present? && File.exists?(path)
       errors.add(:path, "Path file not found.")
     end
   end
