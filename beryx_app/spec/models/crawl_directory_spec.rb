@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe CrawlDirectory, type: :model do
-  describe "path" do
+  describe "new instance" do
     context "single instance test" do
       subject { CrawlDirectory.create(path: path) }
 
@@ -114,16 +114,28 @@ RSpec.describe CrawlDirectory, type: :model do
   end
 
   describe "#mark_as_deleted" do
-    let(:cd) { CrawlDirectory.create(path: "/valid") }
+    let(:path) { "/valid/" }
+    let(:cd) {
+      allow(Dir).to receive(:exist?).with(path).and_return(true)
+      CrawlDirectory.create(path: path)
+    }
+
+    before { cd.mark_as_deleted }
+
+    describe "valid" do
+      subject { cd }
+      it { is_expected.to be_valid }
+    end
+
     describe "deleted_at" do
-      before { cd.mark_as_deleted }
       subject { cd.deleted_at}
       it { is_expected.to be_within(1.minutes).of(Time.current) }
     end
 
+
     describe "#deleted?" do
       before { cd.mark_as_deleted }
-      subject { cd.deleted?}
+      subject { cd.deleted? }
       it { is_expected.to eq true }
     end
   end
