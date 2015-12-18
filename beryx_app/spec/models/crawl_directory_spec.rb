@@ -6,8 +6,8 @@ RSpec.describe CrawlDirectory, type: :model do
       subject { CrawlDirectory.create(path: path) }
 
       context "with not existed directory path" do
-        before {allow(Dir).to receive(:exist?).and_return(false) }
         let(:path) { "/etc/" }
+        before { allow(Dir).to receive(:exist?).with(path).and_return(false) }
         it { is_expected.not_to be_valid }
       end
 
@@ -27,7 +27,7 @@ RSpec.describe CrawlDirectory, type: :model do
       end
 
       context "with existed directory path" do
-        before { allow(Dir).to receive(:exist?).and_return(true) }
+        before { allow(Dir).to receive(:exist?).with(path).and_return(true) }
         context "when valid path" do
           let(:path) { "/found/" }
           it { is_expected.to be_valid }
@@ -53,36 +53,39 @@ RSpec.describe CrawlDirectory, type: :model do
 
     context "both exists" do
       before do
-        allow(Dir).to receive(:exist?).and_return(true)
+        allow(Dir).to receive(:exist?).with(path1).and_return(true)
+        allow(Dir).to receive(:exist?).with(path2).and_return(true)
       end
 
-      subject { CrawlDirectory.create(path: path) }
+      let(:path1) { "/foo/bar/" }
+      let!(:cd1) { CrawlDirectory.create(path: path1) }
 
-      let!(:cd1) { CrawlDirectory.create(path: "/foo/bar/") }
+      subject { CrawlDirectory.create(path: path2) }
+
 
       context "when other directory is included" do
-        let(:path) { "/foo/" }
+        let(:path2) { "/foo/" }
         it{ is_expected.not_to be_valid}
       end
 
       context "when other directory includes this" do
-        let(:path) { "/foo/bar/baz/" }
+        let(:path2) { "/foo/bar/baz/" }
         it{ is_expected.not_to be_valid}
       end
 
       context "when same directory exists" do
-        let(:path) { "/foo/bar/" }
+        let(:path2) { "/foo/bar/" }
         it{ is_expected.not_to be_valid}
       end
 
       # 保存はcase sensitiveで行うが、case insensitiveで重複判定は行う
       context "when same directory found, case insensitive" do
-        let(:path) { "/foO/baR/" }
+        let(:path2) { "/foO/baR/" }
         it{ is_expected.not_to be_valid}
       end
 
       context "when differ" do
-        let(:path) { "/foo/baz/" }
+        let(:path2) { "/foo/baz/" }
         it{ is_expected.to be_valid }
 
         it "count corrent" do
@@ -92,7 +95,7 @@ RSpec.describe CrawlDirectory, type: :model do
       end
 
       context "when differ 2" do
-        let(:path) { "/gat/bar/" }
+        let(:path2) { "/gat/bar/" }
         it{ is_expected.to be_valid }
 
         it "count corrent" do
@@ -103,8 +106,8 @@ RSpec.describe CrawlDirectory, type: :model do
     end
 
     it "stores path as case sensitive" do
-      allow(Dir).to receive(:exist?).and_return(true)
       path = "/Foo/bAr"
+      allow(Dir).to receive(:exist?).with(path).and_return(true)
       cd = CrawlDirectory.create(path: path)
       expect(cd.path).to eq path
     end
