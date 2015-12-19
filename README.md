@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/split-n/beryx.svg?branch=master)](https://travis-ci.org/split-n/beryx)
+
 # beryx
 Video streaming media server
 
