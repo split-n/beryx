@@ -77,6 +77,11 @@ RSpec.describe Video, type: :model do
               let(:path) { "/usr/exists/foo.mp4"}
               it { is_expected.not_to be_valid }
             end
+
+            context "unsupported extension" do
+              let(:path) { "/exists/foo.zip" }
+              it { is_expected.not_to be_valid }
+            end
           end
 
           context "pass crawl_directory_id" do
