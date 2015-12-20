@@ -5,6 +5,7 @@ class Video < ActiveRecord::Base
   validates :path, presence: true
   validate :path_should_exists
   validate :path_file_extension
+  validate :crawl_directory_should_active
 
   before_save do
     self.file_name = File.basename(path)
@@ -23,6 +24,13 @@ class Video < ActiveRecord::Base
     ext = File.extname(path)
     unless ext.in?(VIDEO_EXTS)
       errors.add(:path, "File #{ext} is not supported.")
+    end
+  end
+
+  def crawl_directory_should_active
+    return unless crawl_directory.kind_of? CrawlDirectory
+    if crawl_directory.deleted?
+      errors.add(:crawl_directory, "#{crawl_directory.path} is deleted.")
     end
   end
 end
