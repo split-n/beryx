@@ -46,31 +46,6 @@ RSpec.describe Video, type: :model do
 
       context "with exist path" do
         let(:path) { "/exists/foo.mp4" }
-        context "CrawlDirectory is deleted" do
-          before {
-            cd.mark_as_deleted
-            allow(File).to receive(:exist?).with(path).and_return(true)
-          }
-          subject{ cd.videos.create(path: path, file_size: 350*1024**2) }
-          it { is_expected.not_to be_valid }
-        end
-
-        context "wrong CrawlDirectory" do
-          let(:path) { "/usr/exists/foo.mp4"}
-          before {
-            allow(File).to receive(:exist?).with(path).and_return(true)
-          }
-          subject{ cd.videos.create(path: path, file_size: 350*1024**2) }
-          it { is_expected.not_to be_valid }
-        end
-
-        context "pass crawl_directory_id" do
-          before {
-            allow(File).to receive(:exist?).with(path).and_return(true)
-          }
-          subject{ Video.create(crawl_directory_id: cd.id, path: path, file_size: 350*1024**2) }
-          it { is_expected.to be_valid }
-        end
 
         context "without file_size" do
           before {
@@ -85,10 +60,31 @@ RSpec.describe Video, type: :model do
           before {
             allow(File).to receive(:exist?).with(path).and_return(true)
           }
-          subject{ cd.videos.create(path: path, file_size: 350*1024**2) }
-          it { is_expected.to be_valid }
-        end
 
+          context "normal args" do
+            subject{ cd.videos.create(path: path, file_size: 350*1024**2) }
+
+            context "correct" do
+              it { is_expected.to be_valid }
+            end
+
+            context "CrawlDirectory is deleted" do
+              before { cd.mark_as_deleted }
+              it { is_expected.not_to be_valid }
+            end
+
+            context "wrong CrawlDirectory" do
+              let(:path) { "/usr/exists/foo.mp4"}
+              it { is_expected.not_to be_valid }
+            end
+          end
+
+          context "pass crawl_directory_id" do
+            subject{ Video.create(crawl_directory_id: cd.id, path: path, file_size: 350*1024**2) }
+            it { is_expected.to be_valid }
+          end
+
+        end
       end
     end
   end
