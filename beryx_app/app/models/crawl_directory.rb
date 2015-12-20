@@ -21,17 +21,19 @@ class CrawlDirectory < ActiveRecord::Base
   end
 
   def path_should_not_include_others
-    all = CrawlDirectory.all
-    included = all.reject{|d| d.id == self.id }
-                   .select{|d| dir_includes?(d, self)}
-    unless included.empty?
-      errors.add(:path, "Path duplicated with #{included.first.path}")
+    dup = duplicated_directory
+    if dup
+      errors.add(:path, "Path duplicated with #{dup.path}")
     end
   end
 
-  def dir_includes?(d1, d2)
+  def duplicated_directory
+    CrawlDirectory.all.reject{|d| d.id == self.id }.select{|d| dir_includes?(d)}.first
+  end
+
+  def dir_includes?(d1)
     p1 = d1.path.downcase
-    p2 = d2.path.downcase
+    p2 = self.path.downcase
     p1.start_with?(p2) || p2.start_with?(p1)
   end
 end
