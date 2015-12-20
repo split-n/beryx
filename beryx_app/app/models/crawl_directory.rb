@@ -16,6 +16,22 @@ class CrawlDirectory < ActiveRecord::Base
     save
   end
 
+  def can_mark_as_active?
+    duplicated_directory.nil?
+  end
+
+  def mark_as_active
+    return true unless deleted?
+
+    if !can_mark_as_active?
+      false
+    else
+      self.deleted_at = nil
+      save
+      true
+    end
+  end
+
   private
   def path_should_exists
     unless path.present? && Dir.exist?(path)

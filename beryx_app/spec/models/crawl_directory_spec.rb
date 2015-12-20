@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe CrawlDirectory, type: :model do
-  describe "new instance" do
+  describe "create new instance" do
     context "single instance test" do
       subject { CrawlDirectory.create(path: path) }
 
@@ -150,6 +150,53 @@ RSpec.describe CrawlDirectory, type: :model do
       before { cd.mark_as_deleted }
       subject { cd.deleted? }
       it { is_expected.to eq true }
+    end
+  end
+
+  describe "#mark_as_active" do
+    context "only one directory" do
+      before { allow(Dir).to receive(:exist?).with(path).and_return(true) }
+      let(:path) { "/valid/" }
+      let(:cd) { CrawlDirectory.create(path: path) }
+      subject {
+        cd.mark_as_deleted
+        cd.mark_as_active
+      }
+      it { is_expected.to eq true}
+    end
+
+    context "2 directories" do
+      before { allow(Dir).to receive(:exist?).with(path1).and_return(true) }
+      before { allow(Dir).to receive(:exist?).with(path2).and_return(true) }
+
+      describe "differ directories" do
+        let(:path1) { "/valid/" }
+        let(:path2) { "/vanilla/" }
+        it "can make active" do
+          cd1 = CrawlDirectory.create(path: path1)
+          cd1.mark_as_deleted
+          expect(cd1.deleted?).to eq true
+
+          cd2 = CrawlDirectory.create(path: path2)
+          expect(cd1.mark_as_active).to eq true
+          expect(CrawlDirectory.active.count).to eq 2
+        end
+
+      end
+      describe "dup directory active" do
+        let(:path1) { "/valid/" }
+        let(:path2) { "/valid/yo/" }
+        it "can't make active" do
+          cd1 = CrawlDirectory.create(path: path1)
+          cd1.mark_as_deleted
+          expect(cd1.deleted?).to eq true
+
+          cd2 = CrawlDirectory.create(path: path2)
+          expect(cd2).to be_valid
+          expect(cd1.mark_as_active).to eq false
+          expect(CrawlDirectory.active.count).to eq 1
+        end
+      end
     end
   end
 
