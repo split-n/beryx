@@ -33,7 +33,7 @@ RSpec.describe CrawlDirectory, type: :model do
           it { is_expected.to be_valid }
           it "count correct" do
             subject
-            expect(CrawlDirectory.count).to eq 1
+            expect(CrawlDirectory.active.count).to eq 1
           end
         end
 
@@ -88,9 +88,9 @@ RSpec.describe CrawlDirectory, type: :model do
         let(:path2) { "/foo/baz/" }
         it{ is_expected.to be_valid }
 
-        it "count corrent" do
+        it "count correct" do
           subject
-          expect(CrawlDirectory.count).to eq 2
+          expect(CrawlDirectory.active.count).to eq 2
         end
       end
 
@@ -98,9 +98,9 @@ RSpec.describe CrawlDirectory, type: :model do
         let(:path2) { "/gat/bar/" }
         it{ is_expected.to be_valid }
 
-        it "count corrent" do
+        it "count correct" do
           subject
-          expect(CrawlDirectory.count).to eq 2
+          expect(CrawlDirectory.active.count).to eq 2
         end
       end
 
@@ -114,8 +114,13 @@ RSpec.describe CrawlDirectory, type: :model do
         context "and other directory is included" do
           let(:path2) { "/foo/" }
           it { is_expected.to be_valid }
+          it "count correct" do
+            subject
+            expect(CrawlDirectory.active.count).to eq 1
+          end
         end
       end
+
     end
 
     it "stores path as case sensitive" do
@@ -151,6 +156,11 @@ RSpec.describe CrawlDirectory, type: :model do
       subject { cd.deleted? }
       it { is_expected.to eq true }
     end
+
+    it "correct count" do
+      subject
+      expect(CrawlDirectory.deleted.count).to eq 1
+    end
   end
 
   describe "#mark_as_active" do
@@ -180,6 +190,7 @@ RSpec.describe CrawlDirectory, type: :model do
           cd2 = CrawlDirectory.create(path: path2)
           expect(cd1.mark_as_active).to eq true
           expect(CrawlDirectory.active.count).to eq 2
+          expect(CrawlDirectory.deleted.count).to eq 0
         end
 
       end
@@ -195,6 +206,7 @@ RSpec.describe CrawlDirectory, type: :model do
           expect(cd2).to be_valid
           expect(cd1.mark_as_active).to eq false
           expect(CrawlDirectory.active.count).to eq 1
+          expect(CrawlDirectory.deleted.count).to eq 1
         end
       end
     end
