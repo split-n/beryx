@@ -13,7 +13,7 @@ class CrawlDirectory < ActiveRecord::Base
 
   def mark_as_deleted
     self.deleted_at = Time.current
-    save
+    save!
   end
 
   def can_mark_as_active?
@@ -27,7 +27,7 @@ class CrawlDirectory < ActiveRecord::Base
       false
     else
       self.deleted_at = nil
-      save
+      save!
       true
     end
   end
