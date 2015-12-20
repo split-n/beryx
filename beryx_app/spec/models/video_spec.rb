@@ -35,15 +35,23 @@ RSpec.describe Video, type: :model do
         it { is_expected.not_to be_valid }
       end
 
+      context "path is relative" do
+        let(:path) { "foo.mp4" }
+        before {
+          allow(File).to receive(:exist?).with(path).and_return(true)
+        }
+        subject{ cd.videos.create(path: path, file_size: 350*1024**2) }
+        it { is_expected.not_to be_valid }
+      end
+
       context "with exist path" do
         let(:path) { "/exists/foo.mp4" }
         context "CrawlDirectory is deleted" do
           before {
             cd.mark_as_deleted
             allow(File).to receive(:exist?).with(path).and_return(true)
-            allow(File).to receive(:size).with(path).and_return(350*1024**2)
           }
-          subject{ cd.videos.create(path: path) }
+          subject{ cd.videos.create(path: path, file_size: 350*1024**2) }
           it { is_expected.not_to be_valid }
         end
 
