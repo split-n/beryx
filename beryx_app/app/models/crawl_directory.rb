@@ -4,6 +4,9 @@ class CrawlDirectory < ActiveRecord::Base
   validate :path_should_not_include_others
   has_many :videos, dependent: :destroy
 
+  scope :active, -> { where("deleted_at IS NULL") }
+  scope :deleted, -> { where("deleted_at IS NOT NULL") }
+
   def deleted?
     deleted_at.present?
   end
@@ -28,7 +31,7 @@ class CrawlDirectory < ActiveRecord::Base
   end
 
   def duplicated_directory
-    CrawlDirectory.all.reject{|d| d.id == self.id }.select{|d| dir_includes?(d)}.first
+    CrawlDirectory.active.reject{|d| d.id == self.id }.select{|d| dir_includes?(d)}.first
   end
 
   def dir_includes?(d1)

@@ -103,6 +103,19 @@ RSpec.describe CrawlDirectory, type: :model do
           expect(CrawlDirectory.count).to eq 2
         end
       end
+
+      context "when one is deleted" do
+        before { cd1.mark_as_deleted }
+        context "and same path" do
+          let(:path2) { "/foo/bar/" }
+          it { is_expected.to be_valid }
+        end
+
+        context "and other directory is included" do
+          let(:path2) { "/foo/" }
+          it { is_expected.to be_valid }
+        end
+      end
     end
 
     it "stores path as case sensitive" do
