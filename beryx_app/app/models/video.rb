@@ -6,6 +6,7 @@ class Video < ActiveRecord::Base
   validate :path_should_exists
   validate :path_file_extension
   validate :crawl_directory_should_active
+  validate :crawl_directory_should_be_parent
 
   before_save do
     self.file_name = File.basename(path)
@@ -31,6 +32,14 @@ class Video < ActiveRecord::Base
     return unless crawl_directory.kind_of? CrawlDirectory
     if crawl_directory.deleted?
       errors.add(:crawl_directory, "#{crawl_directory.path} is deleted.")
+    end
+  end
+
+  def crawl_directory_should_be_parent
+    return unless crawl_directory.kind_of? CrawlDirectory
+    return unless path
+    unless path.start_with?(crawl_directory.path)
+      errors.add(:crawl_directory, "#{crawl_directory.path} is not parent of directory.")
     end
   end
 end
