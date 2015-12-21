@@ -1,27 +1,46 @@
 class Video < ActiveRecord::Base
-  VIDEO_EXTS = %w(mp4 mkv) # temp
+  include SoftDeletable
+  VIDEO_EXTS = %w(.mp4 .mkv) # temp
   belongs_to :crawl_directory
   validates :crawl_directory, presence: true
   validates :path, presence: true
   validate :path_should_exists
+  validate :path_file_extension
+  validate :crawl_directory_should_active
+  validate :crawl_directory_should_be_parent
 
   before_save do
-    file_name = File.basename(path)
-    file_size = File.size(path)
+    self.file_name = File.basename(path)
+    self.file_size ||= File.size(path)
   end
 
   private
   def path_should_exists
-    unless path.present? && File.exists?(path)
+    unless path.present? && File.exist?(path)
       errors.add(:path, "Path file not found.")
     end
   end
 
   def path_file_extension
-    VIDEO_EXTS.each do |ext|
-      unless path.downcase.end_with? ext
-        errors.add(:path, "File #{File.extname(path)} is not supported.")
-      end
+    return if path.blank?
+    ext = File.extname(path)
+    unless ext.in?(VIDEO_EXTS)
+      errors.add(:path, "File #{ext} is not supported.")
+    end
+  end
+
+  def crawl_directory_should_active
+    return unless crawl_directory.kind_of? CrawlDirectory
+    if crawl_directory.deleted?
+      errors.add(:crawl_directory, "#{crawl_directory.path} is deleted.")
+    end
+  end
+
+  def crawl_directory_should_be_parent
+    return unless crawl_directory.kind_of? CrawlDirectory
+    return unless path
+    unless path.start_with?(crawl_directory.path)
+      errors.add(:crawl_directory, "#{crawl_directory.path} is not parent of directory.")
     end
   end
 end
