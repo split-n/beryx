@@ -1,4 +1,5 @@
 class Video < ActiveRecord::Base
+  include SoftDeletable
   VIDEO_EXTS = %w(.mp4 .mkv) # temp
   belongs_to :crawl_directory
   validates :crawl_directory, presence: true

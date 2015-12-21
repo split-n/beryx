@@ -1,35 +1,12 @@
 class CrawlDirectory < ActiveRecord::Base
+  include SoftDeletable
   validates :path, presence: true, format: {with: %r{\A/.*/\z}, message: "Path should start /, ending / ." }
   validate :path_should_exists
   validate :path_should_not_include_others
   has_many :videos, dependent: :destroy
 
-  scope :active, -> { where("deleted_at IS NULL") }
-  scope :deleted, -> { where("deleted_at IS NOT NULL") }
-
-  def deleted?
-    deleted_at.present?
-  end
-
-  def mark_as_deleted
-    self.deleted_at = Time.current
-    save!
-  end
-
   def can_mark_as_active?
     duplicated_directory.nil?
-  end
-
-  def mark_as_active
-    return true unless deleted?
-
-    if !can_mark_as_active?
-      false
-    else
-      self.deleted_at = nil
-      save!
-      true
-    end
   end
 
   private
