@@ -1,8 +1,10 @@
 class CrawlDirectory < ActiveRecord::Base
   include SoftDeletable
-  validates :path, presence: true, format: {with: %r{\A/.*/\z}, message: "Path should start /, ending / ." }
-  validate :path_should_exists
-  validate :path_should_not_include_others
+  validates :path, presence: true
+  validates :path, format: {with: %r{\A/}, message: "must be started with /"}, if: -> { path.present? }
+  validates :path, format: {with: %r{/\z}, message: "must be ended with /"}, if: -> { path.present? }
+  validate :path_should_exists, if: -> { path.present? }
+  validate :path_should_not_include_others, if: -> { path.present? }
   has_many :videos, dependent: :destroy
 
   def can_mark_as_active?
@@ -12,14 +14,14 @@ class CrawlDirectory < ActiveRecord::Base
   private
   def path_should_exists
     unless path.present? && Dir.exist?(path)
-      errors.add(:path, "Path directory not found.")
+      errors.add(:path, "directory not found")
     end
   end
 
   def path_should_not_include_others
     dup = duplicated_directory
     if dup
-      errors.add(:path, "Path duplicated with #{dup.path}")
+      errors.add(:path, "duplicated with #{dup.path}")
     end
   end
 
