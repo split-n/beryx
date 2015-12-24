@@ -8,21 +8,21 @@ RSpec.describe CrawlDirectory, type: :model do
       context "with not existed directory path" do
         let(:path) { "/etc/" }
         before { allow(Dir).to receive(:exist?).with(path).and_return(false) }
-        it { is_expected.not_to be_valid }
+        it { expect(subject.errors[:path]).to eq ["directory not found"] }
       end
 
       context "path is blank" do
         context "space" do
           let(:path) { " " }
-          it { is_expected.not_to be_valid }
+          it { expect(subject.errors[:path]).to eq ["can't be blank"] }
         end
         context "empty" do
           let(:path) { "" }
-          it { is_expected.not_to be_valid }
+          it { expect(subject.errors[:path]).to eq ["can't be blank"] }
         end
         context "nil" do
           let(:path) { nil }
-          it { is_expected.not_to be_valid }
+          it { expect(subject.errors[:path]).to eq ["can't be blank"] }
         end
       end
 
@@ -31,20 +31,17 @@ RSpec.describe CrawlDirectory, type: :model do
         context "when valid path" do
           let(:path) { "/found/" }
           it { is_expected.to be_valid }
-          it "count correct" do
-            subject
-            expect(CrawlDirectory.active.count).to eq 1
-          end
+          it { expect{subject}.to change{CrawlDirectory.active.count}.from(0).to(1) }
         end
 
         context "when path isn't ended with slash" do
           let(:path) { "/found" }
-          it { is_expected.not_to be_valid }
+          it { expect(subject.errors[:path]).to eq ["must be ended with /"] }
         end
 
         context "when path isn't started with slash" do
           let(:path) { "found/" }
-          it { is_expected.not_to be_valid }
+          it { expect(subject.errors[:path]).to eq ["must be started with /"] }
         end
       end
 
@@ -62,46 +59,39 @@ RSpec.describe CrawlDirectory, type: :model do
 
       subject { CrawlDirectory.create(path: path2) }
 
-
       context "when other directory is included" do
         let(:path2) { "/foo/" }
-        it{ is_expected.not_to be_valid}
+        it { expect(subject.errors[:path]).to eq ["duplicated with #{path1}"] }
       end
 
       context "when other directory includes this" do
         let(:path2) { "/foo/bar/baz/" }
-        it{ is_expected.not_to be_valid}
+        it { expect(subject.errors[:path]).to eq ["duplicated with #{path1}"] }
       end
 
       context "when same directory exists" do
         let(:path2) { "/foo/bar/" }
-        it{ is_expected.not_to be_valid}
+        it { expect(subject.errors[:path]).to eq ["duplicated with #{path1}"] }
       end
 
       # 保存はcase sensitiveで行うが、case insensitiveで重複判定は行う
       context "when same directory found, case insensitive" do
         let(:path2) { "/foO/baR/" }
-        it{ is_expected.not_to be_valid}
+        it { expect(subject.errors[:path]).to eq ["duplicated with #{path1}"] }
       end
 
       context "when differ" do
         let(:path2) { "/foo/baz/" }
         it{ is_expected.to be_valid }
 
-        it "count correct" do
-          subject
-          expect(CrawlDirectory.active.count).to eq 2
-        end
+        it { expect{subject}.to change{CrawlDirectory.active.count}.from(1).to(2) }
       end
 
       context "when differ 2" do
         let(:path2) { "/gat/bar/" }
         it{ is_expected.to be_valid }
 
-        it "count correct" do
-          subject
-          expect(CrawlDirectory.active.count).to eq 2
-        end
+        it { expect{subject}.to change{CrawlDirectory.active.count}.from(1).to(2) }
       end
 
       context "when one is deleted" do
@@ -109,15 +99,13 @@ RSpec.describe CrawlDirectory, type: :model do
         context "and same path" do
           let(:path2) { "/foo/bar/" }
           it { is_expected.to be_valid }
+          it { expect{subject}.to change{CrawlDirectory.active.count}.by(1) }
         end
 
         context "and other directory is included" do
           let(:path2) { "/foo/" }
           it { is_expected.to be_valid }
-          it "count correct" do
-            subject
-            expect(CrawlDirectory.active.count).to eq 1
-          end
+          it { expect{subject}.to change{CrawlDirectory.active.count}.by(1) }
         end
       end
 
@@ -138,14 +126,14 @@ RSpec.describe CrawlDirectory, type: :model do
       CrawlDirectory.create(path: path)
     }
 
-    before { cd.mark_as_deleted }
-
     describe "valid" do
+      before { cd.mark_as_deleted }
       subject { cd }
       it { is_expected.to be_valid }
     end
 
     describe "deleted_at" do
+      before { cd.mark_as_deleted }
       subject { cd.deleted_at}
       it { is_expected.to be_within(1.minutes).of(Time.current) }
     end
@@ -154,12 +142,12 @@ RSpec.describe CrawlDirectory, type: :model do
     describe "#deleted?" do
       before { cd.mark_as_deleted }
       subject { cd.deleted? }
-      it { is_expected.to eq true }
+      it { is_expected.to be_truthy }
     end
 
-    it "correct count" do
-      subject
-      expect(CrawlDirectory.deleted.count).to eq 1
+    describe "count" do
+      subject { cd.mark_as_deleted }
+      it { expect{subject}.to change{CrawlDirectory.deleted.count}.by(1) }
     end
   end
 
@@ -172,7 +160,7 @@ RSpec.describe CrawlDirectory, type: :model do
         cd.mark_as_deleted
         cd.mark_as_active
       }
-      it { is_expected.to eq true}
+      it { is_expected.to be_truthy }
     end
 
     context "2 directories" do
@@ -185,10 +173,10 @@ RSpec.describe CrawlDirectory, type: :model do
         it "can make active" do
           cd1 = CrawlDirectory.create(path: path1)
           cd1.mark_as_deleted
-          expect(cd1.deleted?).to eq true
+          expect(cd1.deleted?).to be_truthy
 
           cd2 = CrawlDirectory.create(path: path2)
-          expect(cd1.mark_as_active).to eq true
+          expect(cd1.mark_as_active).to be_truthy
           expect(CrawlDirectory.active.count).to eq 2
           expect(CrawlDirectory.deleted.count).to eq 0
         end
@@ -200,7 +188,7 @@ RSpec.describe CrawlDirectory, type: :model do
         it "can't make active" do
           cd1 = CrawlDirectory.create(path: path1)
           cd1.mark_as_deleted
-          expect(cd1.deleted?).to eq true
+          expect(cd1.deleted?).to be_truthy
 
           cd2 = CrawlDirectory.create(path: path2)
           expect(cd2).to be_valid
