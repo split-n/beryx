@@ -34,7 +34,7 @@
     - ['export PATH=\"$HOME/.rbenv/bin:$PATH\"', 'eval \"$(rbenv init -)\"']
 - name: rbenv install
   args: 
-    creates: "/home/{{ ansible_ssh_user }}/.rbenv/versions/2.2.3/bin/ruby"
+    creates: "/home/{{ ansible_ssh_user }}/.rbenv/versions/{{ install_ruby_version}}/bin/ruby"
   shell: /bin/bash -lc 'MAKE_OPTS="-j 3" rbenv install {{ install_ruby_version }}'
 - shell: "cat /home/{{ ansible_ssh_user }}/.rbenv/version"
   register: prev_rbenv_global_version
