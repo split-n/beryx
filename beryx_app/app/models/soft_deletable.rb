@@ -9,8 +9,8 @@ module SoftDeletable
     deleted_at.present?
   end
 
-  def mark_as_deleted
-    self.deleted_at = Time.current
+  def mark_as_deleted(time=Time.current)
+    self.deleted_at = time
     save!
   end
 

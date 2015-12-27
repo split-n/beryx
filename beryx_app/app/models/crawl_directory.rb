@@ -11,6 +11,24 @@ class CrawlDirectory < ActiveRecord::Base
     duplicated_directory.nil?
   end
 
+  def mark_as_deleted(time=Time.current)
+    self.videos.active.find_each do |v|
+      v.mark_as_deleted(time)
+    end
+    super(time)
+  end
+
+  def mark_as_active
+    deleted_at = self.deleted_at
+    succeed = super
+    if succeed && deleted_at
+      self.videos.deleted.where(deleted_at: deleted_at).find_each do |v|
+        v.mark_as_active
+      end
+    end
+    succeed
+  end
+
   private
   def path_should_exists
     unless path.present? && Dir.exist?(path)

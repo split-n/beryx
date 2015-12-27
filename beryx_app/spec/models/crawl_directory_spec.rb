@@ -153,7 +153,14 @@ RSpec.describe CrawlDirectory, type: :model do
     end
 
     context "With videos" do
-
+      let(:video_path) { "/valid/abc.mp4" }
+      let(:video) {
+        allow(File).to receive(:exist?).with(video_path).and_return(true)
+        FG.create(:video, path: video_path, crawl_directory: cd)
+      }
+      it "mark videos as deleted" do
+        expect{cd.mark_as_deleted}.to change{video.reload.deleted?}.from(false).to(true)
+      end
     end
   end
 
