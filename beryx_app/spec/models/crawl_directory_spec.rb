@@ -123,31 +123,37 @@ RSpec.describe CrawlDirectory, type: :model do
     let(:path) { "/valid/" }
     let(:cd) {
       allow(Dir).to receive(:exist?).with(path).and_return(true)
-      CrawlDirectory.create(path: path)
+      FG.create(:crawl_directory, path: path)
     }
 
-    describe "valid" do
-      before { cd.mark_as_deleted }
-      subject { cd }
-      it { is_expected.to be_valid }
+    context "No videos" do
+      describe "valid" do
+        before { cd.mark_as_deleted }
+        subject { cd }
+        it { is_expected.to be_valid }
+      end
+
+      describe "deleted_at" do
+        before { cd.mark_as_deleted }
+        subject { cd.deleted_at}
+        it { is_expected.to be_within(1.minutes).of(Time.current) }
+      end
+
+
+      describe "#deleted?" do
+        before { cd.mark_as_deleted }
+        subject { cd.deleted? }
+        it { is_expected.to be_truthy }
+      end
+
+      describe "count" do
+        subject { cd.mark_as_deleted }
+        it { expect{subject}.to change{CrawlDirectory.deleted.count}.by(1) }
+      end
     end
 
-    describe "deleted_at" do
-      before { cd.mark_as_deleted }
-      subject { cd.deleted_at}
-      it { is_expected.to be_within(1.minutes).of(Time.current) }
-    end
+    context "With videos" do
 
-
-    describe "#deleted?" do
-      before { cd.mark_as_deleted }
-      subject { cd.deleted? }
-      it { is_expected.to be_truthy }
-    end
-
-    describe "count" do
-      subject { cd.mark_as_deleted }
-      it { expect{subject}.to change{CrawlDirectory.deleted.count}.by(1) }
     end
   end
 
@@ -155,7 +161,7 @@ RSpec.describe CrawlDirectory, type: :model do
     context "only one directory" do
       before { allow(Dir).to receive(:exist?).with(path).and_return(true) }
       let(:path) { "/valid/" }
-      let(:cd) { CrawlDirectory.create(path: path) }
+      let(:cd) { FG.create(:crawl_directory, path: path) }
       subject {
         cd.mark_as_deleted
         cd.mark_as_active
@@ -171,11 +177,11 @@ RSpec.describe CrawlDirectory, type: :model do
         let(:path1) { "/valid/" }
         let(:path2) { "/vanilla/" }
         it "can make active" do
-          cd1 = CrawlDirectory.create(path: path1)
+          cd1 = FG.create(:crawl_directory, path: path1)
           cd1.mark_as_deleted
           expect(cd1.deleted?).to be_truthy
 
-          cd2 = CrawlDirectory.create(path: path2)
+          FG.create(:crawl_directory, path: path2)
           expect(cd1.mark_as_active).to be_truthy
           expect(CrawlDirectory.active.count).to eq 2
           expect(CrawlDirectory.deleted.count).to eq 0
@@ -186,11 +192,11 @@ RSpec.describe CrawlDirectory, type: :model do
         let(:path1) { "/valid/" }
         let(:path2) { "/valid/yo/" }
         it "can't make active" do
-          cd1 = CrawlDirectory.create(path: path1)
+          cd1 = FG.create(:crawl_directory, path: path1)
           cd1.mark_as_deleted
           expect(cd1.deleted?).to be_truthy
 
-          cd2 = CrawlDirectory.create(path: path2)
+          cd2 = FG.create(:crawl_directory, path: path2)
           expect(cd2).to be_valid
           expect(cd1.mark_as_active).to eq false
           expect(CrawlDirectory.active.count).to eq 1
