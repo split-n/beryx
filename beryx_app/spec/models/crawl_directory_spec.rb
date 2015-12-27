@@ -143,7 +143,7 @@ RSpec.describe CrawlDirectory, type: :model do
       describe "#deleted?" do
         before { cd.mark_as_deleted }
         subject { cd.deleted? }
-        it { is_expected.to be_truthy }
+        it { is_expected.to eq true }
       end
 
       describe "count" do
@@ -166,7 +166,7 @@ RSpec.describe CrawlDirectory, type: :model do
         cd.mark_as_deleted
         cd.mark_as_active
       }
-      it { is_expected.to be_truthy }
+      it { is_expected.to eq true }
     end
 
     context "2 directories" do
@@ -179,10 +179,10 @@ RSpec.describe CrawlDirectory, type: :model do
         it "can make active" do
           cd1 = FG.create(:crawl_directory, path: path1)
           cd1.mark_as_deleted
-          expect(cd1.deleted?).to be_truthy
+          expect(cd1.deleted?).to eq true
 
           FG.create(:crawl_directory, path: path2)
-          expect(cd1.mark_as_active).to be_truthy
+          expect(cd1.mark_as_active).to eq true
           expect(CrawlDirectory.active.count).to eq 2
           expect(CrawlDirectory.deleted.count).to eq 0
         end
@@ -194,7 +194,7 @@ RSpec.describe CrawlDirectory, type: :model do
         it "can't make active" do
           cd1 = FG.create(:crawl_directory, path: path1)
           cd1.mark_as_deleted
-          expect(cd1.deleted?).to be_truthy
+          expect(cd1.deleted?).to eq true
 
           cd2 = FG.create(:crawl_directory, path: path2)
           expect(cd2).to be_valid
