@@ -83,14 +83,12 @@ RSpec.describe CrawlDirectory, type: :model do
       context "when differ" do
         let(:path2) { "/foo/baz/" }
         it{ is_expected.to be_valid }
-
         it { expect{subject}.to change{CrawlDirectory.active.count}.by(1) }
       end
 
       context "when differ 2" do
         let(:path2) { "/gat/bar/" }
         it{ is_expected.to be_valid }
-
         it { expect{subject}.to change{CrawlDirectory.active.count}.by(1) }
       end
 
@@ -128,7 +126,7 @@ RSpec.describe CrawlDirectory, type: :model do
     subject { cd.mark_as_deleted }
 
     context "No videos" do
-        it { expect{subject}.not_to change{cd.valid?} }
+        it { expect{subject}.not_to change{cd.valid?}.from(true) }
         it { expect{subject}.to change{cd.deleted_at}.from(nil).to(be_within(1.minutes).of(Time.current)) }
         it { expect{subject}.to change{cd.deleted?}.from(false).to(true) }
         it { expect{subject}.to change{CrawlDirectory.deleted.count}.by(1) }
@@ -149,7 +147,7 @@ RSpec.describe CrawlDirectory, type: :model do
         FG.create(:video, path: video_path2, crawl_directory: cd2)
       }
       it { expect{subject}.to change{belong_video.reload.deleted?}.from(false).to(true) }
-      it { expect{subject}.not_to change{not_belong_video.reload.deleted?} }
+      it { expect{subject}.not_to change{not_belong_video.reload.deleted?}.from(false) }
       it { expect{subject}.to change{Video.active.count}.from(2).to(1) }
       it { expect{subject}.to change{Video.deleted.count}.from(0).to(1) }
     end
@@ -160,11 +158,27 @@ RSpec.describe CrawlDirectory, type: :model do
       before { allow(Dir).to receive(:exist?).with(path).and_return(true) }
       let(:path) { "/valid/" }
       let(:cd) { FG.create(:crawl_directory, path: path) }
-      subject {
-        cd.mark_as_deleted
-        cd.mark_as_active
-      }
-      it { is_expected.to eq true }
+      context "without video" do
+        subject {
+          cd.mark_as_deleted
+          cd.mark_as_active
+        }
+        it { is_expected.to eq true }
+        it { expect{subject}.not_to change{cd.valid?}.from(true) }
+      end
+
+      context "with video" do
+        let(:video_path) { "/valid/abc.mp4" }
+        let!(:belong_video) {
+          allow(File).to receive(:exist?).with(video_path).and_return(true)
+          FG.create(:video, path: video_path, crawl_directory: cd)
+        }
+        subject {
+          cd.mark_as_deleted
+          cd.mark_as_active
+        }
+        it { expect{subject}.not_to change{belong_video.reload.deleted?}.from(false) }
+      end
     end
 
     context "2 directories" do
