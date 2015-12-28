@@ -84,14 +84,14 @@ RSpec.describe CrawlDirectory, type: :model do
         let(:path2) { "/foo/baz/" }
         it{ is_expected.to be_valid }
 
-        it { expect{subject}.to change{CrawlDirectory.active.count}.from(1).to(2) }
+        it { expect{subject}.to change{CrawlDirectory.active.count}.by(1) }
       end
 
       context "when differ 2" do
         let(:path2) { "/gat/bar/" }
         it{ is_expected.to be_valid }
 
-        it { expect{subject}.to change{CrawlDirectory.active.count}.from(1).to(2) }
+        it { expect{subject}.to change{CrawlDirectory.active.count}.by(1) }
       end
 
       context "when one is deleted" do
@@ -125,42 +125,33 @@ RSpec.describe CrawlDirectory, type: :model do
       allow(Dir).to receive(:exist?).with(path).and_return(true)
       FG.create(:crawl_directory, path: path)
     }
+    subject { cd.mark_as_deleted }
 
     context "No videos" do
-      describe "valid" do
-        before { cd.mark_as_deleted }
-        subject { cd }
-        it { is_expected.to be_valid }
-      end
-
-      describe "deleted_at" do
-        before { cd.mark_as_deleted }
-        subject { cd.deleted_at}
-        it { is_expected.to be_within(1.minutes).of(Time.current) }
-      end
-
-
-      describe "#deleted?" do
-        before { cd.mark_as_deleted }
-        subject { cd.deleted? }
-        it { is_expected.to eq true }
-      end
-
-      describe "count" do
-        subject { cd.mark_as_deleted }
+        it { expect{subject}.not_to change{cd.valid?} }
+        it { expect{subject}.to change{cd.deleted_at}.from(nil).to(be_within(1.minutes).of(Time.current)) }
+        it { expect{subject}.to change{cd.deleted?}.from(false).to(true) }
         it { expect{subject}.to change{CrawlDirectory.deleted.count}.by(1) }
-      end
     end
 
     context "With videos" do
       let(:video_path) { "/valid/abc.mp4" }
-      let(:video) {
+      let!(:belong_video) {
         allow(File).to receive(:exist?).with(video_path).and_return(true)
         FG.create(:video, path: video_path, crawl_directory: cd)
       }
-      it "mark videos as deleted" do
-        expect{cd.mark_as_deleted}.to change{video.reload.deleted?}.from(false).to(true)
-      end
+      let!(:not_belong_video) {
+        dir_path2 = "/valid2/"
+        video_path2 = "/valid2/foo.mp4"
+        allow(Dir).to receive(:exist?).with(dir_path2).and_return(true)
+        allow(File).to receive(:exist?).with(video_path2).and_return(true)
+        cd2 = FG.create(:crawl_directory, path: dir_path2)
+        FG.create(:video, path: video_path2, crawl_directory: cd2)
+      }
+      it { expect{subject}.to change{belong_video.reload.deleted?}.from(false).to(true) }
+      it { expect{subject}.not_to change{not_belong_video.reload.deleted?} }
+      it { expect{subject}.to change{Video.active.count}.from(2).to(1) }
+      it { expect{subject}.to change{Video.deleted.count}.from(0).to(1) }
     end
   end
 
