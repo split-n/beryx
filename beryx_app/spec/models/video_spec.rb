@@ -61,6 +61,12 @@ RSpec.describe Video, type: :model do
             allow(File).to receive(:exist?).with(path).and_return(true)
           }
 
+          context "pass wrong instance" do
+            let(:cd) { Object.new }
+            subject { Video.create(crawl_directory: cd, path: path, file_size: 200.megabyte) }
+            it { expect{subject}.to raise_error(ActiveRecord::AssociationTypeMismatch)}
+          end
+
           context "normal args" do
             subject{ cd.videos.create(path: path, file_size: 350*1024**2) }
 
@@ -88,7 +94,6 @@ RSpec.describe Video, type: :model do
             subject{ Video.create(crawl_directory_id: cd.id, path: path, file_size: 350*1024**2) }
             it { is_expected.to be_valid }
           end
-
         end
       end
     end
