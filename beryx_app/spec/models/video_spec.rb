@@ -3,18 +3,18 @@ require 'rails_helper'
 RSpec.describe Video, type: :model do
   describe "new instance" do
     context "without CrawlDirectory" do
+      let(:path) { "/exists/foo.mp4" }
+      before { allow(File).to receive(:exist?).with(path).and_return(true) }
       context "cd is nil" do
-        let(:path) { "/exists/foo.mp4" }
-        before { allow(Dir).to receive(:exist?).with(path).and_return(true) }
         subject { Video.create(path: path) }
-        it { is_expected.not_to be_valid }
+        it { expect(subject.errors[:crawl_directory]).to eq ["can't be blank"] }
+        it { expect(subject.errors.messages.length).to eq 1 }
       end
 
       context "specify invalid cd_id" do
-        let(:path) { "/exists/foo.mp4" }
-        before { allow(Dir).to receive(:exist?).with(path).and_return(true) }
         subject { Video.create(path: path, crawl_directory_id: 4) }
-        it { is_expected.not_to be_valid }
+        it { expect(subject.errors[:crawl_directory]).to eq ["can't be blank"] }
+        it { expect(subject.errors.messages.length).to eq 1 }
       end
     end
 
@@ -25,14 +25,16 @@ RSpec.describe Video, type: :model do
 
       context "without args" do
         subject{ cd.videos.create }
-        it { is_expected.not_to be_valid }
+        it { expect(subject.errors[:path]).to eq ["can't be blank"] }
+        it { expect(subject.errors.messages.length).to eq 1 }
       end
 
       context "with not exist path" do
         let(:path) { "/exists/nil.mp4" }
         before { allow(File).to receive(:exist?).with(path).and_return(false) }
         subject{ cd.videos.create(path: path) }
-        it { is_expected.not_to be_valid }
+        it { expect(subject.errors[:path]).to eq ["file not found"] }
+        it { expect(subject.errors.messages.length).to eq 1 }
       end
 
       context "path is relative" do
@@ -40,8 +42,9 @@ RSpec.describe Video, type: :model do
         before {
           allow(File).to receive(:exist?).with(path).and_return(true)
         }
-        subject{ cd.videos.create(path: path, file_size: 350*1024**2) }
-        it { is_expected.not_to be_valid }
+        subject{ cd.videos.create(path: path, file_size: 300.megabyte) }
+        it { expect(subject.errors[:crawl_directory]).to eq ["crawl directory is not parent of directory"] }
+        it { expect(subject.errors.messages.length).to eq 1 }
       end
 
       context "with exist path" do
@@ -50,7 +53,7 @@ RSpec.describe Video, type: :model do
         context "without file_size" do
           before {
             allow(File).to receive(:exist?).with(path).and_return(true)
-            allow(File).to receive(:size).with(path).and_return(350*1024**2)
+            allow(File).to receive(:size).with(path).and_return(300.megabyte)
           }
           subject{ cd.videos.create(path: path) }
           it { is_expected.to be_valid }
@@ -63,12 +66,12 @@ RSpec.describe Video, type: :model do
 
           context "pass wrong instance" do
             let(:cd) { Object.new }
-            subject { Video.create(crawl_directory: cd, path: path, file_size: 200.megabyte) }
+            subject { Video.create(crawl_directory: cd, path: path, file_size: 300.megabyte) }
             it { expect{subject}.to raise_error(ActiveRecord::AssociationTypeMismatch)}
           end
 
           context "normal args" do
-            subject{ cd.videos.create(path: path, file_size: 350*1024**2) }
+            subject{ cd.videos.create(path: path, file_size: 300.megabyte) }
 
             context "correct" do
               it { is_expected.to be_valid }
@@ -76,22 +79,25 @@ RSpec.describe Video, type: :model do
 
             context "CrawlDirectory is deleted" do
               before { cd.mark_as_deleted }
-              it { is_expected.not_to be_valid }
+              it { expect(subject.errors[:crawl_directory]).to eq ["crawl directory is not active"] }
+              it { expect(subject.errors.messages.length).to eq 1 }
             end
 
             context "wrong CrawlDirectory" do
               let(:path) { "/usr/exists/foo.mp4"}
-              it { is_expected.not_to be_valid }
+              it { expect(subject.errors[:crawl_directory]).to eq ["crawl directory is not parent of directory"] }
+              it { expect(subject.errors.messages.length).to eq 1 }
             end
 
             context "unsupported extension" do
               let(:path) { "/exists/foo.zip" }
-              it { is_expected.not_to be_valid }
+              it { expect(subject.errors[:path]).to eq ["extension is not supported"] }
+              it { expect(subject.errors.messages.length).to eq 1 }
             end
           end
 
           context "pass crawl_directory_id" do
-            subject{ Video.create(crawl_directory_id: cd.id, path: path, file_size: 350*1024**2) }
+            subject{ Video.create(crawl_directory_id: cd.id, path: path, file_size: 300.megabyte) }
             it { is_expected.to be_valid }
           end
         end

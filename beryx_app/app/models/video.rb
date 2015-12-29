@@ -4,7 +4,7 @@ class Video < ActiveRecord::Base
   belongs_to :crawl_directory
   validates :crawl_directory, presence: true
   validates :path, presence: true
-  validate :path_should_exists
+  validate :path_should_exists, if: -> { path.present? }
   validate :path_file_extension
   validate :crawl_directory_should_active
   validate :crawl_directory_should_be_parent
@@ -17,7 +17,7 @@ class Video < ActiveRecord::Base
   private
   def path_should_exists
     unless path.present? && File.exist?(path)
-      errors.add(:path, "Path file not found.")
+      errors.add(:path, "file not found")
     end
   end
 
@@ -25,14 +25,14 @@ class Video < ActiveRecord::Base
     return if path.blank?
     ext = File.extname(path)
     unless ext.in?(VIDEO_EXTS)
-      errors.add(:path, "File #{ext} is not supported.")
+      errors.add(:path, "extension is not supported")
     end
   end
 
   def crawl_directory_should_active
     return unless crawl_directory.kind_of? CrawlDirectory
     if crawl_directory.deleted?
-      errors.add(:crawl_directory, "#{crawl_directory.path} is deleted.")
+      errors.add(:crawl_directory, "crawl directory is not active")
     end
   end
 
@@ -40,7 +40,7 @@ class Video < ActiveRecord::Base
     return unless crawl_directory.kind_of? CrawlDirectory
     return unless path
     unless path.start_with?(crawl_directory.path)
-      errors.add(:crawl_directory, "#{crawl_directory.path} is not parent of directory.")
+      errors.add(:crawl_directory, "crawl directory is not parent of directory")
     end
   end
 end
