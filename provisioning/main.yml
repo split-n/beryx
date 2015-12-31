@@ -9,3 +9,4 @@
     - ruby
     - postgresql
     - nginx
+    - redis
