@@ -43,6 +43,11 @@ RSpec.describe CrawlDirectory, type: :model do
           let(:path) { "found/" }
           it { expect(subject.errors[:path]).to eq ["must be started with /"] }
         end
+
+        context "when path contains relative" do
+          let(:path) { "/found/../etc/" }
+          it { expect(subject.errors[:path]).to eq ["must be relative path"] }
+        end
       end
 
     end

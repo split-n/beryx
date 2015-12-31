@@ -4,10 +4,7 @@ class Video < ActiveRecord::Base
   belongs_to :crawl_directory
   validates :crawl_directory, presence: true
   validates :path, presence: true
-  validate :path_should_exists, if: -> { path.present? }
-  validate :path_file_extension
-  validate :crawl_directory_should_active
-  validate :crawl_directory_should_be_parent
+  validate :path_should_exists, :path_file_extension, :crawl_directory_should_active, :crawl_directory_should_be_parent, if: -> { path.present? }
 
   before_save do
     self.file_name = File.basename(path)
@@ -22,7 +19,6 @@ class Video < ActiveRecord::Base
   end
 
   def path_file_extension
-    return if path.blank?
     ext = File.extname(path)
     unless ext.in?(VIDEO_EXTS)
       errors.add(:path, "extension is not supported")
@@ -38,7 +34,6 @@ class Video < ActiveRecord::Base
 
   def crawl_directory_should_be_parent
     return unless crawl_directory.kind_of? CrawlDirectory
-    return unless path
     unless path.start_with?(crawl_directory.path)
       errors.add(:crawl_directory, "crawl directory is not parent of directory")
     end

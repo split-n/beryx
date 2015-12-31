@@ -3,8 +3,7 @@ class CrawlDirectory < ActiveRecord::Base
   validates :path, presence: true
   validates :path, format: {with: %r{\A/}, message: "must be started with /"}, if: -> { path.present? }
   validates :path, format: {with: %r{/\z}, message: "must be ended with /"}, if: -> { path.present? }
-  validate :path_should_exists, if: -> { path.present? }
-  validate :path_should_not_include_others, if: -> { path.present? }
+  validate :path_should_exists, :path_should_not_include_others, :path_should_not_relative, if: -> { path.present? }
   has_many :videos, dependent: :destroy
 
   def can_mark_as_active?
@@ -40,6 +39,14 @@ class CrawlDirectory < ActiveRecord::Base
     dup = duplicated_directory
     if dup
       errors.add(:path, "duplicated with #{dup.path}")
+    end
+  end
+
+  def path_should_not_relative
+    if errors[:path].empty?
+      if (File.absolute_path(path) + "/") != path
+        errors.add(:path, "must be relative path")
+      end
     end
   end
 
