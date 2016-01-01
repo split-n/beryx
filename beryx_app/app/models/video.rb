@@ -11,6 +11,12 @@ class Video < ActiveRecord::Base
     self.file_size ||= File.size(path)
   end
 
+  class << self
+    def file_supported?(path)
+      File.extname(path).in?(VIDEO_EXTS)
+    end
+  end
+
   private
   def path_should_exists
     unless path.present? && File.exist?(path)
@@ -19,8 +25,7 @@ class Video < ActiveRecord::Base
   end
 
   def path_file_extension
-    ext = File.extname(path)
-    unless ext.in?(VIDEO_EXTS)
+    unless Video.file_supported?(path)
       errors.add(:path, "extension is not supported")
     end
   end
