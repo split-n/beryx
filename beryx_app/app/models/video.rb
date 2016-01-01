@@ -13,7 +13,7 @@ class Video < ActiveRecord::Base
 
   class << self
     def file_supported?(path)
-      File.extname(path).in?(VIDEO_EXTS)
+      File.extname(path).downcase.in?(VIDEO_EXTS)
     end
   end
 

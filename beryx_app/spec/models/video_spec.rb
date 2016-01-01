@@ -94,6 +94,11 @@ RSpec.describe Video, type: :model do
               it { expect(subject.errors[:path]).to eq ["extension is not supported"] }
               it { expect(subject.errors.messages.length).to eq 1 }
             end
+
+            context "supported extension uppercase" do
+              let(:path) { "/exists/foo.MP4" }
+              it { is_expected.to be_valid }
+            end
           end
 
           context "pass crawl_directory_id" do
