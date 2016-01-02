@@ -1,3 +1,5 @@
+require 'find'
+
 class CrawlDirectory < ActiveRecord::Base
   include SoftDeletable
   validates :path, presence: true
@@ -26,6 +28,29 @@ class CrawlDirectory < ActiveRecord::Base
       end
     end
     succeed
+  end
+
+  def crawl_videos_and_create
+    crawl_exist_videos_path do |path|
+      if Video.find_by(path: path).blank?
+        videos.create(path: path)
+        logger.debug("created #{path}")
+      else
+        logger.debug("exists #{path}")
+      end
+    end
+  end
+
+  def crawl_exist_videos_path
+    raise if self.invalid?
+    return self.to_enum(__method__) unless block_given?
+
+    Find.find(self.path) do |path|
+      if Video.file_supported?(path)
+        yield path
+      end
+    end
+
   end
 
   private
