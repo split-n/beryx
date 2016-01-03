@@ -123,11 +123,7 @@ RSpec.describe CrawlDirectory, type: :model do
   end
 
   describe "#mark_as_deleted" do
-    let(:path) { "/valid/" }
-    let(:cd) {
-      allow(Dir).to receive(:exist?).with(path).and_return(true)
-      FG.create(:crawl_directory, path: path)
-    }
+    let(:cd) { FG.create(:crawl_directory) }
     subject { cd.mark_as_deleted }
 
     context "No videos" do
@@ -138,17 +134,15 @@ RSpec.describe CrawlDirectory, type: :model do
     end
 
     context "With videos" do
-      let(:video_path) { "/valid/abc.mp4" }
+      let(:video_path) { "#{cd.path}abc.mp4" }
       let!(:belong_video) {
         allow(File).to receive(:exist?).with(video_path).and_return(true)
         FG.create(:video, path: video_path, crawl_directory: cd)
       }
+      let!(:cd2) { FG.create(:crawl_directory) }
       let!(:not_belong_video) {
-        dir_path2 = "/valid2/"
-        video_path2 = "/valid2/foo.mp4"
-        allow(Dir).to receive(:exist?).with(dir_path2).and_return(true)
+        video_path2 = "#{cd2.path}foo.mp4"
         allow(File).to receive(:exist?).with(video_path2).and_return(true)
-        cd2 = FG.create(:crawl_directory, path: dir_path2)
         FG.create(:video, path: video_path2, crawl_directory: cd2)
       }
       it { expect{subject}.to change{belong_video.reload.deleted?}.from(false).to(true) }
@@ -160,9 +154,7 @@ RSpec.describe CrawlDirectory, type: :model do
 
   describe "#mark_as_active" do
     context "only one directory" do
-      before { allow(Dir).to receive(:exist?).with(path).and_return(true) }
-      let(:path) { "/valid/" }
-      let(:cd) { FG.create(:crawl_directory, path: path) }
+      let(:cd) { FG.create(:crawl_directory) }
       context "without video" do
         subject {
           cd.mark_as_deleted
@@ -173,7 +165,7 @@ RSpec.describe CrawlDirectory, type: :model do
       end
 
       context "with video" do
-        let(:video_path) { "/valid/abc.mp4" }
+        let(:video_path) { "#{cd.path}abc.mp4" }
         let!(:belong_video) {
           allow(File).to receive(:exist?).with(video_path).and_return(true)
           FG.create(:video, path: video_path, crawl_directory: cd)
@@ -187,18 +179,13 @@ RSpec.describe CrawlDirectory, type: :model do
     end
 
     context "2 directories" do
-      before { allow(Dir).to receive(:exist?).with(path1).and_return(true) }
-      before { allow(Dir).to receive(:exist?).with(path2).and_return(true) }
-
       describe "differ directories" do
-        let(:path1) { "/valid/" }
-        let(:path2) { "/vanilla/" }
         it "can make active" do
-          cd1 = FG.create(:crawl_directory, path: path1)
+          cd1 = FG.create(:crawl_directory)
           cd1.mark_as_deleted
           expect(cd1.deleted?).to eq true
 
-          FG.create(:crawl_directory, path: path2)
+          FG.create(:crawl_directory)
           expect(cd1.mark_as_active).to eq true
           expect(CrawlDirectory.active.count).to eq 2
           expect(CrawlDirectory.deleted.count).to eq 0
