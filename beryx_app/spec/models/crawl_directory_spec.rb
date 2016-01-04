@@ -204,4 +204,9 @@ RSpec.describe CrawlDirectory, type: :model do
     end
   end
 
+  context "directory is removed after created" do
+    let(:cd) { FG.create(:crawl_directory) }
+    subject { allow(Dir).to receive(:exist?).with(cd.path).and_return(false) }
+    it("still valid") { expect{subject}.not_to change{cd.valid?}.from(true) }
+  end
 end

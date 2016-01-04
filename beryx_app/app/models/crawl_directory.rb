@@ -5,7 +5,8 @@ class CrawlDirectory < ActiveRecord::Base
   validates :path, presence: true
   validates :path, format: {with: %r{\A/}, message: "must be started with /"}, if: -> { path.present? }
   validates :path, format: {with: %r{/\z}, message: "must be ended with /"}, if: -> { path.present? }
-  validate :path_should_exists, :path_should_not_include_others, :path_should_not_relative, if: -> { path.present? }
+  validate :path_should_exists, if: -> { path.present? }, on: :create
+  validate :path_should_not_include_others, :path_should_not_relative, if: -> { path.present? }
   has_many :videos, dependent: :destroy
 
   def can_mark_as_active?
@@ -42,7 +43,8 @@ class CrawlDirectory < ActiveRecord::Base
   end
 
   def crawl_exist_videos_path
-    raise if self.invalid?
+    raise if invalid?
+    raise unless path_exist?
     return self.to_enum(__method__) unless block_given?
 
     Find.find(self.path) do |path|
@@ -53,9 +55,13 @@ class CrawlDirectory < ActiveRecord::Base
 
   end
 
+  def path_exist?
+    path.present? && Dir.exist?(path)
+  end
+
   private
   def path_should_exists
-    unless path.present? && Dir.exist?(path)
+    unless path_exist?
       errors.add(:path, "directory not found")
     end
   end
