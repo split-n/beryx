@@ -170,6 +170,18 @@ RSpec.describe CrawlDirectory, type: :model do
         }
         it { expect{subject}.not_to change{belong_video.reload.deleted?}.from(false) }
       end
+
+      context "path is deleted" do
+        before {
+          cd.mark_as_deleted
+        }
+        subject {
+          allow(Dir).to receive(:exist?).with(cd.path).and_return(false)
+          cd.mark_as_active
+        }
+        it { expect{subject}.to raise_error(CrawlDirectory::PathNotFoundError)  }
+        it { expect{subject rescue nil}.not_to change{cd.deleted?}.from(true) }
+      end
     end
 
     context "2 directories" do
@@ -208,5 +220,14 @@ RSpec.describe CrawlDirectory, type: :model do
     let(:cd) { FG.create(:crawl_directory) }
     subject { allow(Dir).to receive(:exist?).with(cd.path).and_return(false) }
     it("still valid") { expect{subject}.not_to change{cd.valid?}.from(true) }
+  end
+
+  describe "#crawl_exist_videos_path" do
+    let(:cd) { FG.create(:crawl_directory) }
+    context "directory is removed" do
+      before { expect(Dir).to receive(:exist?).with(cd.path).and_return(false) }
+      subject { cd.crawl_exist_videos_path }
+      it { expect{subject}.to raise_error(CrawlDirectory::PathNotFoundError) }
+    end
   end
 end

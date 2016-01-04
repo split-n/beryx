@@ -1,6 +1,9 @@
 require 'find'
 
+
 class CrawlDirectory < ActiveRecord::Base
+  class PathNotFoundError < StandardError; end
+
   include SoftDeletable
   validates :path, presence: true
   validates :path, format: {with: %r{\A/}, message: "must be started with /"}, if: -> { path.present? }
@@ -21,6 +24,7 @@ class CrawlDirectory < ActiveRecord::Base
   end
 
   def mark_as_active
+    raise PathNotFoundError unless path_exist?
     deleted_at = self.deleted_at
     succeed = super
     if succeed && deleted_at
@@ -44,7 +48,7 @@ class CrawlDirectory < ActiveRecord::Base
 
   def crawl_exist_videos_path
     raise if invalid?
-    raise unless path_exist?
+    raise PathNotFoundError unless path_exist?
     return self.to_enum(__method__) unless block_given?
 
     Find.find(self.path) do |path|
