@@ -39,9 +39,7 @@ RSpec.describe Video, type: :model do
 
       context "path is relative" do
         let(:path) { "foo.mp4" }
-        before {
-          allow(File).to receive(:exist?).with(path).and_return(true)
-        }
+        before { allow(File).to receive(:exist?).with(path).and_return(true) }
         subject{ cd.videos.create(path: path, file_size: 300.megabyte) }
         it { expect(subject.errors[:crawl_directory]).to eq ["crawl directory is not parent of directory"] }
         it { expect(subject.errors.messages.length).to eq 1 }
@@ -60,9 +58,7 @@ RSpec.describe Video, type: :model do
         end
 
         context "with file_size" do
-          before {
-            allow(File).to receive(:exist?).with(path).and_return(true)
-          }
+          before { allow(File).to receive(:exist?).with(path).and_return(true) }
 
           context "pass wrong instance" do
             let(:cd) { Object.new }
