@@ -135,10 +135,7 @@ RSpec.describe CrawlDirectory, type: :model do
 
     context "With videos" do
       let(:video_path) { "#{cd.path}abc.mp4" }
-      let!(:belong_video) {
-        allow(File).to receive(:exist?).with(video_path).and_return(true)
-        FG.create(:video, path: video_path, crawl_directory: cd)
-      }
+      let!(:belong_video) { FG.create(:video, path: video_path, crawl_directory: cd) }
       let!(:cd2) { FG.create(:crawl_directory) }
       let!(:not_belong_video) {
         video_path2 = "#{cd2.path}foo.mp4"
@@ -166,10 +163,7 @@ RSpec.describe CrawlDirectory, type: :model do
 
       context "with video" do
         let(:video_path) { "#{cd.path}abc.mp4" }
-        let!(:belong_video) {
-          allow(File).to receive(:exist?).with(video_path).and_return(true)
-          FG.create(:video, path: video_path, crawl_directory: cd)
-        }
+        let!(:belong_video) { FG.create(:video, path: video_path, crawl_directory: cd) }
         subject {
           cd.mark_as_deleted
           cd.mark_as_active
