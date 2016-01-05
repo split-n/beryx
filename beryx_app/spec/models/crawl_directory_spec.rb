@@ -220,6 +220,7 @@ RSpec.describe CrawlDirectory, type: :model do
     let(:cd) { FG.create(:crawl_directory) }
     subject { allow(Dir).to receive(:exist?).with(cd.path).and_return(false) }
     it("still valid") { expect{subject}.not_to change{cd.valid?}.from(true) }
+    it("not exist") { expect{subject}.to change{cd.path_exist?}.from(true).to(false) }
   end
 
   describe "#crawl_exist_videos_path" do
