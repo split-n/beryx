@@ -4,7 +4,8 @@ class Video < ActiveRecord::Base
   belongs_to :crawl_directory
   validates :crawl_directory, presence: true
   validates :path, presence: true
-  validate :path_should_exists, :path_file_extension, :crawl_directory_should_active, :crawl_directory_should_be_parent, if: -> { path.present? }
+  validate :path_should_exists, if: -> { path.present? }, on: :create
+  validate :path_file_extension, :crawl_directory_should_active, :crawl_directory_should_be_parent, if: -> { path.present? }
 
   before_save do
     self.file_name = File.basename(path)
@@ -17,9 +18,13 @@ class Video < ActiveRecord::Base
     end
   end
 
+  def path_exist?
+    path.present? && File.exist?(path)
+  end
+
   private
   def path_should_exists
-    unless path.present? && File.exist?(path)
+    unless path_exist?
       errors.add(:path, "file not found")
     end
   end

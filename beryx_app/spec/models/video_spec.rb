@@ -105,4 +105,12 @@ RSpec.describe Video, type: :model do
       end
     end
   end
+
+  describe "file is deleted after created" do
+    let(:cd) { FG.create(:crawl_directory) }
+    let(:video) { FG.create(:video, crawl_directory: cd) }
+    subject { allow(File).to receive(:exist?).with(video.path).and_return(false)}
+    it { expect{subject}.not_to change{video.valid?}.from(true) }
+    it { expect{subject}.to change{video.path_exist?}.from(true).to(false) }
+  end
 end
