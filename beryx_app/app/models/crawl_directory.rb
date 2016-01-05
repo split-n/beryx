@@ -51,10 +51,8 @@ class CrawlDirectory < ActiveRecord::Base
     raise PathNotFoundError unless path_exist?
     return self.to_enum(__method__) unless block_given?
 
-    Find.find(self.path) do |path|
-      if Video.file_supported?(path)
-        yield path
-      end
+    Find.find(self.path).each do |path|
+      yield path if Video.file_supported?(path)
     end
 
   end

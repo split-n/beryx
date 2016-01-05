@@ -225,10 +225,24 @@ RSpec.describe CrawlDirectory, type: :model do
 
   describe "#crawl_exist_videos_path" do
     let(:cd) { FG.create(:crawl_directory) }
+    subject { cd.crawl_exist_videos_path }
     context "directory is removed" do
       before { expect(Dir).to receive(:exist?).with(cd.path).and_return(false) }
-      subject { cd.crawl_exist_videos_path }
       it { expect{subject}.to raise_error(CrawlDirectory::PathNotFoundError) }
     end
+
+    context "no files" do
+      before { expect(Find).to receive(:find).with(cd.path).and_return([cd.path]) }
+      it { expect(subject.to_a).to eq [] }
+    end
+
+    context "mixed files" do
+      let(:vids) { ["#{cd.path}foo.mp4", "#{cd.path}sub/123/foo.mkv"] }
+      let(:returns) { [cd.path, "#{cd.path}bar.txt"].concat(vids) }
+      before { expect(Find).to receive(:find).with(cd.path).and_return(returns.to_enum) }
+
+      it { expect(subject.to_a).to eq vids }
+    end
+
   end
 end
