@@ -1,20 +1,26 @@
-<div>
-  <p>Directories</p>
-  <ul>
-    <% @crawl_directories.each do |dir| %>
-      <li><%= dir.path %></li>
-    <% end %>
-  </ul>
-</div>
-<div>
-  <p>new</p>
-  <%= form_for(@crawl_directory) do |f| %>
-    <% if @crawl_directory.errors.any? %>
-      <%= @crawl_directory.errors.inspect %>
-    <% end %>
-    <%= f.label :path %>
-    <%= f.text_field :path %>
+<p id="notice"><%= notice %></p>
 
-    <%= f.submit "Create" %>
-  <% end %>
-</div>
+<h1>Listing Crawl Directories</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @crawl_directories.each do |crawl_directory| %>
+      <tr>
+        <td><%= crawl_directory.path %></td>
+        <td><%= link_to 'Show', crawl_directory %></td>
+        <td><%= link_to 'Edit', edit_crawl_directory_path(crawl_directory) %></td>
+        <td><%= link_to 'Destroy', crawl_directory, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Crawl directory', new_crawl_directory_path %>

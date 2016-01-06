@@ -1,0 +1,18 @@
+<%= form_for(@crawl_directory) do |f| %>
+  <% if @crawl_directory.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@crawl_directory.errors.count, "error") %> prohibited this crawl_directory from being saved:</h2>
+
+      <ul>
+      <% @crawl_directory.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="actions">
+    <%= f.text_field :path %>
+    <%= f.submit %>
+  </div>
+<% end %>
