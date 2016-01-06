@@ -2,7 +2,7 @@ class CrawlDirectoriesController < ApplicationController
   before_action :set_crawl_directory, only: [:show, :destroy]
 
   def index
-    @crawl_directories = CrawlDirectory.all
+    @crawl_directories = CrawlDirectory.active
   end
 
   def show
@@ -23,7 +23,7 @@ class CrawlDirectoriesController < ApplicationController
   end
 
   def destroy
-    @crawl_directory.destroy
+    @crawl_directory.mark_as_deleted
     redirect_to crawl_directories_url, notice: 'Crawl directory was successfully destroyed.'
   end
 
