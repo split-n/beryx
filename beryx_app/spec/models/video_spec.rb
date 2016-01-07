@@ -54,7 +54,7 @@ RSpec.describe Video, type: :model do
             allow(File).to receive(:size).with(path).and_return(300.megabyte)
           }
           subject{ cd.videos.create(path: path) }
-          it { is_expected.to be_valid }
+          it { should be_valid }
         end
 
         context "with file_size" do
@@ -70,7 +70,7 @@ RSpec.describe Video, type: :model do
             subject{ cd.videos.create(path: path, file_size: 300.megabyte) }
 
             context "correct" do
-              it { is_expected.to be_valid }
+              it { should be_valid }
             end
 
             context "CrawlDirectory is deleted" do
@@ -93,13 +93,13 @@ RSpec.describe Video, type: :model do
 
             context "supported extension uppercase" do
               let(:path) { "/exists/foo.MP4" }
-              it { is_expected.to be_valid }
+              it { should be_valid }
             end
           end
 
           context "pass crawl_directory_id" do
             subject{ Video.create(crawl_directory_id: cd.id, path: path, file_size: 300.megabyte) }
-            it { is_expected.to be_valid }
+            it { should be_valid }
           end
         end
       end

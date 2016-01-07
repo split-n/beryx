@@ -30,7 +30,7 @@ RSpec.describe CrawlDirectory, type: :model do
         before { allow(Dir).to receive(:exist?).with(path).and_return(true) }
         context "when valid path" do
           let(:path) { "/found/" }
-          it { is_expected.to be_valid }
+          it { should be_valid }
           it { expect{subject}.to change{CrawlDirectory.active.count}.from(0).to(1) }
         end
 
@@ -87,13 +87,13 @@ RSpec.describe CrawlDirectory, type: :model do
 
       context "when differ" do
         let(:path2) { "/foo/baz/" }
-        it{ is_expected.to be_valid }
+        it{ should be_valid }
         it { expect{subject}.to change{CrawlDirectory.active.count}.by(1) }
       end
 
       context "when differ 2" do
         let(:path2) { "/gat/bar/" }
-        it{ is_expected.to be_valid }
+        it{ should be_valid }
         it { expect{subject}.to change{CrawlDirectory.active.count}.by(1) }
       end
 
@@ -101,13 +101,13 @@ RSpec.describe CrawlDirectory, type: :model do
         before { cd1.mark_as_deleted }
         context "and same path" do
           let(:path2) { "/foo/bar/" }
-          it { is_expected.to be_valid }
+          it { should be_valid }
           it { expect{subject}.to change{CrawlDirectory.active.count}.by(1) }
         end
 
         context "and other directory is included" do
           let(:path2) { "/foo/" }
-          it { is_expected.to be_valid }
+          it { should be_valid }
           it { expect{subject}.to change{CrawlDirectory.active.count}.by(1) }
         end
       end
@@ -157,7 +157,7 @@ RSpec.describe CrawlDirectory, type: :model do
           cd.mark_as_deleted
           cd.mark_as_active
         }
-        it { is_expected.to eq true }
+        it { should eq true }
         it { expect{subject}.not_to change{cd.valid?}.from(true) }
       end
 
