@@ -1,4 +1,5 @@
 class CrawlDirectoriesController < ApplicationController
+  before_action :ensure_admin_user
   before_action :set_crawl_directory, only: [:show, :destroy]
 
   def index
@@ -34,5 +35,9 @@ class CrawlDirectoriesController < ApplicationController
 
     def crawl_directory_params
       params.require(:crawl_directory).permit(:path)
+    end
+
+    def ensure_admin_user
+      redirect_to login_path unless logged_in? && current_user.admin?
     end
 end
