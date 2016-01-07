@@ -245,4 +245,16 @@ RSpec.describe CrawlDirectory, type: :model do
     end
 
   end
+
+  describe "ignores changing path" do
+    let(:cd) { FG.create(:crawl_directory) }
+    let(:cd_path) { cd.path }
+    let(:changed_path) { "/changed/foo/" }
+    subject {
+      cd.path = changed_path
+      cd.save!
+    }
+
+    it { expect{subject}.not_to change{cd.reload.path}.from(cd_path) }
+  end
 end

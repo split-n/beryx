@@ -16,6 +16,7 @@ class CrawlDirectory < ActiveRecord::Base
   class PathNotFoundError < StandardError; end
 
   include SoftDeletable
+  attr_readonly :path
   validates :path, presence: true
   validates :path, format: {with: %r{\A/}, message: "must be started with /"}, if: -> { path.present? }
   validates :path, format: {with: %r{/\z}, message: "must be ended with /"}, if: -> { path.present? }
