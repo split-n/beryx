@@ -36,8 +36,4 @@ class CrawlDirectoriesController < ApplicationController
     def crawl_directory_params
       params.require(:crawl_directory).permit(:path)
     end
-
-    def ensure_admin_user
-      redirect_to login_path unless logged_in? && current_user.admin?
-    end
 end
