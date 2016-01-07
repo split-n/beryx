@@ -19,21 +19,25 @@ RSpec.describe User, type: :model do
       context "is nil" do
         let(:login_id) { nil }
         it { should_not be_valid}
+        it { expect(subject.errors[:login_id]).to  include "can't be blank" }
       end
 
       context "length is 2" do
         let(:login_id) { "fo" }
         it { should_not be_valid}
+        it { expect(subject.errors[:login_id]).to include match "is too short" }
       end
 
       context "contain hyphen" do
         let(:login_id) { "foo-bar" }
         it { should_not be_valid}
+        it { expect(subject.errors[:login_id]).to include match "is invalid" }
       end
 
       context "contain space" do
         let(:login_id) { "foo bar" }
         it { should_not be_valid}
+        it { expect(subject.errors[:login_id]).to include match "is invalid" }
       end
 
       context "length is 20" do
@@ -44,6 +48,7 @@ RSpec.describe User, type: :model do
       context "length is 21" do
         let(:login_id) { "a"*21 }
         it { should_not be_valid}
+        it { expect(subject.errors[:login_id]).to include match "is too long" }
       end
 
       context "only numeric" do
@@ -59,11 +64,13 @@ RSpec.describe User, type: :model do
       context "is not set" do
         let(:password) { nil }
         it { should_not be_valid }
+        it { expect(subject.errors[:password]).to include "can't be blank" }
       end
 
       context "length is 6" do
         let(:password) { "a"*6 }
         it { should_not be_valid }
+        it { expect(subject.errors[:password]).to include match "is too short" }
       end
 
       context "length is 7" do
@@ -93,12 +100,14 @@ RSpec.describe User, type: :model do
         let(:password) { nil }
         let(:password_confirmation) { "password" }
         it { should_not be_valid }
+        it { expect(subject.errors[:password]).to include match "can't be blank" }
       end
 
       context "is differ" do
         let(:password) {  "password" }
         let(:password_confirmation) { "passxxxx" }
         it { should_not be_valid }
+        it { expect(subject.errors[:password_confirmation]).to include match "doesn't match Password" }
       end
 
     end
