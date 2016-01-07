@@ -3,8 +3,8 @@
 # Table name: users
 #
 #  id              :integer          not null, primary key
-#  login_id        :string
-#  password_digest :string
+#  login_id        :string           not null
+#  password_digest :string           not null
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  admin           :boolean          default(FALSE), not null
