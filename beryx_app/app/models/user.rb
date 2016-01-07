@@ -11,6 +11,7 @@
 #
 
 class User < ActiveRecord::Base
+  attr_readonly :login_id
   validates :login_id, presence: true,
              length: { minimum: 3, maximum: 20 },
              format: { with: /\A\w{3,20}\z/ }

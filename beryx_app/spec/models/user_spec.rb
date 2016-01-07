@@ -112,4 +112,15 @@ RSpec.describe User, type: :model do
 
     end
   end
+
+  describe "ignores changing login_id" do
+    let(:user) { FG.create(:user) }
+    let!(:user_login_id) { user.login_id }
+    subject {
+      user.login_id = "foo00000"
+      user.save!
+    }
+
+    it { expect{subject}.not_to change{user.reload.login_id}.from(user_login_id) }
+  end
 end
