@@ -123,4 +123,12 @@ RSpec.describe User, type: :model do
 
     it { expect{subject}.not_to change{user.reload.login_id}.from(user_login_id) }
   end
+
+  describe "create dup login_id" do
+    subject {
+      User.create(login_id: "plugin", password: "password")
+      User.create(login_id: "plugin", password: "password2")
+    }
+    it { expect(subject.errors[:login_id]).to include "has already been taken" }
+  end
 end
