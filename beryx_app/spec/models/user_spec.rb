@@ -131,4 +131,58 @@ RSpec.describe User, type: :model do
     }
     it { expect(subject.errors[:login_id]).to include "has already been taken" }
   end
+
+  describe "change to admin user" do
+    let(:user) { User.create(login_id: "foobar", password: "password") }
+    subject {
+      user.admin = true
+      user.save!
+    }
+    it { expect(user).to be_valid }
+    it { expect{subject}.to change{user.reload.admin?}.from(false).to(true) }
+  end
+
+  describe "change password" do
+    let(:user) { FG.create(:user) }
+    context "only password" do
+      subject {
+        user.password = password
+        user.save
+        user
+      }
+      context "short password" do
+        let(:password) { "abc" }
+        it { should_not be_valid}
+      end
+
+      context "valid password" do
+        let(:password) { "password128" }
+        it { should be_valid}
+      end
+
+    end
+
+    context "with confirmation" do
+      subject {
+        user.password = password
+        user.password_confirmation = password_confirmation
+        user.save
+        user
+      }
+
+      context "valid" do
+        let(:password) { "password128" }
+        let(:password_confirmation) { password }
+        it { should be_valid}
+      end
+
+      context "mismatch" do
+        let(:password) { "password128" }
+        let(:password_confirmation) { "password999" }
+        it { should_not be_valid}
+        it { expect(subject.errors[:password_confirmation]).to include match "doesn't match Password" }
+      end
+
+    end
+  end
 end

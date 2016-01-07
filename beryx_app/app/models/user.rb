@@ -16,6 +16,6 @@ class User < ActiveRecord::Base
              length: { minimum: 3, maximum: 20 },
              format: { with: /\A\w{3,20}\z/ },
              uniqueness: true
-  validates :password, length: { minimum: 7 }
+  validates :password, length: { minimum: 7 }, if: -> { new_record? || password.present? }
   has_secure_password
 end
