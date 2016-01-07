@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: crawl_directories
+#
+#  id         :integer          not null, primary key
+#  path       :text             not null
+#  deleted_at :datetime
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+
 require 'find'
 
 

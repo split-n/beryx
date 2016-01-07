@@ -1,3 +1,26 @@
+# == Schema Information
+#
+# Table name: videos
+#
+#  id                 :integer          not null, primary key
+#  crawl_directory_id :integer
+#  path               :text             not null
+#  file_name          :text             not null
+#  file_size          :integer          not null
+#  deleted_at         :datetime
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#
+# Indexes
+#
+#  index_videos_on_crawl_directory_id  (crawl_directory_id)
+#  index_videos_on_path                (path) UNIQUE
+#
+# Foreign Keys
+#
+#  fk_rails_b52ccf2fa6  (crawl_directory_id => crawl_directories.id)
+#
+
 class Video < ActiveRecord::Base
   include SoftDeletable
   VIDEO_EXTS = %w(.mp4 .mkv) # temp
