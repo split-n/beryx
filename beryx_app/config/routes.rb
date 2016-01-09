@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  root 'videos#index'
+
+  get '/videos/:id', to: "videos#show"
+
   resources :crawl_directories, only: [:index, :show, :new, :create, :destroy]
 
   get 'login' => 'sessions#new'
