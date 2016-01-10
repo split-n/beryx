@@ -30,4 +30,19 @@ RSpec.describe SessionsController, type: :controller do
       expect(session[:user_id]).to eq nil
     end
   end
+
+  describe "#destroy" do
+    it "work logout" do
+      session[:user_id] = user.id
+      delete :destroy
+      expect(response).to redirect_to login_path
+      expect(session[:user_id]).to eq nil
+    end
+
+    it "noop when not logged" do
+      delete :destroy
+      expect(response).to redirect_to login_path
+      expect(session[:user_id]).to eq nil
+    end
+  end
 end
