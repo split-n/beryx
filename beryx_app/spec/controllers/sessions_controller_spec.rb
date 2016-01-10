@@ -27,7 +27,7 @@ RSpec.describe SessionsController, type: :controller do
     it "wrong input" do
       post :create, user: { login_id: "foobar", password: "12345678" }
       expect(response).to render_template :new
-      expect(session[:user_id]).to eq nil
+      expect(session[:user_id]).to be_nil
     end
   end
 
@@ -36,13 +36,13 @@ RSpec.describe SessionsController, type: :controller do
       log_in_as(user)
       delete :destroy
       expect(response).to redirect_to login_path
-      expect(session[:user_id]).to eq nil
+      expect(session[:user_id]).to be_nil
     end
 
     it "noop when not logged" do
       delete :destroy
       expect(response).to redirect_to login_path
-      expect(session[:user_id]).to eq nil
+      expect(session[:user_id]).to be_nil
     end
   end
 end
