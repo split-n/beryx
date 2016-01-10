@@ -33,7 +33,7 @@ RSpec.describe SessionsController, type: :controller do
 
   describe "#destroy" do
     it "work logout" do
-      session[:user_id] = user.id
+      log_in_as(user)
       delete :destroy
       expect(response).to redirect_to login_path
       expect(session[:user_id]).to eq nil

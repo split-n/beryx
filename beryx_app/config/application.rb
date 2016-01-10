@@ -29,5 +29,7 @@ module BeryxApp
       g.test_framework :rspec, fixture: true
       g.fixture_replacement :factory_girl
     end
+
+    config.autoload_paths += %W(#{config.root}/spec/helpers)
   end
 end

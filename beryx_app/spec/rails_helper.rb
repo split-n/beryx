@@ -54,6 +54,9 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
+
+  config.include ControllerSpecHelper, type: :controller
+  config.include FeatureSpecHelper, type: :feature
 end
 
 FactoryGirl::SyntaxRunner.class_eval do
@@ -61,3 +64,4 @@ FactoryGirl::SyntaxRunner.class_eval do
 end
 
 FG=FactoryGirl
+
