@@ -18,6 +18,10 @@ module SessionsHelper
   end
 
   def ensure_admin_user
-    redirect_to login_path unless logged_in? && current_user.admin?
+    redirect_to login_path unless current_user&.admin?
+  end
+
+  def ensure_logged_user
+    redirect_to login_path unless logged_in?
   end
 end
