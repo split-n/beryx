@@ -14,13 +14,13 @@ RSpec.describe SessionsController, type: :controller do
   describe "#create" do
     it "normal user login" do
       post :create, user: { login_id: user.login_id, password: user.password }
-      expect(response).to redirect_to "/"
+      expect(response).to redirect_to root_path
       expect(session[:user_id]).to eq user.id
     end
 
     it "admin user login" do
       post :create, user: { login_id: user_admin.login_id, password: user_admin.password }
-      expect(response).to redirect_to "/"
+      expect(response).to redirect_to root_path
       expect(session[:user_id]).to eq user_admin.id
     end
 
