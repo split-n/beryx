@@ -57,6 +57,11 @@ RSpec.configure do |config|
 
   config.include ControllerSpecHelper, type: :controller
   config.include FeatureSpecHelper, type: :feature
+
+  config.before(:each) do
+    allow(Dir).to receive(:exist?).and_call_original
+    allow(File).to receive(:exist?).and_call_original
+  end
 end
 
 FactoryGirl::SyntaxRunner.class_eval do
@@ -64,4 +69,3 @@ FactoryGirl::SyntaxRunner.class_eval do
 end
 
 FG=FactoryGirl
-
