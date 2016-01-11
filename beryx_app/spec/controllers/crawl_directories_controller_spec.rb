@@ -71,8 +71,9 @@ RSpec.describe CrawlDirectoriesController, type: :controller do
     end
 
     context "with crawl directory" do
+      let(:cd) { FG.create(:crawl_directory) }
       subject {
-        get :show, id: crawl_directory.id
+        get :show, id: cd.id
       }
 
       context "not logged" do
@@ -89,7 +90,7 @@ RSpec.describe CrawlDirectoriesController, type: :controller do
         include_context "logged_admin_user"
         it "render page" do
           subject
-          expect(page).to render_template :show
+          expect(response).to render_template :show
         end
       end
     end
