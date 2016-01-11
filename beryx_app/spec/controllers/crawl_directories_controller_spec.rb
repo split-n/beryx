@@ -69,15 +69,31 @@ RSpec.describe CrawlDirectoriesController, type: :controller do
         it { expect{subject}.to raise_error ActiveRecord::RecordNotFound }
       end
     end
+
+    context "with crawl directory" do
+      subject {
+        get :show, id: crawl_directory.id
+      }
+
+      context "not logged" do
+        include_context "not_logged"
+        it_behaves_like "login_required"
+      end
+
+      context "logged with normal user" do
+        include_context "logged_normal_user"
+        it_behaves_like "login_required"
+      end
+
+      context "logged with admin user" do
+        include_context "logged_admin_user"
+        it "render page" do
           subject
-          expect(response).to have_http_status(:not_found)
+          expect(page).to render_template :show
         end
       end
     end
 
-    subject {
-      get :show, id: crawl_directory.id
-    }
 
 
   end
