@@ -66,7 +66,9 @@ RSpec.describe CrawlDirectoriesController, type: :controller do
 
       context "logged with admin user" do
         include_context "logged_admin_user"
-        it "renders 404" do
+        it { expect{subject}.to raise_error ActiveRecord::RecordNotFound }
+      end
+    end
           subject
           expect(response).to have_http_status(:not_found)
         end
