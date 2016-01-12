@@ -51,6 +51,10 @@ group :development do
   gem 'sinatra', :require => nil
 end
 
+group :test do
+  gem 'rspec-sidekiq'
+end
+
 group :production do
   gem 'unicorn'
 end
