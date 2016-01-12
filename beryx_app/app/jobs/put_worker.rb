@@ -1,5 +1,7 @@
-class PutJob < ActiveJob::Base
-  queue_as :default
+class PutWorker
+  include Sidekiq::Worker
+  sidekiq_options queue: :default,
+                  unique: :while_executing
 
   def perform(prefix="")
     40.times do
