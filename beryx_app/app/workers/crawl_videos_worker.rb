@@ -6,8 +6,13 @@ class CrawlVideosWorker
 
   class << self
     def queued?(crawl_directory_id)
-      Sidekiq::Queue.new("crawl_videos")&.select{|job|
-        job.item["class"] == "CrawlVideosWorker" && job.item["args"] == [crawl_directory_id]
+      jobs = if CrawlVideosWorker.respond_to?(:jobs) # on testing
+        CrawlVideosWorker.jobs
+      else
+        Sidekiq::Queue.new("crawl_videos")&.map{|x| x.item}
+      end
+      jobs&.select{|job|
+        job["class"] == "CrawlVideosWorker" && job["args"] == [crawl_directory_id]
       }.present?
     end
 
