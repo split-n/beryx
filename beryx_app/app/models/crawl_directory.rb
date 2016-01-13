@@ -2,11 +2,13 @@
 #
 # Table name: crawl_directories
 #
-#  id         :integer          not null, primary key
-#  path       :text             not null
-#  deleted_at :datetime
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
+#  id               :integer          not null, primary key
+#  path             :text             not null
+#  deleted_at       :datetime
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  crawl_job_status :integer          not null
+#  crawl_jid        :string
 #
 
 require 'find'
@@ -14,6 +16,8 @@ require 'find'
 
 class CrawlDirectory < ActiveRecord::Base
   class PathNotFoundError < StandardError; end
+
+  enum crawl_job_status: { not_running: 0, queued: 1, running: 2 }
 
   include SoftDeletable
   attr_readonly :path
@@ -23,6 +27,10 @@ class CrawlDirectory < ActiveRecord::Base
   validate :path_should_exists, if: -> { path.present? }, on: :create
   validate :path_should_not_include_others, :path_should_not_relative, if: -> { path.present? }
   has_many :videos, dependent: :destroy
+
+  before_save do
+    self.crawl_job_status = :not_running
+  end
 
   def can_mark_as_active?
     duplicated_directory.nil?

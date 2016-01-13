@@ -11,16 +11,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160112115549) do
+ActiveRecord::Schema.define(version: 20160113055939) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "crawl_directories", force: :cascade do |t|
-    t.text     "path",       null: false
+    t.text     "path",             null: false
     t.datetime "deleted_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+    t.integer  "crawl_job_status", null: false
+    t.string   "crawl_jid"
   end
 
   create_table "users", force: :cascade do |t|
