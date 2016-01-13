@@ -56,6 +56,11 @@ RSpec.feature "CrawlDirectories", type: :feature do
         visit crawl_directory_path(cd)
         expect(page).to have_content cd.path
       end
+
+      it "has start crawl button" do
+        visit crawl_directory_path(cd)
+        expect(page).to have_selector(:link_or_button, "Execute crawl")
+      end
     end
   end
 

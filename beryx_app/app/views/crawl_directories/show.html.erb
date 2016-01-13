@@ -1,3 +1,8 @@
 <p id="notice"><%= notice %></p>
 <p><%= @crawl_directory.path %></p>
+<p>
+  <%= form_tag do %>
+    <%= button_tag("Execute crawl") %>
+  <% end %>
+</p>
 <%= link_to 'Back', crawl_directories_path %>
