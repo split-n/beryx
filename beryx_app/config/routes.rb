@@ -4,7 +4,9 @@ Rails.application.routes.draw do
   get '/videos/:id', to: "videos#show"
 
   resources :crawl_directories, only: [:index, :show, :new, :create, :destroy] do
-    post "queue_crawl" => "crawl_directories#queue_crawl" # idではなくcrawl_directory_idになるのをなんとかする
+    member do
+      post "queue_crawl" => "crawl_directories#queue_crawl"
+    end
   end
 
   get 'login' => 'sessions#new'

@@ -35,7 +35,6 @@ class CrawlDirectoriesController < ApplicationController
 
   private
     def set_crawl_directory
-      binding.pry
       @crawl_directory = CrawlDirectory.find(params[:id])
     end
 
