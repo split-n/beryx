@@ -225,7 +225,7 @@ RSpec.describe CrawlDirectory, type: :model do
 
   describe "#crawl_exist_videos_path" do
     let(:cd) { FG.create(:crawl_directory) }
-    subject { cd.crawl_exist_videos_path }
+    subject { cd.send(:crawl_exist_videos_path) }
     context "directory is removed" do
       before { expect(Dir).to receive(:exist?).with(cd.path).and_return(false) }
       it { expect{subject}.to raise_error(CrawlDirectory::PathNotFoundError) }

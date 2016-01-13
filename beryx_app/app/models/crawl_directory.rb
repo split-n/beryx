@@ -2,11 +2,13 @@
 #
 # Table name: crawl_directories
 #
-#  id         :integer          not null, primary key
-#  path       :text             not null
-#  deleted_at :datetime
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
+#  id               :integer          not null, primary key
+#  path             :text             not null
+#  deleted_at       :datetime
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  crawl_job_status :integer          not null
+#  crawl_jid        :string
 #
 
 require 'find'
@@ -14,6 +16,8 @@ require 'find'
 
 class CrawlDirectory < ActiveRecord::Base
   class PathNotFoundError < StandardError; end
+
+  enum crawl_job_status: { not_running: 0, queued: 1, running: 2 }
 
   include SoftDeletable
   attr_readonly :path
@@ -23,6 +27,10 @@ class CrawlDirectory < ActiveRecord::Base
   validate :path_should_exists, if: -> { path.present? }, on: :create
   validate :path_should_not_include_others, :path_should_not_relative, if: -> { path.present? }
   has_many :videos, dependent: :destroy
+
+  before_save do
+    self.crawl_job_status ||= :not_running
+  end
 
   def can_mark_as_active?
     duplicated_directory.nil?
@@ -47,7 +55,21 @@ class CrawlDirectory < ActiveRecord::Base
     succeed
   end
 
+  def enqueue_crawl_videos_and_create
+    jid = CrawlVideosWorker.perform_async(id)
+    self.crawl_job_status = :queued
+    self.crawl_jid = jid
+    save!
+  end
+
+  def path_exist?
+    path.present? && Dir.exist?(path)
+  end
+
   def crawl_videos_and_create
+    self.crawl_job_status = :running
+    save!
+
     crawl_exist_videos_path do |path|
       if Video.find_by(path: path).blank?
         videos.create(path: path)
@@ -56,23 +78,11 @@ class CrawlDirectory < ActiveRecord::Base
         logger.debug("exists #{path}")
       end
     end
+
+    self.crawl_job_status = :not_running
+    self.crawl_jid = nil
+    save!
   end
-
-  def crawl_exist_videos_path
-    raise if invalid?
-    raise PathNotFoundError unless path_exist?
-    return self.to_enum(__method__) unless block_given?
-
-    Find.find(self.path).each do |path|
-      yield path if Video.file_supported?(path)
-    end
-
-  end
-
-  def path_exist?
-    path.present? && Dir.exist?(path)
-  end
-
   private
   def path_should_exists
     unless path_exist?
@@ -103,5 +113,17 @@ class CrawlDirectory < ActiveRecord::Base
     p1 = d1.path.downcase
     p2 = self.path.downcase
     p1.start_with?(p2) || p2.start_with?(p1)
+  end
+
+
+  def crawl_exist_videos_path
+    raise if invalid?
+    raise PathNotFoundError unless path_exist?
+    return self.to_enum(__method__) unless block_given?
+
+    Find.find(self.path).each do |path|
+      yield path if Video.file_supported?(path)
+    end
+
   end
 end
