@@ -55,37 +55,11 @@ class CrawlDirectory < ActiveRecord::Base
     succeed
   end
 
-  def crawl_videos_and_create_enqueue
+  def enqueue_crawl_videos_and_create
     jid = CrawlVideosWorker.perform_async(id)
     self.crawl_job_status = :queued
     self.crawl_jid = jid
     save!
-  end
-
-  def crawl_videos_and_create
-    crawl_exist_videos_path do |path|
-      if Video.find_by(path: path).blank?
-        videos.create(path: path)
-        logger.debug("created #{path}")
-      else
-        logger.debug("exists #{path}")
-      end
-    end
-
-    self.crawl_job_status = :not_running
-    self.crawl_jid = nil
-    save!
-  end
-
-  def crawl_exist_videos_path
-    raise if invalid?
-    raise PathNotFoundError unless path_exist?
-    return self.to_enum(__method__) unless block_given?
-
-    Find.find(self.path).each do |path|
-      yield path if Video.file_supported?(path)
-    end
-
   end
 
   def path_exist?
@@ -122,5 +96,31 @@ class CrawlDirectory < ActiveRecord::Base
     p1 = d1.path.downcase
     p2 = self.path.downcase
     p1.start_with?(p2) || p2.start_with?(p1)
+  end
+
+  def crawl_videos_and_create
+    crawl_exist_videos_path do |path|
+      if Video.find_by(path: path).blank?
+        videos.create(path: path)
+        logger.debug("created #{path}")
+      else
+        logger.debug("exists #{path}")
+      end
+    end
+
+    self.crawl_job_status = :not_running
+    self.crawl_jid = nil
+    save!
+  end
+
+  def crawl_exist_videos_path
+    raise if invalid?
+    raise PathNotFoundError unless path_exist?
+    return self.to_enum(__method__) unless block_given?
+
+    Find.find(self.path).each do |path|
+      yield path if Video.file_supported?(path)
+    end
+
   end
 end

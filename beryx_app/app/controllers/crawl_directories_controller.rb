@@ -1,6 +1,6 @@
 class CrawlDirectoriesController < ApplicationController
   before_action :ensure_admin_user
-  before_action :set_crawl_directory, only: [:show, :destroy]
+  before_action :set_crawl_directory, only: [:show, :destroy, :queue_crawl]
 
   def index
     @crawl_directories = CrawlDirectory.active
@@ -28,8 +28,14 @@ class CrawlDirectoriesController < ApplicationController
     redirect_to crawl_directories_url, notice: 'Crawl directory was successfully destroyed.'
   end
 
+  def queue_crawl
+    @crawl_directory.enqueue_crawl_videos_and_create
+    redirect_to crawl_directory_path(@crawl_directory)
+  end
+
   private
     def set_crawl_directory
+      binding.pry
       @crawl_directory = CrawlDirectory.find(params[:id])
     end
 

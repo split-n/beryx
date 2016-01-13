@@ -1,7 +1,7 @@
 <p id="notice"><%= notice %></p>
 <p><%= @crawl_directory.path %></p>
 <p>
-  <%= form_tag do %>
+  <%= form_tag  crawl_directory_queue_crawl_path(@crawl_directory) do %>
       <% case(@crawl_directory.crawl_job_status)
          when "not_running" %>
           <%= button_tag "Execute crawl" %>
