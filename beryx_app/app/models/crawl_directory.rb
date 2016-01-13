@@ -68,6 +68,8 @@ class CrawlDirectory < ActiveRecord::Base
 
   def crawl_videos_and_create
     self.crawl_job_status = :running
+    save!
+
     crawl_exist_videos_path do |path|
       if Video.find_by(path: path).blank?
         videos.create(path: path)

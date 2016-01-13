@@ -5,7 +5,6 @@ class CrawlVideosWorker
                   unique: :while_executing
 
   def perform(crawl_directory_id)
-    sleep 60
     crawl_directory = CrawlDirectory.find(crawl_directory_id)
     crawl_directory.crawl_videos_and_create
   end
