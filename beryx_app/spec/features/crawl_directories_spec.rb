@@ -59,7 +59,15 @@ RSpec.feature "CrawlDirectories", type: :feature do
 
       it "has start crawl button" do
         visit crawl_directory_path(cd)
-        expect(page).to have_selector(:link_or_button, "Execute crawl")
+        expect(page).to have_button "Execute crawl"
+      end
+
+      it "start button disabled when job running" do
+        cd.crawl_job_status = :running
+        cd.save!
+        visit crawl_directory_path(cd)
+        expect(page).to have_content "Job running"
+        expect(page).to have_css "button[disabled]"
       end
     end
   end
