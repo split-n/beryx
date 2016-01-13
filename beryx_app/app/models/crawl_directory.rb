@@ -66,6 +66,21 @@ class CrawlDirectory < ActiveRecord::Base
     path.present? && Dir.exist?(path)
   end
 
+  def crawl_videos_and_create
+    self.crawl_job_status = :running
+    crawl_exist_videos_path do |path|
+      if Video.find_by(path: path).blank?
+        videos.create(path: path)
+        logger.debug("created #{path}")
+      else
+        logger.debug("exists #{path}")
+      end
+    end
+
+    self.crawl_job_status = :not_running
+    self.crawl_jid = nil
+    save!
+  end
   private
   def path_should_exists
     unless path_exist?
@@ -98,20 +113,6 @@ class CrawlDirectory < ActiveRecord::Base
     p1.start_with?(p2) || p2.start_with?(p1)
   end
 
-  def crawl_videos_and_create
-    crawl_exist_videos_path do |path|
-      if Video.find_by(path: path).blank?
-        videos.create(path: path)
-        logger.debug("created #{path}")
-      else
-        logger.debug("exists #{path}")
-      end
-    end
-
-    self.crawl_job_status = :not_running
-    self.crawl_jid = nil
-    save!
-  end
 
   def crawl_exist_videos_path
     raise if invalid?
