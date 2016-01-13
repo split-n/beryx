@@ -10,3 +10,4 @@
     - postgresql
     - nginx
     - redis
+    - ffmpeg

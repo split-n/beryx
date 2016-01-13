@@ -1,0 +1,8 @@
+---
+# vim:ft=ansible
+- name: add trusty-media ppa
+  apt_repository: repo='ppa:mc3man/trusty-media'
+  sudo: true
+- name: Install ffmpeg
+  apt: name=ffmpeg state=latest update_cache=yes
+  sudo: true
