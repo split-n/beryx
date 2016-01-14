@@ -10,4 +10,6 @@
     - postgresql
     - nginx
     - redis
-    - { role: "ansible-ffmpeg", sudo: yes }
+    - ffmpeg
+
+

@@ -1,0 +1,26 @@
+---
+ffmpeg_tmp_dir: "/home/{{ ansible_ssh_user }}/ffmpeg-factory"
+ffmpeg_src_dir: "{{ ffmpeg_tmp_dir }}/src"
+ffmpeg_refspec: master
+ffmpeg_deps:
+  - cmake
+  - libass-dev
+  - libfreetype6-dev
+  - libtheora-dev
+  - libtool
+  - libvorbis-dev
+  - pkg-config 
+  - texi2html
+  - zlib1g-dev
+  - autoconf
+  - automake
+  - pkg-config
+  - yasm
+  - libx264-dev
+  - libx265-dev
+  - libmp3lame-dev
+  - libopus-dev
+  - libvpx-dev
+  - libnuma-dev
+    
+

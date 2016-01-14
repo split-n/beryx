@@ -19,6 +19,7 @@
     - tmux
     - vim-nox
     - htop
+    - checkinstall
 - name: Install language-pack-ja
   apt: name=language-pack-ja
   sudo: true

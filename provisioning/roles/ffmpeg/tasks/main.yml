@@ -1,0 +1,58 @@
+---
+- name: set ld path
+  lineinfile: 
+    dest="/etc/ld.so.conf"
+    line="include /usr/local/lib"
+- name: install ffmpeg dependency
+  apt: name={{ item }} state=present update_cache=true
+  sudo: yes
+  with_items: ffmpeg_deps
+
+- name: clone latest fdk-aac
+  git: >
+    repo=https://github.com/mstorsjo/fdk-aac.git
+    dest={{ ffmpeg_src_dir }}/fdk-aac
+    accept_hostkey=true
+    depth=1
+
+- name: clone latest ffmpeg
+  git: >
+    repo=git://github.com/FFmpeg/FFmpeg.git
+    dest={{ ffmpeg_src_dir }}/ffmpeg
+    accept_hostkey=true
+    refspec={{ ffmpeg_refspec }}
+    depth=1
+
+- name: configure&make fdk-aac
+  shell: |
+     make distclean
+     autoreconf -fiv
+     ./configure
+     make
+  args:
+    chdir: "{{ ffmpeg_src_dir }}/fdk-aac"
+    creates: "{{ ffmpeg_src_dir }}/fdk-aac/libfdk-aac.la"
+    
+- name: install fdk-aac
+  sudo: yes
+  shell: checkinstall --pkgname=fdk-aac --pkgversion=$(date +%s) -y
+  args:
+    chdir: "{{ ffmpeg_src_dir }}/fdk-aac"
+    creates: "/usr/local/lib/libfdk-aac.a"
+
+- name: configure&make ffmpeg
+  shell: |
+     make distclean
+     ./configure --extra-cflags="-march=native -O2" --enable-gpl --enable-libass --enable-libfdk-aac --enable-libmp3lame --enable-libopus --enable-libtheora --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libx265 --enable-nonfree
+     make -j 4
+  args:
+    chdir: "{{ ffmpeg_src_dir }}/ffmpeg"
+    creates: "{{ ffmpeg_src_dir }}/ffmpeg/ffmpeg"
+
+- name: install ffmpeg
+  sudo: yes
+  shell: |
+     checkinstall --pkgversion=$(date +%s) -y
+  args:
+    chdir: "{{ ffmpeg_src_dir }}/ffmpeg"
+    creates: "/usr/local/bin/ffmpeg"
