@@ -10,4 +10,4 @@
     - postgresql
     - nginx
     - redis
-    - { role: httplab.ffmpeg, sudo: yes }
+    - { role: "ansible-ffmpeg", sudo: yes }
