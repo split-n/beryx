@@ -1,5 +1,0 @@
----
-# vim:ft=ansible
-- name: Install ffmpeg
-  apt: name=ffmpeg state=latest update_cache=yes
-  sudo: true
