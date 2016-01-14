@@ -31,14 +31,14 @@ class TranscodedVideo < ActiveRecord::Base
 
   class << self
     def convert_just_hls(video)
-      transcode_params = TranscodeParams::ConvertToHls.new
+      params = TranscodeParams::ConvertToHls.new
 
-      return tv if tv.find_by(transcode_params: transcode_params.to_json)
+      return tv if tv.find_by(transcode_params: params.to_json)
 
       rand = generate_rand
 
       tv = video.transcoded_videos.create!(
-          transcode_params: "hls_conv", job_status: :building, rand: rand)
+          transcode_params: params, job_status: :building, rand: rand)
       jid = VideoTranscodeWorker.perform_async(tv.id)
       tv.job_status = :queued
       tv.jid = jid
@@ -47,10 +47,18 @@ class TranscodedVideo < ActiveRecord::Base
   end
 
   def run_transcode
+    job_status = :running
+    save!
+
     params = TranscodeParams.from_json(transcode_params)
     dst_path = rand #todo
     command = params.to_command(dst_path)
 
+    system command
+
+    job_status = :done
+    jid = nil
+    save!
   end
 
   private
