@@ -1,5 +1,6 @@
 ---
 - name: set ld path
+  sudo: yes
   lineinfile: 
     dest="/etc/ld.so.conf"
     line="include /usr/local/lib"
