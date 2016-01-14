@@ -42,6 +42,11 @@ class Video < ActiveRecord::Base
     end
   end
 
+  def mark_as_active
+    return false unless path_exist?
+    super
+  end
+
   def path_exist?
     path.present? && File.exist?(path)
   end
