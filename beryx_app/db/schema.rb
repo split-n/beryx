@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160113055939) do
+ActiveRecord::Schema.define(version: 20160114010802) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -24,6 +24,19 @@ ActiveRecord::Schema.define(version: 20160113055939) do
     t.integer  "crawl_job_status", null: false
     t.string   "crawl_jid"
   end
+
+  create_table "transcoded_videos", force: :cascade do |t|
+    t.integer  "video_id",         null: false
+    t.text     "transcode_params", null: false
+    t.string   "rand",             null: false
+    t.integer  "job_status",       null: false
+    t.string   "jid"
+    t.datetime "last_played",      null: false
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+  end
+
+  add_index "transcoded_videos", ["video_id"], name: "index_transcoded_videos_on_video_id", using: :btree
 
   create_table "users", force: :cascade do |t|
     t.string   "login_id",                        null: false
@@ -46,5 +59,6 @@ ActiveRecord::Schema.define(version: 20160113055939) do
   add_index "videos", ["crawl_directory_id"], name: "index_videos_on_crawl_directory_id", using: :btree
   add_index "videos", ["path"], name: "index_videos_on_path", unique: true, using: :btree
 
+  add_foreign_key "transcoded_videos", "videos"
   add_foreign_key "videos", "crawl_directories"
 end

@@ -164,11 +164,23 @@ RSpec.describe CrawlDirectory, type: :model do
       context "with video" do
         let(:video_path) { "#{cd.path}abc.mp4" }
         let!(:belong_video) { FG.create(:video, path: video_path, crawl_directory: cd) }
-        subject {
-          cd.mark_as_deleted
-          cd.mark_as_active
-        }
-        it { expect{subject}.not_to change{belong_video.reload.deleted?}.from(false) }
+        context "normal" do
+          subject {
+            cd.mark_as_deleted
+            cd.mark_as_active
+          }
+          it { expect{subject}.not_to change{belong_video.reload.deleted?}.from(false) }
+        end
+
+        context "video is deleted after mark_as_deleted" do
+          subject {
+            cd.mark_as_deleted
+            allow(File).to receive(:exist?).with(video_path).and_return(false)
+            cd.mark_as_active
+          }
+          it { expect{subject}.to change{belong_video.reload.deleted?}.from(false).to(true) }
+          it { expect(belong_video).not_to receive(:mark_as_active) }
+        end
       end
 
       context "path is deleted" do

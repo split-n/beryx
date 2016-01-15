@@ -113,4 +113,33 @@ RSpec.describe Video, type: :model do
     it { expect{subject}.not_to change{video.valid?}.from(true) }
     it { expect{subject}.to change{video.path_exist?}.from(true).to(false) }
   end
+
+  describe "#mark_as_deleted" do
+    let(:cd) { FG.create(:crawl_directory) }
+    let(:video) { FG.create(:video, crawl_directory: cd) }
+    subject { video.mark_as_deleted }
+    context "normal" do
+      it { expect{subject}.to change{video.deleted?}.from(false).to(true) }
+    end
+
+    context "file is deleted" do
+      before { allow(File).to receive(:exist?).with(video.path).and_return(false) }
+      it { expect{subject}.to change{video.deleted?}.from(false).to(true) }
+    end
+  end
+
+  describe "#mark_as_active" do
+    let(:cd) { FG.create(:crawl_directory) }
+    let(:video) { FG.create(:video, crawl_directory: cd) }
+    before { video.mark_as_deleted }
+    subject { video.mark_as_active }
+    context "normal" do
+      it { expect{subject}.to change{video.deleted?}.from(true).to(false) }
+    end
+
+    context "file is deleted" do
+      before { allow(File).to receive(:exist?).with(video.path).and_return(false) }
+      it { expect{subject}.not_to change{video.deleted?}.from(true) }
+    end
+  end
 end
