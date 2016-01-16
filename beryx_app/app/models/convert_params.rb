@@ -2,7 +2,7 @@ module ConvertParams
 
   class CopyHls
     class << self
-      def from_json
+      def from_json(json)
         self.new
       end
     end
