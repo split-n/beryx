@@ -20,7 +20,7 @@
 #
 
 class ConvertedVideo < ActiveRecord::Base
-  CONVERTED_VIDEOS_ROOT_PATH = Rails.root + "tmp/converted_videos/"
+  CONVERTED_VIDEOS_ROOT_PATH = Rails.root + "public/converted_videos/"
   belongs_to :video
   enum job_status: { building: 0, queued: 1, running: 2, done: 3, fail: 4 }
 
