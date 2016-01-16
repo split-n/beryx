@@ -73,4 +73,9 @@ class ConvertedVideo < ActiveRecord::Base
 
     save!
   end
+
+  def destroy
+    FileUtils.rm_r(self.converted_dir_path)
+    super
+  end
 end
