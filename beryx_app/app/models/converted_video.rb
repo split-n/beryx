@@ -35,22 +35,22 @@ class ConvertedVideo < ActiveRecord::Base
     end
 
     def convert_to(video, param, converted_dir_path, converted_file_path)
-      done_video = self.find_by(video: video, param_class: param.class.name, param_json: param.to_json)
-      return done_video if done_video
+      done_c_video = self.find_by(video: video, param_class: param.class.name, param_json: param.to_json)
+      return done_c_video if done_c_video
 
 
-      video = video.converted_videos.create(
+      c_video = video.converted_videos.create(
           param_class: param.class.name, param_json: param.to_json,
           converted_dir_path: converted_dir_path,
           converted_file_path: converted_file_path, job_status: :building,
           last_played: Time.now
         )
 
-      jid = VideoConvertWorker.perform_async(video.id)
-      video.job_status = :queued
-      video.jid = jid
-      video.save!
-      video
+      jid = VideoConvertWorker.perform_async(c_video.id)
+      c_video.job_status = :queued
+      c_video.jid = jid
+      c_video.save!
+      c_video
     end
   end
 
