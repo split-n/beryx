@@ -15,7 +15,7 @@ module ConvertParams
       "{}"
     end
 
-    def to_command(converted_dir_path, converted_file_path)
+    def to_command(source_path, converted_dir_path, converted_file_path)
       # todo
     end
   end
