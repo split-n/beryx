@@ -20,14 +20,15 @@
 #
 
 class ConvertedVideo < ActiveRecord::Base
-  CONVERTED_VIDEOS_ROOT_PATH = Rails.root + "public/converted_videos/"
+  RAILS_PUBLIC_FS_PATH = Rails.root + "public"
+  CONVERTED_VIDEOS_FS_PATH = RAILS_PUBLIC_FS_PATH + "converted_videos"
   belongs_to :video
   enum job_status: { building: 0, queued: 1, running: 2, done: 3, fail: 4 }
 
   class << self
     def convert_to_copy_hls(video)
       param = ConvertParams::CopyHls.new
-      converted_dir_path =  CONVERTED_VIDEOS_ROOT_PATH + SecureRandom.hex
+      converted_dir_path =  CONVERTED_VIDEOS_FS_PATH + SecureRandom.hex
       converted_file_path = converted_dir_path + "playlist.m3u8"
 
       convert_to(video, param, converted_dir_path, converted_file_path)
@@ -73,6 +74,10 @@ class ConvertedVideo < ActiveRecord::Base
     logger.debug("[ConvertedVideo] stdout: \n#{stdout})")
 
     save!
+  end
+
+  def file_url_path
+    self.converted_file_path.tr(RAILS_PUBLIC_FS_PATH, "")
   end
 
   def destroy
