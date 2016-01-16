@@ -55,9 +55,11 @@ class ConvertedVideo < ActiveRecord::Base
   end
 
   def run_convert
-    raise unless self.job_status.queued?
+    raise unless self.queued?
     self.job_status = :running
     save!
+
+    FileUtils.mkdir_p(self.converted_dir_path)
 
     param = Module.const_get(self.param_class).from_json(self.param_json)
     command = param.to_command(self.video.path, self.converted_dir_path, self.converted_file_path)
