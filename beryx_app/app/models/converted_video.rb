@@ -80,11 +80,13 @@ class ConvertedVideo < ActiveRecord::Base
   end
 
   def file_url_path
-    self.converted_file_path.tr(RAILS_PUBLIC_FS_PATH, "")
+    self.converted_file_path.gsub(RAILS_PUBLIC_FS_PATH.to_s, "")
   end
 
   def destroy
-    FileUtils.rm_r(self.converted_dir_path)
+    if Dir.exist?(self.converted_dir_path)
+      FileUtils.rm_r(self.converted_dir_path)
+    end
     super
   end
 end
