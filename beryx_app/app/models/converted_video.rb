@@ -42,7 +42,8 @@ class ConvertedVideo < ActiveRecord::Base
       video = video.converted_videos.create(
           param_class: param.class.name, param_json: param.to_json,
           converted_dir_path: converted_dir_path,
-          converted_file_path: converted_file_path, job_status: :building
+          converted_file_path: converted_file_path, job_status: :building,
+          last_played: Time.now
         )
 
       jid = VideoConvertWorker.perform_async(video.id)
