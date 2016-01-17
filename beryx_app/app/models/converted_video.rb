@@ -34,9 +34,31 @@ class ConvertedVideo < ActiveRecord::Base
       convert_to(video, param, converted_dir_path, converted_file_path)
     end
 
+    def convert_to_copy_faststart_mp4(video)
+      param = ConvertParams::CopyFastStartMp4.new
+      converted_dir_path =  CONVERTED_VIDEOS_FS_PATH + SecureRandom.hex
+      converted_file_path = converted_dir_path + "play.mp4"
+
+      convert_to(video, param, converted_dir_path, converted_file_path)
+    end
+
+    def convert_to_copy_fragmented_mp4(video)
+      param = ConvertParams::CopyFragmentedMp4.new
+      converted_dir_path =  CONVERTED_VIDEOS_FS_PATH + SecureRandom.hex
+      converted_file_path = converted_dir_path + "play.mp4"
+
+      convert_to(video, param, converted_dir_path, converted_file_path)
+    end
+
     def convert_to(video, param, converted_dir_path, converted_file_path)
       done_c_video = self.find_by(video: video, param_class: param.class.name, param_json: param.to_json)
-      return done_c_video if done_c_video
+      if done_c_video
+        if done_c_video.fail?
+          done_c_video.destroy
+        else
+          return done_c_video
+        end
+      end
 
 
       c_video = video.converted_videos.create(
@@ -55,7 +77,6 @@ class ConvertedVideo < ActiveRecord::Base
   end
 
   def run_convert
-    raise unless self.queued?
     self.job_status = :running
     save!
 

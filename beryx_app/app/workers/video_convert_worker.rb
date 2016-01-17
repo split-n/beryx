@@ -4,8 +4,15 @@ class VideoConvertWorker
                   retry: 5
 
   def perform(converted_video_id)
-    tv = ConvertedVideo.find(converted_video_id)
-    tv.run_convert
+    cv = ConvertedVideo.find(converted_video_id)
+
+    # タイミングが悪い場合に備え
+    cv.job_status = :queued
+    cv.jid = self.jid
+    cv.save!
+
+    cv.run_convert
   end
 
 end
+
