@@ -36,7 +36,13 @@ class ConvertedVideo < ActiveRecord::Base
 
     def convert_to(video, param, converted_dir_path, converted_file_path)
       done_c_video = self.find_by(video: video, param_class: param.class.name, param_json: param.to_json)
-      return done_c_video if done_c_video
+      if done_c_video
+        if done_c_video.fail?
+          done_c_video.destroy
+        else
+          return done_c_video
+        end
+      end
 
 
       c_video = video.converted_videos.create(
