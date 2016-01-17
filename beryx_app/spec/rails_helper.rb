@@ -61,6 +61,8 @@ RSpec.configure do |config|
   config.before(:each) do
     allow(Dir).to receive(:exist?).and_call_original
     allow(File).to receive(:exist?).and_call_original
+    allow(File).to receive(:stat).and_call_original
+    allow(File).to receive(:size).and_call_original
   end
 end
 

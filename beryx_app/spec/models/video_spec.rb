@@ -52,8 +52,11 @@ RSpec.describe Video, type: :model do
           before {
             allow(File).to receive(:exist?).with(path).and_return(true)
             allow(File).to receive(:size).with(path).and_return(300.megabyte)
+            stat_mock = double("stat")
+            allow(stat_mock).to receive(:mtime).and_return(2.days.ago)
+            allow(File).to receive(:stat).with(path).and_return(stat_mock)
           }
-          subject{ cd.videos.create(path: path, file_timestamp: 2.days.ago) }
+          subject{ cd.videos.create(path: path) }
           it { should be_valid }
         end
 
