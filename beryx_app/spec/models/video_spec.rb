@@ -47,31 +47,25 @@ RSpec.describe Video, type: :model do
 
       context "with exist path" do
         let(:path) { "/exists/foo.mp4" }
+        before {
+          allow(File).to receive(:exist?).with(path).and_return(true)
+        }
 
-        context "without file_size" do
+        context "pass file stats" do
+          subject { cd.videos.create(path: path,
+                                     file_size: 300.megabyte, file_timestamp: 2.days.ago)}
+          it { should be_valid }
+        end
+
+        context "file stat mocked" do
           before {
-            allow(File).to receive(:exist?).with(path).and_return(true)
             allow(File).to receive(:size).with(path).and_return(300.megabyte)
             stat_mock = double("stat")
             allow(stat_mock).to receive(:mtime).and_return(2.days.ago)
             allow(File).to receive(:stat).with(path).and_return(stat_mock)
           }
-          subject{ cd.videos.create(path: path) }
-          it { should be_valid }
-        end
-
-        context "with file_size" do
-          before { allow(File).to receive(:exist?).with(path).and_return(true) }
-
-          context "pass wrong instance" do
-            let(:cd) { Object.new }
-            subject { Video.create(crawl_directory: cd, path: path, file_timestamp: 2.days.ago, file_size: 300.megabyte) }
-            it { expect{subject}.to raise_error(ActiveRecord::AssociationTypeMismatch)}
-          end
-
           context "normal args" do
-            subject{ cd.videos.create(path: path, file_size: 300.megabyte, file_timestamp: 2.days.ago) }
-
+            subject{ cd.videos.create(path: path) }
             context "correct" do
               it { should be_valid }
             end
@@ -101,8 +95,14 @@ RSpec.describe Video, type: :model do
           end
 
           context "pass crawl_directory_id" do
-            subject{ Video.create(crawl_directory_id: cd.id, path: path, file_size: 300.megabyte, file_timestamp: 2.days.ago) }
+            subject{ Video.create(crawl_directory_id: cd.id, path: path) }
             it { should be_valid }
+          end
+
+          context "pass wrong instance" do
+            let(:cd) { Object.new }
+            subject { Video.create(crawl_directory: cd, path: path) }
+            it { expect{subject}.to raise_error(ActiveRecord::AssociationTypeMismatch)}
           end
         end
       end
