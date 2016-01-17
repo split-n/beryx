@@ -53,7 +53,7 @@ RSpec.describe Video, type: :model do
             allow(File).to receive(:exist?).with(path).and_return(true)
             allow(File).to receive(:size).with(path).and_return(300.megabyte)
           }
-          subject{ cd.videos.create(path: path) }
+          subject{ cd.videos.create(path: path, file_timestamp: 2.days.ago) }
           it { should be_valid }
         end
 
@@ -62,12 +62,12 @@ RSpec.describe Video, type: :model do
 
           context "pass wrong instance" do
             let(:cd) { Object.new }
-            subject { Video.create(crawl_directory: cd, path: path, file_size: 300.megabyte) }
+            subject { Video.create(crawl_directory: cd, path: path, file_timestamp: 2.days.ago, file_size: 300.megabyte) }
             it { expect{subject}.to raise_error(ActiveRecord::AssociationTypeMismatch)}
           end
 
           context "normal args" do
-            subject{ cd.videos.create(path: path, file_size: 300.megabyte) }
+            subject{ cd.videos.create(path: path, file_size: 300.megabyte, file_timestamp: 2.days.ago) }
 
             context "correct" do
               it { should be_valid }
@@ -98,7 +98,7 @@ RSpec.describe Video, type: :model do
           end
 
           context "pass crawl_directory_id" do
-            subject{ Video.create(crawl_directory_id: cd.id, path: path, file_size: 300.megabyte) }
+            subject{ Video.create(crawl_directory_id: cd.id, path: path, file_size: 300.megabyte, file_timestamp: 2.days.ago) }
             it { should be_valid }
           end
         end

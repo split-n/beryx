@@ -35,6 +35,7 @@ class Video < ActiveRecord::Base
   before_save do
     self.file_name = File.basename(path)
     self.file_size ||= File.size(path)
+    self.file_timestamp ||= File.stat(path).mtime
   end
 
   class << self
