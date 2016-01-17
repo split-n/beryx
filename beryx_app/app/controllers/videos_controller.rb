@@ -6,6 +6,6 @@ class VideosController < ApplicationController
 
   def show
     @video = Video.find(params[:id])
-    @converted_video = ConvertedVideo.convert_to_copy_hls(@video)
+    @converted_video = ConvertedVideo.convert_to_copy_fragmented_mp4(@video)
   end
 end
