@@ -61,7 +61,6 @@ class ConvertedVideo < ActiveRecord::Base
   end
 
   def run_convert
-    raise unless self.queued?
     self.job_status = :running
     save!
 
