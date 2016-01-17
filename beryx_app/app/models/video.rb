@@ -10,6 +10,7 @@
 #  deleted_at         :datetime
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
+#  file_timestamp     :datetime         not null
 #
 # Indexes
 #
