@@ -60,9 +60,7 @@ RSpec.describe Video, type: :model do
         context "file stat mocked" do
           before {
             allow(File).to receive(:size).with(path).and_return(300.megabyte)
-            stat_mock = double("stat")
-            allow(stat_mock).to receive(:mtime).and_return(2.days.ago)
-            allow(File).to receive(:stat).with(path).and_return(stat_mock)
+            allow(File).to receive(:mtime).with(path).and_return(2.days.ago)
           }
           context "normal args" do
             subject{ cd.videos.create(path: path) }
