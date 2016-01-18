@@ -5,7 +5,7 @@ var VideoPlayer = React.createClass({
         <div>
             <h1>Video Player</h1>
             <p>{this.props.file_name}</p>
-            <video src={this.props.video_path} preload="none" onclick="this.play()" controls="controls"/>
+            <VideoPlayerCore src={this.props.video_path} />
         </div>
     );
   }
