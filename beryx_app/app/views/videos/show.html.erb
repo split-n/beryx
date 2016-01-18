@@ -1,5 +1,1 @@
-<h1>Video Player</h1>
-<p><%= @video.file_name %></p>
-<div>
-  <video src="<%= @converted_video.file_url_path %>" preload="none" onclick="this.play()" controls ></video>
-</div>
+<%= react_component('VideoPlayer', file_name: @video.file_name, video_path: @converted_video.file_url_path) %>
