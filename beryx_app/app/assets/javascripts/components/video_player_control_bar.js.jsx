@@ -38,7 +38,7 @@ var VideoPlayerControlBar = React.createClass({
     }
     return (
       <button className="btn" onClick={this.props.togglePause}>
-        <span className={classes}></span>
+        <span className={classes}/>
       </button>
     );
   },
