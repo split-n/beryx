@@ -1,4 +1,4 @@
-/*global React, VideoPlayerCore */
+/*global React:false, VideoPlayerCore:false */
 /*exported VideoPlayer */
 
 var VideoPlayer = React.createClass({

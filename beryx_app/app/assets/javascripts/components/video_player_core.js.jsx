@@ -1,4 +1,4 @@
-/*global React, Hls, VideoPlayerControlBar */
+/*global React:false, Hls:false, VideoPlayerControlBar:false */
 /*exported VideoPlayerCore */
 
 var VideoPlayerCore = React.createClass({
@@ -18,7 +18,8 @@ var VideoPlayerCore = React.createClass({
     video.addEventListener("play", this.onPlay);
     video.addEventListener("pause", this.onPause);
 
-    var hasHlsNativeSupport = !!document.createElement("video").canPlayType("application/vnd.apple.mpegURL");
+    var hasHlsNativeSupport = !!document.createElement("video")
+      .canPlayType("application/vnd.apple.mpegURL");
     if (!hasHlsNativeSupport) {
       if (Hls.isSupported()) {
         var hls = new Hls();

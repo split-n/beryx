@@ -1,4 +1,4 @@
-/*global React */
+/*global React:false */
 /*exported VideoPlayerControlBar */
 
 var VideoPlayerControlBar = React.createClass({
