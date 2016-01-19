@@ -3,10 +3,10 @@ var VideoPlayerSeekBar = React.createClass({
     duration: React.PropTypes.number.isRequired,
     currentTime: React.PropTypes.number.isRequired
   },
-  _zeroPad: function(val, dig) {
+  _zeroPad(val, dig) {
     return ("0".repeat(dig)+val).slice(-dig)
   },
-  _secToTime: function(sec) {
+  _secToTime(sec) {
     var m = Math.floor(sec/60);
     var s = Math.floor(sec%60);
     var mDig = 2;
@@ -16,13 +16,13 @@ var VideoPlayerSeekBar = React.createClass({
     }
     return `${this._zeroPad(m, mDig)}:${this._zeroPad(s, sDig)}`;
   },
-  getCurrent: function() {
+  getCurrent() {
     return this._secToTime(this.props.currentTime);
   },
-  getDuration: function() {
+  getDuration() {
     return this._secToTime(this.props.duration);
   },
-  render: function() {
+  render() {
     return (
       <div id="playing-seekbar">
         <span id="playing-seekbar-time">{this.getCurrent()}/{this.getDuration()}</span>
@@ -61,11 +61,11 @@ var VideoPlayerCore = React.createClass({
     var video = this.refs.video;
     video.removeEventListener("timeupdate", this.onTimeUpdate);
   },
-  onTimeUpdate: function() {
+  onTimeUpdate() {
     var video = this.refs.video;
     this.setState({duration: video.duration, currentTime: video.currentTime});
   },
-  render: function() {
+  render() {
     return (
       <div>
         <video id="playing-video" src={this.props.src} preload="none" onclick="this.play()" controls="controls" ref="video"/>
