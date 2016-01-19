@@ -3,11 +3,18 @@ var VideoPlayerSeekBar = React.createClass({
     duration: React.PropTypes.number.isRequired,
     currentTime: React.PropTypes.number.isRequired
   },
-
+  _zeroPad: function(val, dig) {
+    return ("0".repeat(dig)+val).slice(-dig)
+  },
   _secToTime: function(sec) {
     var m = Math.floor(sec/60);
     var s = Math.floor(sec%60);
-    return `${("00"+m).slice(-2)}:${("00"+s).slice(-2)}`;
+    var mDig = 2;
+    var sDig = 2;
+    if(m >= 100) {
+      mDig = 3;
+    }
+    return `${this._zeroPad(m, mDig)}:${this._zeroPad(s, sDig)}`;
   },
   getCurrent: function() {
     return this._secToTime(this.props.currentTime);
