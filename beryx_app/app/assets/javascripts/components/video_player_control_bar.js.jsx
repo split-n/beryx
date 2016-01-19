@@ -4,7 +4,8 @@ var VideoPlayerControlBar = React.createClass({
     currentTime: React.PropTypes.number.isRequired,
     isPlaying: React.PropTypes.bool.isRequired,
     togglePause: React.PropTypes.func.isRequired,
-    seekToTime: React.PropTypes.func.isRequired
+    seekToTime: React.PropTypes.func.isRequired,
+    setPlaybackRate: React.PropTypes.func.isRequired
   },
   _zeroPad(val, dig) {
     return ("0".repeat(dig)+val).slice(-dig);
@@ -51,11 +52,28 @@ var VideoPlayerControlBar = React.createClass({
       </div>
     );
   },
+  _PlaybackRateSelectHandler() {
+    var select = this.refs.pl_select;
+    var rate = parseFloat(select.value);
+    this.props.setPlaybackRate(rate)
+  },
+  _renderPlaybackRateSelects() {
+    var rates = [0.8, 1, 1.2, 1.4, 1.5, 1.8, 2];
+    var options = rates.map(r => {
+      return <option value={r} key={r}>x{r}</option>;
+    });
+    return (
+      <select ref="pl_select" defaultValue="1" onChange={this._PlaybackRateSelectHandler}>
+        {options}
+      </select>
+    );
+  },
   render() {
     return (
       <div id="playing-seekbar">
         {this._renderPlayButton()}
         {this._renderJumpButtons()}
+        {this._renderPlaybackRateSelects()}
         <span id="playing-seekbar-time">{this._getCurrent()}/{this._getDuration()}</span>
       </div>
     );

@@ -53,6 +53,10 @@ var VideoPlayerCore = React.createClass({
     var video = this.refs.video;
     video.currentTime = sec;
   },
+  setPlaybackRate(rate) {
+    var video = this.refs.video;
+    video.playbackRate = rate;
+  },
   render() {
     return (
       <div>
@@ -60,7 +64,7 @@ var VideoPlayerCore = React.createClass({
         <VideoPlayerControlBar
         duration={this.state.duration} currentTime={this.state.currentTime}
         togglePause={this.togglePause} isPlaying={this.state.isPlaying}
-        seekToTime={this.seekToTime}
+        seekToTime={this.seekToTime} setPlaybackRate={this.setPlaybackRate}
         />
       </div>
     );
