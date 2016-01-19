@@ -3,7 +3,8 @@ var VideoPlayerSeekBar = React.createClass({
     duration: React.PropTypes.number.isRequired,
     currentTime: React.PropTypes.number.isRequired,
     isPlaying: React.PropTypes.bool.isRequired,
-    togglePause: React.PropTypes.func.isRequired
+    togglePause: React.PropTypes.func.isRequired,
+    seekToTime: React.PropTypes.func.isRequired
   },
   _zeroPad(val, dig) {
     return ("0".repeat(dig)+val).slice(-dig);
@@ -37,10 +38,25 @@ var VideoPlayerSeekBar = React.createClass({
       </button>
     );
   },
+  _seekRelative(sec) {
+    console.log(`seek to ${sec}`)
+    this.props.seekToTime(this.props.currentTime + sec);
+  },
+  _renderJumpButtons() {
+    return (
+      <div>
+        <button className="btn" onClick={this._seekRelative.bind(this, -30)}>-30</button>
+        <button className="btn" onClick={this._seekRelative.bind(this, -15)}>-15</button>
+        <button className="btn" onClick={this._seekRelative.bind(this, 15)}>+15</button>
+        <button className="btn" onClick={this._seekRelative.bind(this, 30)}>+30</button>
+      </div>
+    );
+  },
   render() {
     return (
       <div id="playing-seekbar">
         {this._renderPlayButton()}
+        {this._renderJumpButtons()}
         <span id="playing-seekbar-time">{this._getCurrent()}/{this._getDuration()}</span>
       </div>
     );
@@ -98,11 +114,19 @@ var VideoPlayerCore = React.createClass({
     var video = this.refs.video;
     video.paused ? video.play() : video.pause();
   },
+  seekToTime(sec) {
+    var video = this.refs.video;
+    video.currentTime = sec;
+  },
   render() {
     return (
       <div>
         <video id="playing-video" src={this.props.src} preload="none" onclick="this.play()" controls="controls" ref="video"/>
-        <VideoPlayerSeekBar duration={this.state.duration} currentTime={this.state.currentTime} togglePause={this.togglePause} isPlaying={this.state.isPlaying}/>
+        <VideoPlayerSeekBar
+        duration={this.state.duration} currentTime={this.state.currentTime}
+        togglePause={this.togglePause} isPlaying={this.state.isPlaying}
+        seekToTime={this.seekToTime}
+        />
       </div>
     );
   }
