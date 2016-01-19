@@ -59,12 +59,13 @@ var VideoPlayerControlBar = React.createClass({
     this.props.setPlaybackRate(rate)
   },
   _renderPlaybackRateSelects() {
-    var rates = [0.8, 1, 1.2, 1.4, 1.5, 1.8, 2];
+    var rates = [0.8, 1, 1.1, 1.25, 1.4, 1.5, 1.75, 2];
     var options = rates.map(r => {
-      return <option value={r} key={r}>x{r}</option>;
+      var f = r.toFixed(2);
+      return <option value={f} key={f}>x{f}</option>;
     });
     return (
-      <select ref="pl_select" defaultValue="1" onChange={this._PlaybackRateSelectHandler}>
+      <select ref="pl_select" defaultValue="1.00" onChange={this._PlaybackRateSelectHandler}>
         {options}
       </select>
     );
