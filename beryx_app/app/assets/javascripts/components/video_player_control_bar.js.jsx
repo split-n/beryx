@@ -43,12 +43,13 @@ var VideoPlayerControlBar = React.createClass({
     this.props.seekToTime(this.props.currentTime + sec);
   },
   _renderJumpButtons() {
+    var secs = [-30, -15, 15, 30];
+    var buttons = secs.map(s => {
+      return <button className="btn" onClick={this._seekRelative.bind(this, s)}>{s}</button>
+    });
     return (
       <div>
-        <button className="btn" onClick={this._seekRelative.bind(this, -30)}>-30</button>
-        <button className="btn" onClick={this._seekRelative.bind(this, -15)}>-15</button>
-        <button className="btn" onClick={this._seekRelative.bind(this, 15)}>+15</button>
-        <button className="btn" onClick={this._seekRelative.bind(this, 30)}>+30</button>
+        {buttons}
       </div>
     );
   },
