@@ -50,7 +50,8 @@ var VideoPlayerControlBar = React.createClass({
     var buttons = secs.map(s => {
       return (
         <button
-          className="btn" onClick={this._seekRelative.bind(this, s)}
+          className="btn" key={s}
+          onClick={this._seekRelative.bind(this, s)}
         >{s}</button> );
     });
     return (
