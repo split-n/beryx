@@ -6,5 +6,6 @@ FactoryGirl.define do
     crawl_directory
     sequence(:path) {|n| "#{crawl_directory.path}foo#{n}.mp4" }
     file_size 200.megabytes
+    file_timestamp { 2.days.ago }
   end
 end

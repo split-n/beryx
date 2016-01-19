@@ -255,6 +255,36 @@ RSpec.describe CrawlDirectory, type: :model do
 
       it { expect(subject.to_a).to eq vids }
     end
+  end
+
+  describe "#crawl_videos_and_create" do
+    let(:cd) { FG.create(:crawl_directory) }
+    subject { cd.crawl_videos_and_create }
+
+    context "first time" do
+      context "directory is removed" do
+        before { expect(Dir).to receive(:exist?).with(cd.path).and_return(false) }
+        it { expect{subject}.to raise_error(CrawlDirectory::PathNotFoundError) }
+      end
+
+      context "video files exist" do
+        let(:returns) { ["#{cd.path}foo.mp4", "#{cd.path}bar.mkv", "#{cd.path}sub/123/foo.mkv"] }
+        before {
+          expect(Find).to receive(:find).with(cd.path).and_return(returns.to_enum)
+          returns.each{|p|
+            allow(File).to receive(:exist?).with(p).and_return(true)
+            allow(File).to receive(:size).with(p).and_return(300.megabyte)
+            allow(File).to receive(:mtime).with(p).and_return(2.days.ago)
+          }
+        }
+        it { expect{subject}.to change{Video.active.count}.from(0).to(returns.count)}
+        it {
+          subject
+          expect(cd.videos.find_by(path: returns.first)).to be_present
+        }
+      end
+    end
+
 
   end
 
