@@ -39,7 +39,6 @@ var VideoPlayerControlBar = React.createClass({
     );
   },
   _seekRelative(sec) {
-    console.log(`seek to ${sec}`)
     this.props.seekToTime(this.props.currentTime + sec);
   },
   _renderJumpButtons() {
