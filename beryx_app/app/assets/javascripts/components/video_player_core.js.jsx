@@ -3,10 +3,22 @@ var VideoPlayerSeekBar = React.createClass({
     duration: React.PropTypes.number.isRequired,
     currentTime: React.PropTypes.number.isRequired
   },
+
+  _secToTime: function(sec) {
+    var m = Math.floor(sec/60);
+    var s = Math.floor(sec%60);
+    return `${("00"+m).slice(-2)}:${("00"+s).slice(-2)}`;
+  },
+  getCurrent: function() {
+    return this._secToTime(this.props.currentTime);
+  },
+  getDuration: function() {
+    return this._secToTime(this.props.duration);
+  },
   render: function() {
     return (
       <div id="playing-seekbar">
-        <span id="playing-seekbar-time">{this.props.currentTime}/{this.props.duration}</span>
+        <span id="playing-seekbar-time">{this.getCurrent()}/{this.getDuration()}</span>
       </div>
     )
   }
