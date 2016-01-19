@@ -1,3 +1,6 @@
+/*global React, Hls, VideoPlayerControlBar */
+/*exported VideoPlayerCore */
+
 var VideoPlayerCore = React.createClass({
   propTypes: {
     src: React.PropTypes.string.isRequired
@@ -7,7 +10,7 @@ var VideoPlayerCore = React.createClass({
       duration: 0,
       currentTime: 0,
       isPlaying: false
-    }
+    };
   },
   componentDidMount() {
     var video = this.refs.video;
@@ -15,13 +18,13 @@ var VideoPlayerCore = React.createClass({
     video.addEventListener("play", this.onPlay);
     video.addEventListener("pause", this.onPause);
 
-    var hasHlsNativeSupport = !!document.createElement('video').canPlayType('application/vnd.apple.mpegURL');
-    if(!hasHlsNativeSupport) {
-      if(Hls.isSupported()) {
+    var hasHlsNativeSupport = !!document.createElement("video").canPlayType("application/vnd.apple.mpegURL");
+    if (!hasHlsNativeSupport) {
+      if (Hls.isSupported()) {
         var hls = new Hls();
         hls.loadSource(location.protocol + "//" + location.host + this.props.src);
         hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED,function() {
+        hls.on(Hls.Events.MANIFEST_PARSED, function () {
           video.play();
         });
       }
@@ -38,11 +41,9 @@ var VideoPlayerCore = React.createClass({
     this.setState({duration: video.duration, currentTime: video.currentTime});
   },
   onPlay() {
-    var video = this.refs.video;
     this.setState({isPlaying: true});
   },
   onPause() {
-    var video = this.refs.video;
     this.setState({isPlaying: false});
   },
   togglePause() {
@@ -60,11 +61,15 @@ var VideoPlayerCore = React.createClass({
   render() {
     return (
       <div>
-        <video id="playing-video" src={this.props.src} preload="none" onclick="this.play()" controls="controls" ref="video"/>
+        <video
+          id="playing-video" src={this.props.src}
+          preload="none" controls="controls"
+          ref="video"
+        />
         <VideoPlayerControlBar
-        duration={this.state.duration} currentTime={this.state.currentTime}
-        togglePause={this.togglePause} isPlaying={this.state.isPlaying}
-        seekToTime={this.seekToTime} setPlaybackRate={this.setPlaybackRate}
+          duration={this.state.duration} currentTime={this.state.currentTime}
+          togglePause={this.togglePause} isPlaying={this.state.isPlaying}
+          seekToTime={this.seekToTime} setPlaybackRate={this.setPlaybackRate}
         />
       </div>
     );

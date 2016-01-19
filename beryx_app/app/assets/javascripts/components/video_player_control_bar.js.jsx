@@ -1,3 +1,6 @@
+/*global React */
+/*exported VideoPlayerControlBar */
+
 var VideoPlayerControlBar = React.createClass({
   propTypes: {
     duration: React.PropTypes.number.isRequired,
@@ -8,14 +11,14 @@ var VideoPlayerControlBar = React.createClass({
     setPlaybackRate: React.PropTypes.func.isRequired
   },
   _zeroPad(val, dig) {
-    return ("0".repeat(dig)+val).slice(-dig);
+    return ("0".repeat(dig) + val).slice(-dig);
   },
   _secToTime(sec) {
-    var m = Math.floor(sec/60);
-    var s = Math.floor(sec%60);
+    var m = Math.floor(sec / 60);
+    var s = Math.floor(sec % 60);
     var mDig = 2;
     var sDig = 2;
-    if(m >= 100) {
+    if (m >= 100) {
       mDig = 3;
     }
     return `${this._zeroPad(m, mDig)}:${this._zeroPad(s, sDig)}`;
@@ -28,10 +31,10 @@ var VideoPlayerControlBar = React.createClass({
   },
   _renderPlayButton() {
     var classes;
-    if(this.props.isPlaying) {
-      classes = "glyphicon glyphicon-pause"
+    if (this.props.isPlaying) {
+      classes = "glyphicon glyphicon-pause";
     } else {
-      classes = "glyphicon glyphicon-play"
+      classes = "glyphicon glyphicon-play";
     }
     return (
       <button className="btn" onClick={this.props.togglePause}>
@@ -45,7 +48,10 @@ var VideoPlayerControlBar = React.createClass({
   _renderJumpButtons() {
     var secs = [-30, -15, 15, 30];
     var buttons = secs.map(s => {
-      return <button className="btn" onClick={this._seekRelative.bind(this, s)}>{s}</button>
+      return (
+        <button
+          className="btn" onClick={this._seekRelative.bind(this, s)}
+        >{s}</button> );
     });
     return (
       <div>
@@ -56,7 +62,7 @@ var VideoPlayerControlBar = React.createClass({
   _PlaybackRateSelectHandler() {
     var select = this.refs.pl_select;
     var rate = parseFloat(select.value);
-    this.props.setPlaybackRate(rate)
+    this.props.setPlaybackRate(rate);
   },
   _renderPlaybackRateSelects() {
     var rates = [0.8, 1, 1.1, 1.25, 1.4, 1.5, 1.75, 2];
