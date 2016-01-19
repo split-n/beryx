@@ -1,10 +1,12 @@
 var VideoPlayerSeekBar = React.createClass({
   propTypes: {
     duration: React.PropTypes.number.isRequired,
-    currentTime: React.PropTypes.number.isRequired
+    currentTime: React.PropTypes.number.isRequired,
+    isPlaying: React.PropTypes.bool.isRequired,
+    togglePause: React.PropTypes.func.isRequired
   },
   _zeroPad(val, dig) {
-    return ("0".repeat(dig)+val).slice(-dig)
+    return ("0".repeat(dig)+val).slice(-dig);
   },
   _secToTime(sec) {
     var m = Math.floor(sec/60);
@@ -16,18 +18,32 @@ var VideoPlayerSeekBar = React.createClass({
     }
     return `${this._zeroPad(m, mDig)}:${this._zeroPad(s, sDig)}`;
   },
-  getCurrent() {
+  _getCurrent() {
     return this._secToTime(this.props.currentTime);
   },
-  getDuration() {
+  _getDuration() {
     return this._secToTime(this.props.duration);
+  },
+  _renderPlayButton() {
+    var classes;
+    if(this.props.isPlaying) {
+      classes = "glyphicon glyphicon-pause"
+    } else {
+      classes = "glyphicon glyphicon-play"
+    }
+    return (
+      <button className="btn" onClick={this.props.togglePause}>
+        <span className={classes}></span>
+      </button>
+    );
   },
   render() {
     return (
       <div id="playing-seekbar">
-        <span id="playing-seekbar-time">{this.getCurrent()}/{this.getDuration()}</span>
+        {this._renderPlayButton()}
+        <span id="playing-seekbar-time">{this._getCurrent()}/{this._getDuration()}</span>
       </div>
-    )
+    );
   }
 });
 
@@ -38,12 +54,15 @@ var VideoPlayerCore = React.createClass({
   getInitialState() {
     return {
       duration: 0,
-      currentTime: 0
+      currentTime: 0,
+      isPlaying: false
     }
   },
   componentDidMount() {
     var video = this.refs.video;
     video.addEventListener("timeupdate", this.onTimeUpdate);
+    video.addEventListener("play", this.onPlay);
+    video.addEventListener("pause", this.onPause);
 
     var hasHlsNativeSupport = !!document.createElement('video').canPlayType('application/vnd.apple.mpegURL');
     if(!hasHlsNativeSupport) {
@@ -60,16 +79,30 @@ var VideoPlayerCore = React.createClass({
   componentWillUnmount() {
     var video = this.refs.video;
     video.removeEventListener("timeupdate", this.onTimeUpdate);
+    video.removeEventListener("play", this.onPlay);
+    video.removeEventListener("pause", this.onPause);
   },
   onTimeUpdate() {
     var video = this.refs.video;
     this.setState({duration: video.duration, currentTime: video.currentTime});
   },
+  onPlay() {
+    var video = this.refs.video;
+    this.setState({isPlaying: true});
+  },
+  onPause() {
+    var video = this.refs.video;
+    this.setState({isPlaying: false});
+  },
+  togglePause() {
+    var video = this.refs.video;
+    video.paused ? video.play() : video.pause();
+  },
   render() {
     return (
       <div>
         <video id="playing-video" src={this.props.src} preload="none" onclick="this.play()" controls="controls" ref="video"/>
-        <VideoPlayerSeekBar duration={this.state.duration} currentTime={this.state.currentTime}/>
+        <VideoPlayerSeekBar duration={this.state.duration} currentTime={this.state.currentTime} togglePause={this.togglePause} isPlaying={this.state.isPlaying}/>
       </div>
     );
   }
