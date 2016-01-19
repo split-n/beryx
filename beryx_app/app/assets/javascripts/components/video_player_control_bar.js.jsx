@@ -79,11 +79,11 @@ var VideoPlayerControlBar = React.createClass({
   },
   render() {
     return (
-      <div id="playing-seekbar">
+      <div id="player-controller">
         {this._renderPlayButton()}
         {this._renderJumpButtons()}
         {this._renderPlaybackRateSelects()}
-        <span id="playing-seekbar-time">{this._getCurrent()}/{this._getDuration()}</span>
+        <span id="player-controller-time">{this._getCurrent()}/{this._getDuration()}</span>
       </div>
     );
   }
