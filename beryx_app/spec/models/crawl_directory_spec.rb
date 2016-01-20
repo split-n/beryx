@@ -276,7 +276,7 @@ RSpec.describe CrawlDirectory, type: :model do
 
         let(:returns) { ["#{cd.path}foo.mp4", "#{cd.path}bar.mkv", "#{cd.path}sub/123/foo.mkv"] }
         before {
-          expect(Find).to receive(:find).with(cd.path).and_return(returns.to_enum)
+          allow(Find).to receive(:find).with(cd.path).and_return(returns.to_enum)
           returns.each{|p| mock_file_methods(p) }
         }
         it { expect{subject}.to change{Video.active.count}.from(0).to(returns.count)}

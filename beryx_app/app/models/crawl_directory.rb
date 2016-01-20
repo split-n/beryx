@@ -71,18 +71,31 @@ class CrawlDirectory < ActiveRecord::Base
     save!
 
     crawl_exist_videos_path do |path|
-      if Video.find_by(path: path).blank?
-        videos.create(path: path)
+      video = Video.find_by(path: path)
+      if video.blank?
+        video = videos.create!(path: path)
         logger.debug("created #{path}")
       else
+        video.mark_as_active
         logger.debug("exists #{path}")
       end
+      ExistedVideoOnCrawl.create!(video: video, crawl_directory: self)
     end
+
+
+    crawled_video_marks = ExistedVideoOnCrawl.where(crawl_directory: self)
+    crawled_video_ids = crawled_video_marks.select(:video_id)
+    not_crawled_videos = Video.where.not(id: crawled_video_ids).where(crawl_directory: self)
+    not_crawled_videos.find_each{|video|
+      video.mark_as_deleted
+    }
+    crawled_video_marks.delete_all
 
     self.crawl_job_status = :not_running
     self.crawl_jid = nil
     save!
   end
+
   private
   def path_should_exists
     unless path_exist?
