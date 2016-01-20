@@ -307,7 +307,19 @@ RSpec.describe CrawlDirectory, type: :model do
           }
         end
 
-        context "crawled twice, and deleted file is revived"
+        context "crawled twice, and deleted file is revived" do
+          before {
+            cd.crawl_videos_and_create
+            @deleted_path = returns.delete_at(1)
+            mock_file_noent(@deleted_path)
+            cd.crawl_videos_and_create
+            returns.unshift(@deleted_path)
+            mock_file_exists(@deleted_path)
+          }
+
+          it { expect{subject}.to change{cd.videos.active.count}.from(2).to(3) }
+          it { expect{subject}.to change{cd.videos.deleted.count}.from(1).to(0) }
+        end
       end
     end
 
