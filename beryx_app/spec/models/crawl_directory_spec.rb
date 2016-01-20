@@ -268,20 +268,39 @@ RSpec.describe CrawlDirectory, type: :model do
       end
 
       context "video files exist" do
+        def mock_file_methods(path)
+          allow(File).to receive(:exist?).with(path).and_return(true)
+          allow(File).to receive(:size).with(path).and_return(300.megabyte)
+          allow(File).to receive(:mtime).with(path).and_return(2.days.ago)
+        end
+
         let(:returns) { ["#{cd.path}foo.mp4", "#{cd.path}bar.mkv", "#{cd.path}sub/123/foo.mkv"] }
         before {
           expect(Find).to receive(:find).with(cd.path).and_return(returns.to_enum)
-          returns.each{|p|
-            allow(File).to receive(:exist?).with(p).and_return(true)
-            allow(File).to receive(:size).with(p).and_return(300.megabyte)
-            allow(File).to receive(:mtime).with(p).and_return(2.days.ago)
-          }
+          returns.each{|p| mock_file_methods(p) }
         }
         it { expect{subject}.to change{Video.active.count}.from(0).to(returns.count)}
         it {
           subject
           expect(cd.videos.find_by(path: returns.first)).to be_present
         }
+
+        context "crawled once, and file deleted" do
+          before {
+            cd.crawl_videos_and_create
+            @deleted_path = returns.delete_at(1)
+            allow(File).to receive(:exist?).with(@deleted_path).and_return(false)
+            allow(File).to receive(:size).with(@deleted_path).and_raise(Errno::ENOENT)
+            allow(File).to receive(:mtime).with(@deleted_path).and_raise(Errno::ENOENT)
+          }
+
+          it { expect{subject}.to change{Video.active.count}.from(3).to(2) }
+          it {
+            subject
+            deleted_video = cd.videos.find_by(path: @deleted_path)
+            expect(deleted_video.deleted_at).to be_within(1.minute).of(Time.now)
+          }
+        end
       end
     end
 
