@@ -280,7 +280,7 @@ RSpec.describe CrawlDirectory, type: :model do
 
     context "video files exist" do
 
-      let(:returns) { ["#{cd.path}foo.mp4", "#{cd.path}bar.mkv", "#{cd.path}sub/123/foo.mkv"] }
+      let(:returns) { %W(#{cd.path}foo/1.mp4 #{cd.path}foo/2.mkv #{cd.path}bar/3.mp4 #{cd.path}4.mkv) }
       before {
         allow(Find).to receive(:find).with(cd.path).and_return(returns.to_enum)
         returns.each{|p| mock_file_exists(p) }
@@ -298,8 +298,8 @@ RSpec.describe CrawlDirectory, type: :model do
           mock_file_noent(@deleted_path)
         }
 
-        it { expect{subject}.to change{cd.videos.active.count}.from(3).to(2) }
-        it { expect{subject}.to change{cd.videos.deleted.count}.from(0).to(1) }
+        it { expect{subject}.to change{cd.videos.active.count}.by(-1) }
+        it { expect{subject}.to change{cd.videos.deleted.count}.by(1) }
         it {
           subject
           deleted_video = cd.videos.find_by(path: @deleted_path)
@@ -317,11 +317,31 @@ RSpec.describe CrawlDirectory, type: :model do
           mock_file_exists(@deleted_path)
         }
 
-        it { expect{subject}.to change{cd.videos.active.count}.from(2).to(3) }
-        it { expect{subject}.to change{cd.videos.deleted.count}.from(1).to(0) }
+        it { expect{subject}.to change{cd.videos.active.count}.by(1) }
+        it { expect{subject}.to change{cd.videos.deleted.count}.by(-1) }
+      end
+
+      context "first cd has been deleted, new one revives deleted videos" do
+        before {
+          cd.crawl_videos_and_create
+          cd.mark_as_deleted
+          @cd2 = FG.create(:crawl_directory, path: "#{cd.path}foo/")
+          returns_in2 = returns.select{|p| p.start_with?(@cd2.path)}
+          allow(Find).to receive(:find).with(@cd2.path).and_return(returns_in2.to_enum)
+        }
+        subject { @cd2.crawl_videos_and_create }
+        it { expect{subject}.to change{@cd2.videos.active.count}.from(0).to(2)}
+        it { expect{subject}.to change{cd.videos.deleted.count}.from(returns.count).to(2)}
+        it "video is same id" do
+          target_path = returns.first
+          old = cd.videos.deleted.find_by(path: target_path)
+          subject
+          new = @cd2.videos.active.find_by(path: target_path)
+          expect(new).to eq old
+        end
+
       end
     end
-
   end
 
 

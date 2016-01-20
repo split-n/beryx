@@ -76,8 +76,16 @@ class CrawlDirectory < ActiveRecord::Base
         video = videos.create!(path: path)
         logger.debug("created #{path}")
       else
-        video.mark_as_active
-        logger.debug("exists #{path}")
+        if video.deleted?
+          if video.crawl_directory != self
+            video.crawl_directory = self
+            video.save!
+          end
+          video.mark_as_active
+          logger.debug("activated #{path}")
+        else
+          logger.debug("exists #{path}")
+        end
       end
       ExistedVideoOnCrawl.create!(video: video, crawl_directory: self)
     end
