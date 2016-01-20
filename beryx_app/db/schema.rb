@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160117153310) do
+ActiveRecord::Schema.define(version: 20160120054511) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -38,6 +38,16 @@ ActiveRecord::Schema.define(version: 20160117153310) do
     t.string   "crawl_jid"
   end
 
+  create_table "existed_video_on_crawls", force: :cascade do |t|
+    t.integer  "video_id",           null: false
+    t.integer  "crawl_directory_id", null: false
+    t.datetime "created_at",         null: false
+    t.datetime "updated_at",         null: false
+  end
+
+  add_index "existed_video_on_crawls", ["crawl_directory_id"], name: "index_existed_video_on_crawls_on_crawl_directory_id", using: :btree
+  add_index "existed_video_on_crawls", ["video_id"], name: "index_existed_video_on_crawls_on_video_id", using: :btree
+
   create_table "users", force: :cascade do |t|
     t.string   "login_id",                        null: false
     t.string   "password_digest",                 null: false
@@ -61,5 +71,7 @@ ActiveRecord::Schema.define(version: 20160117153310) do
   add_index "videos", ["path"], name: "index_videos_on_path", unique: true, using: :btree
 
   add_foreign_key "converted_videos", "videos"
+  add_foreign_key "existed_video_on_crawls", "crawl_directories"
+  add_foreign_key "existed_video_on_crawls", "videos"
   add_foreign_key "videos", "crawl_directories"
 end
