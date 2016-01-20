@@ -268,7 +268,7 @@ RSpec.describe CrawlDirectory, type: :model do
       end
 
       context "video files exist" do
-        def mock_file_methods(path)
+        def mock_file_exists(path)
           allow(File).to receive(:exist?).with(path).and_return(true)
           allow(File).to receive(:size).with(path).and_return(300.megabyte)
           allow(File).to receive(:mtime).with(path).and_return(2.days.ago)
@@ -277,7 +277,7 @@ RSpec.describe CrawlDirectory, type: :model do
         let(:returns) { ["#{cd.path}foo.mp4", "#{cd.path}bar.mkv", "#{cd.path}sub/123/foo.mkv"] }
         before {
           allow(Find).to receive(:find).with(cd.path).and_return(returns.to_enum)
-          returns.each{|p| mock_file_methods(p) }
+          returns.each{|p| mock_file_exists(p) }
         }
         it { expect{subject}.to change{Video.active.count}.from(0).to(returns.count)}
         it {
