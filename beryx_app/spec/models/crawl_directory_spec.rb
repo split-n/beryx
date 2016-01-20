@@ -1,6 +1,18 @@
 require 'rails_helper'
 
 RSpec.describe CrawlDirectory, type: :model do
+  def mock_file_exists(path)
+    allow(File).to receive(:exist?).with(path).and_return(true)
+    allow(File).to receive(:size).with(path).and_return(300.megabyte)
+    allow(File).to receive(:mtime).with(path).and_return(2.days.ago)
+  end
+
+  def mock_file_noent(path)
+    allow(File).to receive(:exist?).with(path).and_return(false)
+    allow(File).to receive(:size).with(path).and_raise(Errno::ENOENT)
+    allow(File).to receive(:mtime).with(path).and_raise(Errno::ENOENT)
+  end
+
   describe "create new instance" do
     context "single instance test" do
       subject { CrawlDirectory.create(path: path) }
@@ -261,70 +273,57 @@ RSpec.describe CrawlDirectory, type: :model do
     let(:cd) { FG.create(:crawl_directory) }
     subject { cd.crawl_videos_and_create }
 
-    context "first time" do
-      context "directory is removed" do
-        before { expect(Dir).to receive(:exist?).with(cd.path).and_return(false) }
-        it { expect{subject}.to raise_error(CrawlDirectory::PathNotFoundError) }
-      end
+    context "directory is removed" do
+      before { expect(Dir).to receive(:exist?).with(cd.path).and_return(false) }
+      it { expect{subject}.to raise_error(CrawlDirectory::PathNotFoundError) }
+    end
 
-      context "video files exist" do
-        def mock_file_exists(path)
-          allow(File).to receive(:exist?).with(path).and_return(true)
-          allow(File).to receive(:size).with(path).and_return(300.megabyte)
-          allow(File).to receive(:mtime).with(path).and_return(2.days.ago)
-        end
+    context "video files exist" do
 
-        def mock_file_noent(path)
-          allow(File).to receive(:exist?).with(path).and_return(false)
-          allow(File).to receive(:size).with(path).and_raise(Errno::ENOENT)
-          allow(File).to receive(:mtime).with(path).and_raise(Errno::ENOENT)
-        end
+      let(:returns) { ["#{cd.path}foo.mp4", "#{cd.path}bar.mkv", "#{cd.path}sub/123/foo.mkv"] }
+      before {
+        allow(Find).to receive(:find).with(cd.path).and_return(returns.to_enum)
+        returns.each{|p| mock_file_exists(p) }
+      }
+      it { expect{subject}.to change{Video.active.count}.from(0).to(returns.count)}
+      it {
+        subject
+        expect(cd.videos.find_by(path: returns.first)).to be_present
+      }
 
-        let(:returns) { ["#{cd.path}foo.mp4", "#{cd.path}bar.mkv", "#{cd.path}sub/123/foo.mkv"] }
+      context "crawled once, and file deleted" do
         before {
-          allow(Find).to receive(:find).with(cd.path).and_return(returns.to_enum)
-          returns.each{|p| mock_file_exists(p) }
+          cd.crawl_videos_and_create
+          @deleted_path = returns.delete_at(1)
+          mock_file_noent(@deleted_path)
         }
-        it { expect{subject}.to change{Video.active.count}.from(0).to(returns.count)}
+
+        it { expect{subject}.to change{cd.videos.active.count}.from(3).to(2) }
+        it { expect{subject}.to change{cd.videos.deleted.count}.from(0).to(1) }
         it {
           subject
-          expect(cd.videos.find_by(path: returns.first)).to be_present
+          deleted_video = cd.videos.find_by(path: @deleted_path)
+          expect(deleted_video.deleted_at).to be_within(1.minute).of(Time.now)
+        }
+      end
+
+      context "crawled twice, and deleted file is revived" do
+        before {
+          cd.crawl_videos_and_create
+          @deleted_path = returns.delete_at(1)
+          mock_file_noent(@deleted_path)
+          cd.crawl_videos_and_create
+          returns.unshift(@deleted_path)
+          mock_file_exists(@deleted_path)
         }
 
-        context "crawled once, and file deleted" do
-          before {
-            cd.crawl_videos_and_create
-            @deleted_path = returns.delete_at(1)
-            mock_file_noent(@deleted_path)
-          }
-
-          it { expect{subject}.to change{cd.videos.active.count}.from(3).to(2) }
-          it { expect{subject}.to change{cd.videos.deleted.count}.from(0).to(1) }
-          it {
-            subject
-            deleted_video = cd.videos.find_by(path: @deleted_path)
-            expect(deleted_video.deleted_at).to be_within(1.minute).of(Time.now)
-          }
-        end
-
-        context "crawled twice, and deleted file is revived" do
-          before {
-            cd.crawl_videos_and_create
-            @deleted_path = returns.delete_at(1)
-            mock_file_noent(@deleted_path)
-            cd.crawl_videos_and_create
-            returns.unshift(@deleted_path)
-            mock_file_exists(@deleted_path)
-          }
-
-          it { expect{subject}.to change{cd.videos.active.count}.from(2).to(3) }
-          it { expect{subject}.to change{cd.videos.deleted.count}.from(1).to(0) }
-        end
+        it { expect{subject}.to change{cd.videos.active.count}.from(2).to(3) }
+        it { expect{subject}.to change{cd.videos.deleted.count}.from(1).to(0) }
       end
     end
 
-
   end
+
 
   describe "ignores changing path" do
     let(:cd) { FG.create(:crawl_directory) }
