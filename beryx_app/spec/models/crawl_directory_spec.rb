@@ -274,6 +274,12 @@ RSpec.describe CrawlDirectory, type: :model do
           allow(File).to receive(:mtime).with(path).and_return(2.days.ago)
         end
 
+        def mock_file_noent(path)
+          allow(File).to receive(:exist?).with(path).and_return(false)
+          allow(File).to receive(:size).with(path).and_raise(Errno::ENOENT)
+          allow(File).to receive(:mtime).with(path).and_raise(Errno::ENOENT)
+        end
+
         let(:returns) { ["#{cd.path}foo.mp4", "#{cd.path}bar.mkv", "#{cd.path}sub/123/foo.mkv"] }
         before {
           allow(Find).to receive(:find).with(cd.path).and_return(returns.to_enum)
@@ -289,9 +295,7 @@ RSpec.describe CrawlDirectory, type: :model do
           before {
             cd.crawl_videos_and_create
             @deleted_path = returns.delete_at(1)
-            allow(File).to receive(:exist?).with(@deleted_path).and_return(false)
-            allow(File).to receive(:size).with(@deleted_path).and_raise(Errno::ENOENT)
-            allow(File).to receive(:mtime).with(@deleted_path).and_raise(Errno::ENOENT)
+            mock_file_noent(@deleted_path)
           }
 
           it { expect{subject}.to change{cd.videos.active.count}.from(3).to(2) }
