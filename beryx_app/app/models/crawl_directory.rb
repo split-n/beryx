@@ -93,8 +93,8 @@ class CrawlDirectory < ActiveRecord::Base
 
     crawled_video_marks = ExistedVideoOnCrawl.where(crawl_directory: self)
     crawled_video_ids = crawled_video_marks.select(:video_id)
-    not_crawled_videos = Video.where.not(id: crawled_video_ids).where(crawl_directory: self)
-    not_crawled_videos.find_each{|video|
+    not_crawled_active_videos = self.videos.active.where.not(id: crawled_video_ids)
+    not_crawled_active_videos.find_each{|video|
       video.mark_as_deleted
     }
     crawled_video_marks.delete_all
