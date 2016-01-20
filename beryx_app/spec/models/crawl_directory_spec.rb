@@ -294,13 +294,16 @@ RSpec.describe CrawlDirectory, type: :model do
             allow(File).to receive(:mtime).with(@deleted_path).and_raise(Errno::ENOENT)
           }
 
-          it { expect{subject}.to change{Video.active.count}.from(3).to(2) }
+          it { expect{subject}.to change{cd.videos.active.count}.from(3).to(2) }
+          it { expect{subject}.to change{cd.videos.deleted.count}.from(0).to(1) }
           it {
             subject
             deleted_video = cd.videos.find_by(path: @deleted_path)
             expect(deleted_video.deleted_at).to be_within(1.minute).of(Time.now)
           }
         end
+
+        context "crawled twice, and deleted file is revived"
       end
     end
 
