@@ -53,7 +53,8 @@ RSpec.describe Video, type: :model do
 
         context "pass file stats" do
           subject { cd.videos.create(path: path,
-                                     file_size: 300.megabyte, file_timestamp: 2.days.ago)}
+                                     file_size: 300.megabyte, file_timestamp: 2.days.ago,
+                                     duration: 24.minutes )}
           it { should be_valid }
         end
 
@@ -61,6 +62,10 @@ RSpec.describe Video, type: :model do
           before {
             allow(File).to receive(:size).with(path).and_return(300.megabyte)
             allow(File).to receive(:mtime).with(path).and_return(2.days.ago)
+            allow_any_instance_of(Video).to receive(:get_duration).and_return(24.minutes)
+          }
+          after {
+            allow_any_instance_of(Video).to receive(:get_duration).and_call_original
           }
           context "normal args" do
             subject{ cd.videos.create(path: path) }

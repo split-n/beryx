@@ -11,6 +11,7 @@
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  file_timestamp     :datetime         not null
+#  duration           :integer          not null
 #
 # Indexes
 #
@@ -32,12 +33,14 @@ class Video < ActiveRecord::Base
   validates :crawl_directory, presence: true
   validates :path, presence: true
   validate :path_should_exists, if: -> { path.present? }, on: :create
-  validate :path_file_extension, :crawl_directory_should_active, :crawl_directory_should_be_parent, if: -> { path.present? }
+  validate :path_file_extension, :crawl_directory_should_active,
+           :crawl_directory_should_be_parent, :duration_should_available, if: -> { path.present? }
 
   before_save do
     self.file_name = File.basename(path)
     self.file_size ||= File.size(path)
     self.file_timestamp ||= File.mtime(path)
+    self.duration ||= get_duration
   end
 
   class << self
@@ -82,7 +85,13 @@ class Video < ActiveRecord::Base
     end
   end
 
+  def duration_should_available
+    return unless path_exist?
+    errors.add(:path, "can't get video duration") unless get_duration
+  end
+
   def get_duration
+    return self.duration if self.duration
     cmd = %Q(ffprobe -show_streams -print_format json "#{self.path}" 2>/dev/null)
     out, err, status = Open3.capture3(cmd)
     probe = JSON.parse(out)
