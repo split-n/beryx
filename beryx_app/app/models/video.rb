@@ -86,6 +86,6 @@ class Video < ActiveRecord::Base
     cmd = %Q(ffprobe -show_streams -print_format json "#{self.path}" 2>/dev/null)
     out, err, status = Open3.capture3(cmd)
     probe = JSON.parse(out)
-    probe["streams"][0]["duration"].to_i
+    probe.dig("streams", 0, "duration")&.to_i
   end
 end
