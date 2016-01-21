@@ -22,6 +22,8 @@
 #  fk_rails_b52ccf2fa6  (crawl_directory_id => crawl_directories.id)
 #
 
+require 'open3'
+
 class Video < ActiveRecord::Base
   include SoftDeletable
   VIDEO_EXTS = %w(.mp4 .mkv) # temp
@@ -78,5 +80,12 @@ class Video < ActiveRecord::Base
     unless path.start_with?(crawl_directory.path)
       errors.add(:crawl_directory, "crawl directory is not parent of directory")
     end
+  end
+
+  def get_duration
+    cmd = %Q(ffprobe -show_streams -print_format json "#{self.path}" 2>/dev/null)
+    out, err, status = Open3.capture3(cmd)
+    probe = JSON.parse(out)
+    probe["streams"][0]["duration"].to_i
   end
 end
