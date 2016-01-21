@@ -26,6 +26,7 @@ require 'open3'
 
 class Video < ActiveRecord::Base
   include SoftDeletable
+  include PrivateAttribute
   VIDEO_EXTS = %w(.mp4 .mkv) # temp
   belongs_to :crawl_directory
   has_many :converted_videos
@@ -34,10 +35,10 @@ class Video < ActiveRecord::Base
   validate :path_should_exists, if: -> { path.present? }, on: :create
   validate :path_file_extension, :crawl_directory_should_active, :crawl_directory_should_be_parent, if: -> { path.present? }
 
-  before_save do
+  before_create do
     self.file_name = File.basename(path)
-    self.file_size ||= File.size(path)
-    self.file_timestamp ||= File.mtime(path)
+    self.file_size = File.size(path)
+    self.file_timestamp = File.mtime(path)
   end
 
   class << self
@@ -56,6 +57,9 @@ class Video < ActiveRecord::Base
   end
 
   private
+
+  prop_readonly :file_name, :file_size, :file_timestamp, :duration
+
   def path_should_exists
     unless path_exist?
       errors.add(:path, "file not found")
