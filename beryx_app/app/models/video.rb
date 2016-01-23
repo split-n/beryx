@@ -35,6 +35,8 @@ class Video < ActiveRecord::Base
   validate :path_should_exists, if: -> { path.present? }, on: :create
   validate :path_file_extension, :crawl_directory_should_active, :crawl_directory_should_be_parent, if: -> { path.present? }
 
+  attr_private_writer :file_name, :file_size, :file_timestamp, :duration
+
   before_create do
     self.file_name = File.basename(path)
     self.file_size = File.size(path)
@@ -57,9 +59,6 @@ class Video < ActiveRecord::Base
   end
 
   private
-
-  prop_readonly :file_name, :file_size, :file_timestamp, :duration
-
   def path_should_exists
     unless path_exist?
       errors.add(:path, "file not found")
