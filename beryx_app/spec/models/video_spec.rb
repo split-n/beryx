@@ -1,18 +1,25 @@
 require 'rails_helper'
 
 RSpec.describe Video, type: :model do
+  shared_context "path file exist" do
+    before {
+      allow(File).to receive(:exist?).with(path).and_return(true)
+      allow(File).to receive(:size).with(path).and_return(300.megabyte)
+      allow(File).to receive(:mtime).with(path).and_return(2.days.ago)
+      allow_any_instance_of(Video).to receive(:get_duration).and_return(24.minutes)
+    }
+    after {
+      allow_any_instance_of(Video).to receive(:get_duration).and_call_original
+      allow(File).to receive(:exist?).and_call_original
+      allow(File).to receive(:size).and_call_original
+      allow(File).to receive(:mtime).and_call_original
+    }
+  end
+
   describe "new instance" do
     context "without CrawlDirectory" do
       let(:path) { "/exists/foo.mp4" }
-      before {
-        allow(File).to receive(:exist?).with(path).and_return(true)
-        allow(File).to receive(:size).with(path).and_return(300.megabyte)
-        allow(File).to receive(:mtime).with(path).and_return(2.days.ago)
-        allow_any_instance_of(Video).to receive(:get_duration).and_return(24.minutes)
-      }
-      after {
-        allow_any_instance_of(Video).to receive(:get_duration).and_call_original
-      }
+      include_context "path file exist"
 
       context "cd is nil" do
         subject { Video.create(path: path) }
@@ -48,15 +55,7 @@ RSpec.describe Video, type: :model do
 
       context "path is relative" do
         let(:path) { "foo.mp4" }
-        before {
-          allow(File).to receive(:exist?).with(path).and_return(true)
-          allow(File).to receive(:size).with(path).and_return(300.megabyte)
-          allow(File).to receive(:mtime).with(path).and_return(2.days.ago)
-          allow_any_instance_of(Video).to receive(:get_duration).and_return(24.minutes)
-        }
-        after {
-          allow_any_instance_of(Video).to receive(:get_duration).and_call_original
-        }
+        include_context "path file exist"
 
         subject{ cd.videos.create(path: path) }
         it { expect(subject.errors[:crawl_directory]).to eq ["crawl directory is not parent of directory"] }
@@ -65,16 +64,7 @@ RSpec.describe Video, type: :model do
 
       context "with exist path" do
         let(:path) { "/exists/foo.mp4" }
-        before {
-          allow(File).to receive(:exist?).with(path).and_return(true)
-          allow(File).to receive(:size).with(path).and_return(300.megabyte)
-          allow(File).to receive(:mtime).with(path).and_return(2.days.ago)
-          allow_any_instance_of(Video).to receive(:get_duration).and_return(24.minutes)
-        }
-
-        after {
-          allow_any_instance_of(Video).to receive(:get_duration).and_call_original
-        }
+        include_context "path file exist"
 
         context "normal args" do
           subject{ cd.videos.create(path: path) }
