@@ -11,6 +11,7 @@
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  file_timestamp     :datetime         not null
+#  duration           :integer          not null
 #
 # Indexes
 #
@@ -22,20 +23,27 @@
 #  fk_rails_b52ccf2fa6  (crawl_directory_id => crawl_directories.id)
 #
 
+require 'open3'
+
 class Video < ActiveRecord::Base
   include SoftDeletable
+  include PrivateAttribute
   VIDEO_EXTS = %w(.mp4 .mkv) # temp
   belongs_to :crawl_directory
   has_many :converted_videos
   validates :crawl_directory, presence: true
   validates :path, presence: true
   validate :path_should_exists, if: -> { path.present? }, on: :create
-  validate :path_file_extension, :crawl_directory_should_active, :crawl_directory_should_be_parent, if: -> { path.present? }
+  validate :path_file_extension, :crawl_directory_should_active,
+           :crawl_directory_should_be_parent, :duration_should_available, if: -> { path.present? }
 
-  before_save do
+  attr_private_writer :file_name, :file_size, :file_timestamp, :duration
+
+  before_create do
     self.file_name = File.basename(path)
-    self.file_size ||= File.size(path)
-    self.file_timestamp ||= File.mtime(path)
+    self.file_size = File.size(path)
+    self.file_timestamp = File.mtime(path)
+    self.duration = get_duration
   end
 
   class << self
@@ -78,5 +86,19 @@ class Video < ActiveRecord::Base
     unless path.start_with?(crawl_directory.path)
       errors.add(:crawl_directory, "crawl directory is not parent of directory")
     end
+  end
+
+  def duration_should_available
+    return unless path_exist?
+    errors.add(:path, "can't get video duration") unless get_duration
+  end
+
+  def get_duration
+    return self.duration if self.duration
+    return  @_duration if @_duration
+    cmd = %Q(ffprobe -show_streams -print_format json "#{self.path}" 2>/dev/null)
+    out, err, status = Open3.capture3(cmd)
+    probe = JSON.parse(out)
+    @_duration = probe.dig("streams", 0, "duration")&.to_i
   end
 end
