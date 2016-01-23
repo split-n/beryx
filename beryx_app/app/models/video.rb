@@ -11,6 +11,7 @@
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  file_timestamp     :datetime         not null
+#  duration           :integer          not null
 #
 # Indexes
 #
@@ -33,7 +34,8 @@ class Video < ActiveRecord::Base
   validates :crawl_directory, presence: true
   validates :path, presence: true
   validate :path_should_exists, if: -> { path.present? }, on: :create
-  validate :path_file_extension, :crawl_directory_should_active, :crawl_directory_should_be_parent, if: -> { path.present? }
+  validate :path_file_extension, :crawl_directory_should_active,
+           :crawl_directory_should_be_parent, :duration_should_available, if: -> { path.present? }
 
   attr_private_writer :file_name, :file_size, :file_timestamp, :duration
 
@@ -41,6 +43,7 @@ class Video < ActiveRecord::Base
     self.file_name = File.basename(path)
     self.file_size = File.size(path)
     self.file_timestamp = File.mtime(path)
+    self.duration = get_duration
   end
 
   class << self
@@ -85,10 +88,17 @@ class Video < ActiveRecord::Base
     end
   end
 
+  def duration_should_available
+    return unless path_exist?
+    errors.add(:path, "can't get video duration") unless get_duration
+  end
+
   def get_duration
+    return self.duration if self.duration
+    return  @_duration if @_duration
     cmd = %Q(ffprobe -show_streams -print_format json "#{self.path}" 2>/dev/null)
     out, err, status = Open3.capture3(cmd)
     probe = JSON.parse(out)
-    probe.dig("streams", 0, "duration")&.to_i
+    @_duration = probe.dig("streams", 0, "duration")&.to_i
   end
 end

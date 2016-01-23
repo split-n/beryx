@@ -4,7 +4,16 @@ RSpec.describe Video, type: :model do
   describe "new instance" do
     context "without CrawlDirectory" do
       let(:path) { "/exists/foo.mp4" }
-      before { allow(File).to receive(:exist?).with(path).and_return(true) }
+      before {
+        allow(File).to receive(:exist?).with(path).and_return(true)
+        allow(File).to receive(:size).with(path).and_return(300.megabyte)
+        allow(File).to receive(:mtime).with(path).and_return(2.days.ago)
+        allow_any_instance_of(Video).to receive(:get_duration).and_return(24.minutes)
+      }
+      after {
+        allow_any_instance_of(Video).to receive(:get_duration).and_call_original
+      }
+
       context "cd is nil" do
         subject { Video.create(path: path) }
         it { expect(subject.errors[:crawl_directory]).to eq ["can't be blank"] }
@@ -43,7 +52,12 @@ RSpec.describe Video, type: :model do
           allow(File).to receive(:exist?).with(path).and_return(true)
           allow(File).to receive(:size).with(path).and_return(300.megabyte)
           allow(File).to receive(:mtime).with(path).and_return(2.days.ago)
+          allow_any_instance_of(Video).to receive(:get_duration).and_return(24.minutes)
         }
+        after {
+          allow_any_instance_of(Video).to receive(:get_duration).and_call_original
+        }
+
         subject{ cd.videos.create(path: path) }
         it { expect(subject.errors[:crawl_directory]).to eq ["crawl directory is not parent of directory"] }
         it { expect(subject.errors.messages.length).to eq 1 }
@@ -55,6 +69,11 @@ RSpec.describe Video, type: :model do
           allow(File).to receive(:exist?).with(path).and_return(true)
           allow(File).to receive(:size).with(path).and_return(300.megabyte)
           allow(File).to receive(:mtime).with(path).and_return(2.days.ago)
+          allow_any_instance_of(Video).to receive(:get_duration).and_return(24.minutes)
+        }
+
+        after {
+          allow_any_instance_of(Video).to receive(:get_duration).and_call_original
         }
 
         context "normal args" do

@@ -282,9 +282,15 @@ RSpec.describe CrawlDirectory, type: :model do
 
       let(:returns) { %W(#{cd.path}foo/1.mp4 #{cd.path}foo/2.mkv #{cd.path}bar/3.mp4 #{cd.path}4.mkv) }
       before {
+        allow_any_instance_of(Video).to receive(:get_duration).and_return(24.minutes)
         allow(Find).to receive(:find).with(cd.path).and_return(returns.to_enum)
         returns.each{|p| mock_file_exists(p) }
       }
+
+      after {
+        allow_any_instance_of(Video).to receive(:get_duration).and_call_original
+      }
+
       it { expect{subject}.to change{Video.active.count}.from(0).to(returns.count)}
       it {
         subject
