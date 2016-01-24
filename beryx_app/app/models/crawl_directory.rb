@@ -73,7 +73,14 @@ class CrawlDirectory < ActiveRecord::Base
     crawl_exist_videos_path do |path|
       video = Video.find_by(path: path)
       if video.blank?
-        video = videos.create!(path: path)
+        same_videos = Video.where(file_name: File.basename(path), file_size: File.size(path))
+        video = same_videos.select{|v| !v.path_exist? || v.deleted?}.first
+        if video.present?
+          video.path = path
+          video.save!
+        else
+          video = self.videos.create!(path: path)
+        end
         logger.debug("created #{path}")
       else
         if video.deleted?

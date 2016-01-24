@@ -280,7 +280,7 @@ RSpec.describe CrawlDirectory, type: :model do
 
     context "video files exist" do
 
-      let(:returns) { %W(#{cd.path}foo/1.mp4 #{cd.path}foo/2.mkv #{cd.path}bar/3.mp4 #{cd.path}4.mkv) }
+      let(:returns) { %W(#{cd.path}foo/1.mp4 #{cd.path}foo/2.mkv #{cd.path}bar/3.mp4 #{cd.path}1.mp4) }
       before {
         allow_any_instance_of(Video).to receive(:get_duration).and_return(24.minutes)
         allow(Find).to receive(:find).with(cd.path).and_return(returns.to_enum)
@@ -323,7 +323,7 @@ RSpec.describe CrawlDirectory, type: :model do
         it { expect{subject}.not_to change{cd.videos.active.count} }
         it { expect{subject}.not_to change{cd.videos.deleted.count} }
         it { expect{subject}.not_to change{Video.find_by(path: @deleted_path).deleted_at}}
-        end
+      end
 
       context "crawled twice, and deleted file is revived" do
         before {
@@ -358,7 +358,28 @@ RSpec.describe CrawlDirectory, type: :model do
           new = @cd2.videos.active.find_by(path: target_path)
           expect(new).to eq old
         end
+      end
 
+      context "crawled once, and file is moved" do
+        before {
+          cd.crawl_videos_and_create
+          @deleted_path = returns.delete_at(0)
+          @deleted_video = Video.find_by(path: @deleted_path)
+          file_name = File.basename(@deleted_path)
+          mock_file_noent(@deleted_path)
+          @new_path = "#{cd.path}moved/#{file_name}"
+          returns.unshift(@new_path)
+          mock_file_exists(@new_path)
+        }
+
+        subject { cd.crawl_videos_and_create }
+        it { expect{subject}.not_to change{cd.videos.active.count} }
+        it { expect{subject}.not_to change{cd.videos.deleted.count} }
+        it "is same entity" do
+          subject
+          new_video = Video.find_by(path: @new_path)
+          expect(@deleted_video).to eq new_video
+        end
       end
     end
   end
