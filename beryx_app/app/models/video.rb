@@ -45,7 +45,7 @@ class Video < ActiveRecord::Base
     self.file_size = File.size(path)
     self.file_timestamp = File.mtime(path)
     self.duration = get_duration
-    self.normalized_file_name = self.normalize_file_name
+    self.normalized_file_name = self.class.normalize_file_name(path)
   end
 
   class << self
