@@ -2,16 +2,17 @@
 #
 # Table name: videos
 #
-#  id                 :integer          not null, primary key
-#  crawl_directory_id :integer
-#  path               :text             not null
-#  file_name          :text             not null
-#  file_size          :integer          not null
-#  deleted_at         :datetime
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#  file_timestamp     :datetime         not null
-#  duration           :integer          not null
+#  id                   :integer          not null, primary key
+#  crawl_directory_id   :integer
+#  path                 :text             not null
+#  file_name            :text             not null
+#  file_size            :integer          not null
+#  deleted_at           :datetime
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#  file_timestamp       :datetime         not null
+#  duration             :integer          not null
+#  normalized_file_name :text             not null
 #
 # Indexes
 #
@@ -37,18 +38,23 @@ class Video < ActiveRecord::Base
   validate :path_file_extension, :crawl_directory_should_active,
            :crawl_directory_should_be_parent, :duration_should_available, if: -> { path.present? }
 
-  attr_private_writer :file_name, :file_size, :file_timestamp, :duration
+  attr_private_writer :file_name, :file_size, :file_timestamp, :duration, :normalized_file_name
 
   before_create do
     self.file_name = File.basename(path)
     self.file_size = File.size(path)
     self.file_timestamp = File.mtime(path)
     self.duration = get_duration
+    self.normalized_file_name = self.normalize_file_name
   end
 
   class << self
     def file_supported?(path)
       File.extname(path).downcase.in?(VIDEO_EXTS)
+    end
+
+    def normalize_file_name(file_name)
+      file_name.tr("０-９", "0-9").tr("ａ-ｚ", "a-z").tr("Ａ-Ｚ", "a-z").tr("A-Z", "a-z")
     end
   end
 

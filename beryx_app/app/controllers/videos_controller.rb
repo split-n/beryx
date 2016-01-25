@@ -2,10 +2,10 @@ class VideosController < ApplicationController
   before_action :ensure_logged_user
   def index
     q = params[:q]
-    if q && q[:file_name_cont_all]
+    if q && q[:normalized_file_name_cont_all]
       @ransack = Video.active.ransack(
-          q.except(:file_name_cont_all).merge(
-              { file_name_cont_all: q[:file_name_cont_all].split("\s") }
+          q.except(:normalized_file_name_cont_all).merge(
+              { normalized_file_name_cont_all: q[:normalized_file_name_cont_all].split("\s") }
           ))
     else
       @ransack = Video.active.ransack(q)

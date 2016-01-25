@@ -1,6 +1,6 @@
 <h1>Videos</h1>
 <%= search_form_for @ransack, url: root_path do |f| %>
-    <%= f.text_field :file_name_cont_all %>
+    <%= f.text_field :normalized_file_name_cont_all %>
     <%= f.submit %>
 <% end %>
 <ul>
