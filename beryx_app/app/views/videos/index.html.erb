@@ -1,4 +1,8 @@
 <h1>Videos</h1>
+<%= search_form_for @ransack, url: root_path do |f| %>
+    <%= f.text_field :file_name_cont_all %>
+    <%= f.submit %>
+<% end %>
 <ul>
   <% @videos.each do |video| %>
     <li><%= link_to video.file_name, video_path(video.id) %></li>
