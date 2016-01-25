@@ -94,6 +94,14 @@ RSpec.describe Video, type: :model do
             let(:path) { "/exists/foo.MP4" }
             it { should be_valid }
           end
+
+          context "video file cant' detect duration" do
+            let(:path) { "/exists/foo.mp4" }
+            before {
+              allow_any_instance_of(Video).to receive(:get_duration).and_return(nil)
+            }
+            it { should_not be_valid }
+          end
         end
 
         context "pass crawl_directory_id" do
