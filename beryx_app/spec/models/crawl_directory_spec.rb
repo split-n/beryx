@@ -381,6 +381,31 @@ RSpec.describe CrawlDirectory, type: :model do
           expect(@deleted_video).to eq new_video
         end
       end
+
+      context "crawled once, and a file is deleted, a same name file is created" do
+        before {
+          cd.crawl_videos_and_create
+          @deleted_path = returns.delete_at(0)
+          @deleted_video = Video.find_by(path: @deleted_path)
+          file_name = File.basename(@deleted_path)
+          mock_file_noent(@deleted_path)
+          @new_path = "#{cd.path}neq/#{file_name}"
+          returns.unshift(@new_path)
+          allow(File).to receive(:exist?).with(@new_path).and_return(true)
+          allow(File).to receive(:size).with(@new_path).and_return(777.megabyte)
+          allow(File).to receive(:mtime).with(@new_path).and_return(2.days.ago)
+        }
+
+        subject { cd.crawl_videos_and_create }
+        it { expect{subject}.not_to change{cd.videos.active.count} }
+        it { expect{subject}.to change{cd.videos.deleted.count}.by(1) }
+        it "is not same entity" do
+          subject
+          new_video = Video.find_by(path: @new_path)
+          expect(@deleted_video).not_to eq new_video
+        end
+      end
+
     end
   end
 
