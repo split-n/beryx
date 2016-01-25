@@ -26,7 +26,7 @@ class CrawlDirectory < ActiveRecord::Base
   validates :path, format: {with: %r{/\z}, message: "must be ended with /"}, if: -> { path.present? }
   validate :path_should_exists, if: -> { path.present? }, on: :create
   validate :path_should_not_include_others, :path_should_not_relative, if: -> { path.present? }
-  has_many :videos, dependent: :destroy
+  has_many :videos, dependent: :destroy, validate: false
 
   before_save do
     self.crawl_job_status ||= :not_running
@@ -71,6 +71,7 @@ class CrawlDirectory < ActiveRecord::Base
     save!
 
     crawl_exist_videos_path do |path|
+      begin
       video = Video.find_by(path: path)
       if video.blank?
         same_videos = Video.where(file_name: File.basename(path), file_size: File.size(path))
@@ -78,10 +79,12 @@ class CrawlDirectory < ActiveRecord::Base
         if video.present?
           video.path = path
           video.save!
+          logger.debug("[CrawlVideos] move detected #{path}")
         else
-          video = self.videos.create!(path: path)
+          video = self.videos.build(path: path)
+          video.save!
         end
-        logger.debug("created #{path}")
+        logger.debug("[CrawlVideos] created #{path}")
       else
         if video.deleted?
           if video.crawl_directory != self
@@ -89,12 +92,19 @@ class CrawlDirectory < ActiveRecord::Base
             video.save!
           end
           video.mark_as_active
-          logger.debug("activated #{path}")
+          logger.debug("[CrawlVideos] activated #{path}")
         else
-          logger.debug("exists #{path}")
+          logger.debug("[CrawlVideos] exists #{path}")
         end
       end
       ExistedVideoOnCrawl.create!(video: video, crawl_directory: self)
+      rescue ActiveRecord::RecordInvalid => e
+        if video.errors[:path].include? "can't get video duration"
+          logger.warn("[CrawlVideos] can't get duration #{video.path} ")
+        else
+          raise e
+        end
+      end
     end
 
 
@@ -104,7 +114,10 @@ class CrawlDirectory < ActiveRecord::Base
     not_crawled_active_videos.find_each{|video|
       video.mark_as_deleted
     }
-    crawled_video_marks.delete_all
+
+
+  ensure
+    crawled_video_marks&.delete_all
 
     self.crawl_job_status = :not_running
     self.crawl_jid = nil

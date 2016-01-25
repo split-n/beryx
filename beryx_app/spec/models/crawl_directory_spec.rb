@@ -279,21 +279,18 @@ RSpec.describe CrawlDirectory, type: :model do
     end
 
     context "video files exist" do
-      context "vldeo file invalid" do
-        before {
+      context "video file invalid" do
           let(:file) { "#{cd.path}foo/a.mp4" }
           before {
+            mock_file_exists(file)
             allow_any_instance_of(Video).to receive(:get_duration).and_return(nil)
             allow(Find).to receive(:find).with(cd.path).and_return([file])
-            mock_file_exists(file)
           }
-
           after {
             allow_any_instance_of(Video).to receive(:get_duration).and_call_original
           }
 
-          it { expect{subject}.not_to change{cd.videos.active} }
-        }
+          it { expect{subject}.not_to change{cd.videos.active.count} }
       end
 
       context "video file valid" do
