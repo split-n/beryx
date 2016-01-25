@@ -70,55 +70,57 @@ class CrawlDirectory < ActiveRecord::Base
     self.crawl_job_status = :running
     save!
 
-    crawl_exist_videos_path do |path|
-      begin
-      video = Video.find_by(path: path)
-      if video.blank?
-        same_videos = Video.where(file_name: File.basename(path), file_size: File.size(path))
-        video = same_videos.select{|v| !v.path_exist? || v.deleted?}.first
-        if video.present?
-          video.path = path
-          video.save!
-          logger.debug("[CrawlVideos] move detected #{path}")
-        else
-          video = self.videos.build(path: path)
-          video.save!
-        end
-        logger.debug("[CrawlVideos] created #{path}")
-      else
-        if video.deleted?
-          if video.crawl_directory != self
-            video.crawl_directory = self
-            video.save!
+    ActiveRecord::Base.transaction do
+      crawl_exist_videos_path do |path|
+        begin
+          video = Video.find_by(path: path)
+          if video.blank?
+            same_videos = Video.where(file_name: File.basename(path), file_size: File.size(path))
+            video = same_videos.select{|v| !v.path_exist? || v.deleted?}.first
+            if video.present?
+              video.path = path
+              video.save!
+              logger.debug("[CrawlVideos] move detected #{path}")
+            else
+              video = self.videos.build(path: path)
+              video.save!
+              logger.debug("[CrawlVideos] created #{path}")
+            end
+          else
+            if video.deleted?
+              if video.crawl_directory != self
+                video.crawl_directory = self
+                video.save!
+              end
+              video.mark_as_active
+              logger.debug("[CrawlVideos] activated #{path}")
+            else
+              logger.debug("[CrawlVideos] exists #{path}")
+            end
           end
-          video.mark_as_active
-          logger.debug("[CrawlVideos] activated #{path}")
-        else
-          logger.debug("[CrawlVideos] exists #{path}")
+          ExistedVideoOnCrawl.create!(video: video, crawl_directory: self)
+        rescue ActiveRecord::RecordInvalid => e
+          if video.errors[:path].include? "can't get video duration"
+            logger.warn("[CrawlVideos] can't get duration #{video.path} ")
+            next
+          else
+            logger.warn("[CrawlVideos] unknown error thrown #{e.inspect}")
+            raise e
+          end
         end
       end
-      ExistedVideoOnCrawl.create!(video: video, crawl_directory: self)
-      rescue ActiveRecord::RecordInvalid => e
-        if video.errors[:path].include? "can't get video duration"
-          logger.warn("[CrawlVideos] can't get duration #{video.path} ")
-        else
-          raise e
-        end
-      end
+
+      crawled_video_marks = ExistedVideoOnCrawl.where(crawl_directory: self)
+      crawled_video_ids = crawled_video_marks.select(:video_id)
+      not_crawled_active_videos = self.videos.active.where.not(id: crawled_video_ids)
+      not_crawled_active_videos.find_each{|video|
+        video.mark_as_deleted
+      }
+      crawled_video_marks.delete_all
     end
 
-
-    crawled_video_marks = ExistedVideoOnCrawl.where(crawl_directory: self)
-    crawled_video_ids = crawled_video_marks.select(:video_id)
-    not_crawled_active_videos = self.videos.active.where.not(id: crawled_video_ids)
-    not_crawled_active_videos.find_each{|video|
-      video.mark_as_deleted
-    }
-
-
   ensure
-    crawled_video_marks&.delete_all
-
+    self.reload
     self.crawl_job_status = :not_running
     self.crawl_jid = nil
     save!
