@@ -31,7 +31,7 @@ class Video < ActiveRecord::Base
   include PrivateAttribute
   VIDEO_EXTS = %w(.mp4 .mkv) # temp
   belongs_to :crawl_directory
-  has_many :converted_videos
+  has_many :converted_videos, dependent: :destroy
   validates :crawl_directory, presence: true
   validates :path, presence: true
   validate :path_should_exists, if: -> { path.present? }, on: :create
