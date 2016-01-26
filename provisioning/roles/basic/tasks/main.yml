@@ -20,6 +20,7 @@
     - vim-nox
     - htop
     - checkinstall
+    - wget
 - name: Install language-pack-ja
   apt: name=language-pack-ja
   sudo: true
