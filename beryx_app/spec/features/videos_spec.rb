@@ -14,13 +14,13 @@ RSpec.feature "Videos", type: :feature do
     it "gets empty list" do
       visit root_path
       expect(page).to have_content "Videos"
-      expect(page).not_to have_selector "li a"
+      expect(page).not_to have_selector "td"
     end
 
     it "gets videos list" do
       video = FG.create(:video)
       visit root_path
-      expect(page).to have_selector "li a", text: video.file_name
+      expect(page).to have_selector "table td", text: video.file_name
     end
   end
 end
