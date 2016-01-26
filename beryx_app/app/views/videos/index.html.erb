@@ -8,7 +8,7 @@
     <th><%= sort_link(@ransack, :file_name, "Title") %></th>
     <th><%= sort_link(@ransack, :duration, "Duration") %></th>
     <th><%= sort_link(@ransack, :file_size ,"File size") %></th>
-    <th><%= sort_link(@ransack, :file_timestamp, "Update time") %></th>
+    <th><%= sort_link(@ransack, :file_timestamp, "Update time",  default_order: :desc) %></th>
   </tr>
 <% @videos.each do |video| %>
   <tr>
