@@ -67,7 +67,7 @@ class Video < ActiveRecord::Base
     path.present? && File.exist?(path)
   end
 
-  def mark_as_deleted
+  def mark_as_deleted(time=Time.current)
     super
     self.converted_videos.clear
   end

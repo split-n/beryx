@@ -138,6 +138,15 @@ RSpec.describe Video, type: :model do
       before { allow(File).to receive(:exist?).with(video.path).and_return(false) }
       it { expect{subject}.to change{video.deleted?}.from(false).to(true) }
     end
+
+    context "with ConvertedVideo" do
+      let(:dst_dir) { "/path/to/dst" }
+      let(:dst_file) { dst_dir + "/file.m3u8" }
+      let!(:cv1) { ConvertedVideo.convert_to(video, ConvertParams::CopyHls.new, dst_dir, dst_file) }
+      describe "deletes ConvertedVideo "
+        it { expect{subject}.to change{video.converted_videos.include?(cv1)}.from(true).to(false) }
+        it { expect{subject}.to change{video.converted_videos.count}.from(1).to(0) }
+    end
   end
 
   describe "#mark_as_active" do
