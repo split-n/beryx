@@ -11,7 +11,7 @@ class VideosController < ApplicationController
       @ransack = Video.active.ransack(q)
     end
 
-    @videos = @ransack.result
+    @videos = @ransack.result.page(params[:page])
   end
 
   def show
