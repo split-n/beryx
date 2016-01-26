@@ -67,6 +67,11 @@ class Video < ActiveRecord::Base
     path.present? && File.exist?(path)
   end
 
+  def mark_as_deleted
+    super
+    self.converted_videos.clear
+  end
+
   private
   def path_should_exists
     unless path_exist?
