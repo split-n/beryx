@@ -95,6 +95,11 @@ RSpec.describe Video, type: :model do
             it { should be_valid }
           end
 
+          context "normalize test" do
+            let(:path) { "/exists/フーＦｏあaBCxｊ.Mp4" }
+            it { expect(subject.normalized_file_name).to eq "フーfoあabcxj.mp4" }
+          end
+
           context "video file cant' detect duration" do
             let(:path) { "/exists/foo.mp4" }
             before {
