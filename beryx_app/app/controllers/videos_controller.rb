@@ -11,6 +11,8 @@ class VideosController < ApplicationController
       @ransack = Video.active.ransack(q)
     end
 
+    @ransack.sorts = 'file_timestamp desc' if @ransack.sorts.empty?
+
     @videos = @ransack.result.page(params[:page])
   end
 
