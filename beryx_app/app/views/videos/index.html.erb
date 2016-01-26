@@ -3,8 +3,19 @@
     <%= f.text_field :normalized_file_name_cont_all %>
     <%= f.submit %>
 <% end %>
-<ul>
-  <% @videos.each do |video| %>
-    <li><%= link_to video.file_name, video_path(video.id) %></li>
-  <% end %>
-</ul>
+<table>
+  <tr>
+    <th>title</th>
+    <th>duration</th>
+    <th>size</th>
+    <th>file_timestamp</th>
+  </tr>
+<% @videos.each do |video| %>
+  <tr>
+    <td><%= link_to video.file_name, video_path(video.id) %></td>
+    <td><%= to_hms video.duration %></td>
+    <td><%= to_megabyte video.file_size %></td>
+    <td><%= pp_file_timestamp video.file_timestamp  %></td>
+  </tr>
+<% end %>
+</table>
