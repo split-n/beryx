@@ -5,10 +5,10 @@
 <% end %>
 <table>
   <tr>
-    <th>title</th>
-    <th>duration</th>
-    <th>size</th>
-    <th>file_timestamp</th>
+    <th><%= sort_link(@ransack, :file_name, "Title") %></th>
+    <th><%= sort_link(@ransack, :duration, "Duration") %></th>
+    <th><%= sort_link(@ransack, :file_size ,"File size") %></th>
+    <th><%= sort_link(@ransack, :file_timestamp, "Update time") %></th>
   </tr>
 <% @videos.each do |video| %>
   <tr>
