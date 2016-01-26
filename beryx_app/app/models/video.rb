@@ -107,9 +107,9 @@ class Video < ActiveRecord::Base
   def get_duration
     return self.duration if self.duration
     return  @_duration if @_duration
-    cmd = %Q(ffprobe -show_streams -print_format json "#{self.path}" 2>/dev/null)
+    cmd = %Q(ffprobe -hide_banner -show_entries format=duration -print_format json "#{self.path}" 2>/dev/null)
     out, err, status = Open3.capture3(cmd)
     probe = JSON.parse(out)
-    @_duration = probe.dig("streams", 0, "duration")&.to_i
+    @_duration = probe.dig("format", "duration")&.to_i
   end
 end
