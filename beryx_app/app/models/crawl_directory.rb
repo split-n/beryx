@@ -76,6 +76,7 @@ class CrawlDirectory < ActiveRecord::Base
       if same_name_videos.empty? # new video
         video = self.videos.build(path: path)
         video.save!
+        logger.debug("[CrawlVideos] created #{path}")
       else # already crawled path or same name file found
         video = same_name_videos.select{|v| v.path == path}.first
         if video # already crawled path
@@ -105,6 +106,7 @@ class CrawlDirectory < ActiveRecord::Base
           else # create new if another one is not same or active
             video = self.videos.build(path: path)
             video.save!
+            logger.debug("[CrawlVideos] created #{path}")
           end
         end
       end
