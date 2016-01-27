@@ -17,6 +17,7 @@
 # Indexes
 #
 #  index_videos_on_crawl_directory_id  (crawl_directory_id)
+#  index_videos_on_file_name           (file_name)
 #  index_videos_on_file_timestamp      (file_timestamp)
 #  index_videos_on_path                (path) UNIQUE
 #

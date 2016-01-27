@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160126065711) do
+ActiveRecord::Schema.define(version: 20160127105525) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -70,6 +70,7 @@ ActiveRecord::Schema.define(version: 20160126065711) do
   end
 
   add_index "videos", ["crawl_directory_id"], name: "index_videos_on_crawl_directory_id", using: :btree
+  add_index "videos", ["file_name"], name: "index_videos_on_file_name", using: :btree
   add_index "videos", ["file_timestamp"], name: "index_videos_on_file_timestamp", using: :btree
   add_index "videos", ["path"], name: "index_videos_on_path", unique: true, using: :btree
 
