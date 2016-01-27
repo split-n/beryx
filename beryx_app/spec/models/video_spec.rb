@@ -94,6 +94,19 @@ RSpec.describe Video, type: :model do
             let(:path) { "/exists/foo.MP4" }
             it { should be_valid }
           end
+
+          context "normalize test" do
+            let(:path) { "/exists/フーＦｏあaBCxｊ.Mp4" }
+            it { expect(subject.normalized_file_name).to eq "フーfoあabcxj.mp4" }
+          end
+
+          context "video file cant' detect duration" do
+            let(:path) { "/exists/foo.mp4" }
+            before {
+              allow_any_instance_of(Video).to receive(:get_duration).and_return(nil)
+            }
+            it { should_not be_valid }
+          end
         end
 
         context "pass crawl_directory_id" do
@@ -129,6 +142,15 @@ RSpec.describe Video, type: :model do
     context "file is deleted" do
       before { allow(File).to receive(:exist?).with(video.path).and_return(false) }
       it { expect{subject}.to change{video.deleted?}.from(false).to(true) }
+    end
+
+    context "with ConvertedVideo" do
+      let(:dst_dir) { "/path/to/dst" }
+      let(:dst_file) { dst_dir + "/file.m3u8" }
+      let!(:cv1) { ConvertedVideo.convert_to(video, ConvertParams::CopyHls.new, dst_dir, dst_file) }
+      describe "deletes ConvertedVideo "
+        it { expect{subject}.to change{video.converted_videos.include?(cv1)}.from(true).to(false) }
+        it { expect{subject}.to change{video.converted_videos.count}.from(1).to(0) }
     end
   end
 

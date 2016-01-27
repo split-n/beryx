@@ -1,6 +1,23 @@
-<h1>Videos</h1>
-<ul>
-  <% @videos.each do |video| %>
-    <li><%= link_to video.file_name, video_path(video.id) %></li>
-  <% end %>
-</ul>
+<h1><%= link_to "Videos", root_path %></h1>
+<%= search_form_for @ransack, url: root_path do |f| %>
+    <%= f.text_field :normalized_file_name_cont_all %>
+    <%= f.submit %>
+<% end %>
+<p><%= @ransack.result.count %> videos found.</p>
+<table>
+  <tr>
+    <th><%= sort_link(@ransack, :file_name, "Title") %></th>
+    <th><%= sort_link(@ransack, :duration, "Duration") %></th>
+    <th><%= sort_link(@ransack, :file_size ,"File size") %></th>
+    <th><%= sort_link(@ransack, :file_timestamp, "Update time",  default_order: :desc) %></th>
+  </tr>
+<% @videos.each do |video| %>
+  <tr>
+    <td><%= link_to video.file_name, video_path(video.id) %></td>
+    <td><%= to_hms video.duration %></td>
+    <td><%= to_megabyte video.file_size %></td>
+    <td><%= pp_file_timestamp video.file_timestamp  %></td>
+  </tr>
+<% end %>
+</table>
+<%= paginate @videos %>

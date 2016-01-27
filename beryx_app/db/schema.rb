@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160121032713) do
+ActiveRecord::Schema.define(version: 20160126065711) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -58,17 +58,19 @@ ActiveRecord::Schema.define(version: 20160121032713) do
 
   create_table "videos", force: :cascade do |t|
     t.integer  "crawl_directory_id"
-    t.text     "path",               null: false
-    t.text     "file_name",          null: false
-    t.integer  "file_size",          null: false
+    t.text     "path",                           null: false
+    t.text     "file_name",                      null: false
+    t.integer  "file_size",            limit: 8, null: false
     t.datetime "deleted_at"
-    t.datetime "created_at",         null: false
-    t.datetime "updated_at",         null: false
-    t.datetime "file_timestamp",     null: false
-    t.integer  "duration",           null: false
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+    t.datetime "file_timestamp",                 null: false
+    t.integer  "duration",                       null: false
+    t.text     "normalized_file_name",           null: false
   end
 
   add_index "videos", ["crawl_directory_id"], name: "index_videos_on_crawl_directory_id", using: :btree
+  add_index "videos", ["file_timestamp"], name: "index_videos_on_file_timestamp", using: :btree
   add_index "videos", ["path"], name: "index_videos_on_path", unique: true, using: :btree
 
   add_foreign_key "converted_videos", "videos"

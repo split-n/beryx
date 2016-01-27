@@ -15,3 +15,9 @@
     name={{ pg_db_user }}
     password={{ pg_db_password }}
     role_attr_flags=NOSUPERUSER,CREATEDB
+- name: Pg config
+  sudo: yes
+  lineinfile: 
+    dest=/etc/postgresql/9.4/main/postgresql.conf
+    line="random_page_cost = 1.4"
+  notify: restart postgresql
