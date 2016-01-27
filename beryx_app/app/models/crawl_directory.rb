@@ -72,7 +72,7 @@ class CrawlDirectory < ActiveRecord::Base
 
     crawl_exist_videos_path do |path|
       begin
-      same_name_videos = Video.where(file_name: File.basename(path))
+      same_name_videos = Video.where(file_name: File.basename(path)).to_a
       if same_name_videos.empty? # new video
         video = self.videos.build(path: path)
         video.save!
