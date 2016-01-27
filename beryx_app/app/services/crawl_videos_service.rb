@@ -77,19 +77,19 @@ class CrawlVideosService
       end
     end
 
-    Parallel.each(to_create_paths, in_threads: 4) do |path|
-      ActiveRecord::Base.connection_pool.with_connection do
-        begin
-          video = @crawl_directory.videos.build(path: path)
+    Parallel.each(to_create_paths, in_threads: 6) do |path|
+      begin
+        video = @crawl_directory.videos.build(path: path)
+        ActiveRecord::Base.connection_pool.with_connection do
           video.save!
           ExistedVideoOnCrawl.create!(video: video, crawl_directory: @crawl_directory)
-          @logger.debug("[CrawlVideos] created #{path}")
-        rescue ActiveRecord::RecordInvalid => e
-          if video.errors[:path].include? "can't get video duration"
-            @logger.warn("[CrawlVideos] can't get duration #{video.path} ")
-          else
-            raise e
-          end
+        end
+        @logger.debug("[CrawlVideos] created #{path}")
+      rescue ActiveRecord::RecordInvalid => e
+        if video.errors[:path].include? "can't get video duration"
+          @logger.warn("[CrawlVideos] can't get duration #{video.path} ")
+        else
+          raise e
         end
       end
     end
