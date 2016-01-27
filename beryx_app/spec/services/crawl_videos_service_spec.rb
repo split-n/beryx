@@ -1,7 +1,7 @@
 require 'rails_helper'
 require 'find'
 
-RSpec.describe CrawlVideosService do
+RSpec.describe CrawlVideosService, truncation_spec: true do
   def mock_file_exists(path)
     allow(File).to receive(:exist?).with(path).and_return(true)
     allow(File).to receive(:size).with(path).and_return(300.megabyte)

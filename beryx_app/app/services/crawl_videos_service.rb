@@ -25,13 +25,13 @@ class CrawlVideosService
     @crawl_directory.crawl_job_status = :running
     @crawl_directory.save!
 
+    to_create_paths = []
+
     crawl_exist_videos_path do |path|
       begin
         same_name_videos = Video.where(file_name: File.basename(path)).to_a
         if same_name_videos.empty? # new video
-          video = @crawl_directory.videos.build(path: path)
-          video.save!
-          @logger.debug("[CrawlVideos] created #{path}")
+          to_create_paths.push(path)
         else # already crawled path or same name file found
           video = same_name_videos.select{|v| v.path == path}.first
           if video # already crawled path
@@ -59,14 +59,15 @@ class CrawlVideosService
               video.save!
               @logger.debug("[CrawlVideos] move detected #{path}")
             else # create new if another one is not same or active
-              video = @crawl_directory.videos.build(path: path)
-              video.save!
-              @logger.debug("[CrawlVideos] created #{path}")
+              to_create_paths.push(path)
             end
           end
         end
 
+      if video
         ExistedVideoOnCrawl.create!(video: video, crawl_directory: @crawl_directory)
+      end
+
       rescue ActiveRecord::RecordInvalid => e
         if video.errors[:path].include? "can't get video duration"
           @logger.warn("[CrawlVideos] can't get duration #{video.path} ")
@@ -75,6 +76,24 @@ class CrawlVideosService
         end
       end
     end
+
+    Parallel.each(to_create_paths, in_threads: 4) do |path|
+      ActiveRecord::Base.connection_pool.with_connection do
+        begin
+          video = @crawl_directory.videos.build(path: path)
+          video.save!
+          ExistedVideoOnCrawl.create!(video: video, crawl_directory: @crawl_directory)
+          @logger.debug("[CrawlVideos] created #{path}")
+        rescue ActiveRecord::RecordInvalid => e
+          if video.errors[:path].include? "can't get video duration"
+            @logger.warn("[CrawlVideos] can't get duration #{video.path} ")
+          else
+            raise e
+          end
+        end
+      end
+    end
+
 
 
     crawled_video_marks = ExistedVideoOnCrawl.where(crawl_directory: @crawl_directory)
@@ -92,5 +111,4 @@ class CrawlVideosService
     @crawl_directory.crawl_jid = nil
     @crawl_directory.save!
   end
-
 end
