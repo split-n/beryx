@@ -15,7 +15,7 @@ class CrawlVideosService
   end
 
   def enqueue_crawl_videos_and_create
-    jid = CrawlVideosWorker.perform_async(id)
+    jid = CrawlVideosWorker.perform_async(@crawl_directory.id)
     @crawl_directory.crawl_job_status = :queued
     @crawl_directory.crawl_jid = jid
     @crawl_directory.save!
