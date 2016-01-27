@@ -77,6 +77,8 @@ class CrawlVideosService
       end
     end
 
+    ExistedVideoOnCrawl # avoid loading on multithread code
+
     Parallel.each(to_create_paths, in_threads: 6) do |path|
       begin
         video = @crawl_directory.videos.build(path: path)
