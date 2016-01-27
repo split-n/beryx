@@ -327,6 +327,22 @@ RSpec.describe CrawlDirectory, type: :model do
           }
         end
 
+        context "crawled once, and file size is changed" do
+          before {
+            cd.crawl_videos_and_create
+            @changed_path = returns.first
+            allow(File).to receive(:size).with(@changed_path).and_return(573.megabytes)
+          }
+          it "returns same instance" do
+            first_instance = Video.find_by(path: @changed_path)
+            subject
+            second_instance = Video.find_by(path: @changed_path)
+            expect(first_instance).to eq second_instance
+          end
+
+          it { expect{subject}.to change{Video.find_by(path: @changed_path).file_size}.to(573.megabytes) }
+        end
+
         context "crawled twice, and file status is still deleted" do
           before {
             cd.crawl_videos_and_create

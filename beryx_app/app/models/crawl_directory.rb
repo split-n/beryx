@@ -72,13 +72,18 @@ class CrawlDirectory < ActiveRecord::Base
 
     crawl_exist_videos_path do |path|
       begin
-      same_name_and_size_videos = Video.where(file_name: File.basename(path), file_size: File.size(path))
-      if same_name_and_size_videos.empty? # new video
+      same_name_videos = Video.where(file_name: File.basename(path))
+      if same_name_videos.empty? # new video
         video = self.videos.build(path: path)
         video.save!
-      else # already crawled path or same file found
-        video = same_name_and_size_videos.select{|v| v.path == path}.first
+      else # already crawled path or same name file found
+        video = same_name_videos.select{|v| v.path == path}.first
         if video # already crawled path
+          path_size = File.size(path)
+          if video.file_size != path_size
+            video.reload_stats!
+          end
+
           if video.deleted?
             if video.crawl_directory != self
               video.crawl_directory = self
@@ -89,13 +94,15 @@ class CrawlDirectory < ActiveRecord::Base
           else
             logger.debug("[CrawlVideos] exists #{path}")
           end
-        else # same file found
-          video = same_name_and_size_videos.select{|v| !v.path_exist? || v.deleted?}.first
-          if video # only deleted file
+        else # same name file found
+          video = same_name_videos.select{|v|
+            (!v.path_exist? || v.deleted?) && v.file_size == File.size(path)
+          }.first
+          if video # same size and deleted file
             video.path = path
             video.save!
             logger.debug("[CrawlVideos] move detected #{path}")
-          else # create new if another one is active
+          else # create new if another one is not same or active
             video = self.videos.build(path: path)
             video.save!
           end

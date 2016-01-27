@@ -43,11 +43,7 @@ class Video < ActiveRecord::Base
   attr_private_writer :file_name, :file_size, :file_timestamp, :duration, :normalized_file_name
 
   before_create do
-    self.file_name = File.basename(path)
-    self.file_size = File.size(path)
-    self.file_timestamp = File.mtime(path)
-    self.duration = get_duration
-    self.normalized_file_name = self.class.normalize_file_name(file_name)
+    load_and_set_stats
   end
 
   class << self
@@ -72,6 +68,11 @@ class Video < ActiveRecord::Base
   def mark_as_deleted(time=Time.current)
     super
     self.converted_videos.clear
+  end
+
+  def reload_stats!
+    load_and_set_stats
+    save!
   end
 
   private
@@ -113,5 +114,13 @@ class Video < ActiveRecord::Base
     out, err, status = Open3.capture3(cmd)
     probe = JSON.parse(out)
     @_duration = probe.dig("format", "duration")&.to_i
+  end
+
+  def load_and_set_stats
+    self.file_name = File.basename(path)
+    self.file_size = File.size(path)
+    self.file_timestamp = File.mtime(path)
+    self.duration = get_duration
+    self.normalized_file_name = self.class.normalize_file_name(file_name)
   end
 end
