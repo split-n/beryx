@@ -19,7 +19,7 @@ module ConvertParams
 
     def to_command(source_path, converted_dir_path, converted_file_path)
       raise if self.invalid?
-      %Q(ffmpeg -i "#{source_path}" -filter:v scale=trunc(oh*a/2)*2:#{@height} -c:a libfdk_aac -b:a #{@audio_kbps}k -c:v libx264 -c:b #{@video_kbps}k -sn -bsf h264_mp4toannexb -map 0 -f segment -segment_format mpegts -segment_time 5 -segment_list "#{converted_file_path}" -segment_list_flags -cache "#{converted_dir_path}/stream%05d.ts")
+      %Q(ffmpeg -i "#{source_path}" -filter:v "scale=trunc(oh*a/2)*2:#{@height}" -c:a libfdk_aac -b:a #{@audio_kbps}k -c:v libx264 -b:v #{@video_kbps}k -sn -flags +loop-global_header -bsf h264_mp4toannexb -map 0 -f segment -segment_format mpegts -segment_time 5 -segment_list "#{converted_file_path}" -segment_list_flags -cache "#{converted_dir_path}/stream%05d.ts")
     end
   end
 
