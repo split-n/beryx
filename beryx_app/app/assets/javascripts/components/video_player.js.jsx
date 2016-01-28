@@ -1,18 +1,28 @@
-/*global React:false, VideoPlayerCore:false */
+/*global React:false, VideoPlayerCore:false, VideoConvertSelect:false */
 /*exported VideoPlayer */
 
 var VideoPlayer = React.createClass({
   propTypes: {
-    file_name: React.PropTypes.string.isRequired,
-    video_path: React.PropTypes.string.isRequired
+    videoName: React.PropTypes.string.isRequired,
+    videoId: React.PropTypes.number.isRequired
+  },
+  getInitialState() {
+    return {};
+  },
+  onVideoSourceSupplied(path) {
+    this.setState({videoFilePath: path});
   },
   render: function() {
-    return (
-        <div>
-          <h1>Video Player</h1>
-          <p>{this.props.file_name}</p>
-          <VideoPlayerCore src={this.props.video_path} />
-        </div>
-    );
+    if(this.state.videoFilePath) {
+      return <VideoPlayerCore src={this.state.videoFilePath} />;
+    } else {
+      return (
+        <VideoConvertSelect
+          videoId={this.props.videoId}
+          videoName={this.props.videoName}
+          onVideoSourceSupplied={this.onVideoSourceSupplied}
+        />
+      );
+    }
   }
 });
