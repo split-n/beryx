@@ -37,8 +37,12 @@
 
 .player-controller-play-button {
   margin-right: 1em;
+  padding: 4px 10px;
 }
 
 .player-controller-jump-buttons {
   display: inline;
+  button {
+    padding: 4px 8px;
+  }
 }
