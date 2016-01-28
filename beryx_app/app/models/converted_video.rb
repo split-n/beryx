@@ -34,14 +34,6 @@ class ConvertedVideo < ActiveRecord::Base
       convert_to(video, param, converted_dir_path, converted_file_path)
     end
 
-    def convert_to_copy_faststart_mp4(video)
-      param = ConvertParams::CopyFastStartMp4.new
-      converted_dir_path =  CONVERTED_VIDEOS_FS_PATH + SecureRandom.hex
-      converted_file_path = converted_dir_path + "play.mp4"
-
-      convert_to(video, param, converted_dir_path, converted_file_path)
-    end
-
     def convert_to_copy_fragmented_mp4(video)
       param = ConvertParams::CopyFragmentedMp4.new
       converted_dir_path =  CONVERTED_VIDEOS_FS_PATH + SecureRandom.hex

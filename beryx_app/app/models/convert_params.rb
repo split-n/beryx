@@ -16,23 +16,6 @@ module ConvertParams
     end
   end
 
-
-  class CopyFastStartMp4
-    class << self
-      def from_json(json)
-        self.new
-      end
-    end
-
-    def to_json
-      "{}"
-    end
-
-    def to_command(source_path, converted_dir_path, converted_file_path)
-      %Q(ffmpeg -i "#{source_path}" -acodec copy -vcodec copy -movflags faststart -f mp4 #{converted_file_path})
-    end
-  end
-
   class CopyFragmentedMp4
     class << self
       def from_json(json)
