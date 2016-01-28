@@ -55,73 +55,8 @@ class CrawlDirectory < ActiveRecord::Base
     succeed
   end
 
-  def enqueue_crawl_videos_and_create
-    jid = CrawlVideosWorker.perform_async(id)
-    self.crawl_job_status = :queued
-    self.crawl_jid = jid
-    save!
-  end
-
   def path_exist?
     path.present? && Dir.exist?(path)
-  end
-
-  def crawl_videos_and_create
-    self.crawl_job_status = :running
-    save!
-
-    crawl_exist_videos_path do |path|
-      begin
-      video = Video.find_by(path: path)
-      if video.blank?
-        same_videos = Video.where(file_name: File.basename(path), file_size: File.size(path))
-        video = same_videos.select{|v| !v.path_exist? || v.deleted?}.first
-        if video.present?
-          video.path = path
-          video.save!
-          logger.debug("[CrawlVideos] move detected #{path}")
-        else
-          video = self.videos.build(path: path)
-          video.save!
-        end
-        logger.debug("[CrawlVideos] created #{path}")
-      else
-        if video.deleted?
-          if video.crawl_directory != self
-            video.crawl_directory = self
-            video.save!
-          end
-          video.mark_as_active
-          logger.debug("[CrawlVideos] activated #{path}")
-        else
-          logger.debug("[CrawlVideos] exists #{path}")
-        end
-      end
-      ExistedVideoOnCrawl.create!(video: video, crawl_directory: self)
-      rescue ActiveRecord::RecordInvalid => e
-        if video.errors[:path].include? "can't get video duration"
-          logger.warn("[CrawlVideos] can't get duration #{video.path} ")
-        else
-          raise e
-        end
-      end
-    end
-
-
-    crawled_video_marks = ExistedVideoOnCrawl.where(crawl_directory: self)
-    crawled_video_ids = crawled_video_marks.select(:video_id)
-    not_crawled_active_videos = self.videos.active.where.not(id: crawled_video_ids)
-    not_crawled_active_videos.find_each{|video|
-      video.mark_as_deleted
-    }
-
-
-  ensure
-    crawled_video_marks&.delete_all
-
-    self.crawl_job_status = :not_running
-    self.crawl_jid = nil
-    save!
   end
 
   private
@@ -154,17 +89,5 @@ class CrawlDirectory < ActiveRecord::Base
     p1 = d1.path.downcase
     p2 = self.path.downcase
     p1.start_with?(p2) || p2.start_with?(p1)
-  end
-
-
-  def crawl_exist_videos_path
-    raise if invalid?
-    raise PathNotFoundError unless path_exist?
-    return self.to_enum(__method__) unless block_given?
-
-    Find.find(self.path).each do |path|
-      yield path if Video.file_supported?(path)
-    end
-
   end
 end

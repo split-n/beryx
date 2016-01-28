@@ -8,7 +8,9 @@ var VideoPlayerControlBar = React.createClass({
     isPlaying: React.PropTypes.bool.isRequired,
     togglePause: React.PropTypes.func.isRequired,
     seekToTime: React.PropTypes.func.isRequired,
-    setPlaybackRate: React.PropTypes.func.isRequired
+    setPlaybackRate: React.PropTypes.func.isRequired,
+    isFullScreen: React.PropTypes.bool.isRequired,
+    toggleFullScreen: React.PropTypes.func.isRequired
   },
   _zeroPad(val, dig) {
     return ("0".repeat(dig) + val).slice(-dig);
@@ -37,7 +39,7 @@ var VideoPlayerControlBar = React.createClass({
       classes = "glyphicon glyphicon-play";
     }
     return (
-      <button className="btn" onClick={this.props.togglePause}>
+      <button className="btn player-controller-play-button" onClick={this.props.togglePause}>
         <span className={classes}/>
       </button>
     );
@@ -55,7 +57,7 @@ var VideoPlayerControlBar = React.createClass({
         >{s}</button> );
     });
     return (
-      <div>
+      <div className="player-controller-jump-buttons">
         {buttons}
       </div>
     );
@@ -72,18 +74,38 @@ var VideoPlayerControlBar = React.createClass({
       return <option value={f} key={f}>x{f}</option>;
     });
     return (
-      <select ref="pl_select" defaultValue="1.00" onChange={this._PlaybackRateSelectHandler}>
-        {options}
-      </select>
+      <select className="player-controller-select-rate" ref="pl_select"
+        defaultValue="1.00" onChange={this._PlaybackRateSelectHandler}
+      >{options} </select>
+    );
+  },
+  _renderFullScreenButton() {
+
+    var iconClasses;
+    if(this.props.isFullScreen) {
+      iconClasses = "glyphicon glyphicon-resize-small";
+    } else {
+      iconClasses = "glyphicon glyphicon-fullscreen";
+    }
+    return (
+     <button className="btn" onClick={this.props.toggleFullScreen}>
+       <span className={iconClasses}/>
+     </button>
     );
   },
   render() {
     return (
-      <div id="player-controller">
-        {this._renderPlayButton()}
-        {this._renderJumpButtons()}
-        {this._renderPlaybackRateSelects()}
-        <span id="player-controller-time">{this._getCurrent()}/{this._getDuration()}</span>
+      <div className="player-controller">
+        <div className="player-controller-left">
+          {this._renderPlayButton()}
+          {this._renderJumpButtons()}
+        </div>
+        <div className="player-controller-right">
+          {this._renderPlaybackRateSelects()}
+          <span className="player-controller-display-time">
+            {this._getCurrent()}/{this._getDuration()}</span>
+          {this._renderFullScreenButton()}
+        </div>
       </div>
     );
   }

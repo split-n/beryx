@@ -5,6 +5,7 @@ gem 'rails', '4.2.5'
 gem 'puma'
 gem 'pg'
 gem 'bcrypt'
+gem 'parallel'
 gem 'ransack', '~> 1.7.0'
 gem 'kaminari'
 gem 'kaminari-bootstrap', '~> 3.0.1'
@@ -29,12 +30,14 @@ group :development, :test do
   gem 'pry-byebug'
   gem 'capybara', "~> 2.5.0"
   gem 'spring'
+  gem 'database_cleaner'
 end
 
 group :development do
   gem 'web-console', '~> 2.0'
   gem 'spring-commands-rspec'
   gem 'annotate'
+  gem 'stackprof'
 
   # for sidekiq
   gem 'sinatra', :require => nil

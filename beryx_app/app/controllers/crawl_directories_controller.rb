@@ -29,7 +29,8 @@ class CrawlDirectoriesController < ApplicationController
   end
 
   def queue_crawl
-    @crawl_directory.enqueue_crawl_videos_and_create
+    cvs = CrawlVideosService.new(@crawl_directory)
+    cvs.enqueue_crawl_videos_and_create
     redirect_to crawl_directory_path(@crawl_directory)
   end
 
