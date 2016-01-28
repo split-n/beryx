@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   root 'videos#index'
 
   get '/videos/:id', to: "videos#show"
+  post '/videos/:id/convert', to: "videos#convert"
 
   resources :crawl_directories, only: [:index, :show, :new, :create, :destroy] do
     member do

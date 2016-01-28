@@ -34,6 +34,14 @@ class ConvertedVideo < ActiveRecord::Base
       convert_to(video, param, converted_dir_path, converted_file_path)
     end
 
+    def convert_to_encode_avc_aac_hls(video, param_hash)
+      param = ConvertParams::EncodeAvcAacHls.new(param_hash)
+      converted_dir_path =  CONVERTED_VIDEOS_FS_PATH + SecureRandom.hex
+      converted_file_path = converted_dir_path + "playlist.m3u8"
+
+      convert_to(video, param, converted_dir_path, converted_file_path)
+    end
+
     def convert_to_copy_fragmented_mp4(video)
       param = ConvertParams::CopyFragmentedMp4.new
       converted_dir_path =  CONVERTED_VIDEOS_FS_PATH + SecureRandom.hex
