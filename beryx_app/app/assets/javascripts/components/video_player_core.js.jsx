@@ -9,7 +9,8 @@ var VideoPlayerCore = React.createClass({
     return {
       duration: 0,
       currentTime: 0,
-      isPlaying: false
+      isPlaying: false,
+      isFullScreen: false
     };
   },
   componentDidMount() {
@@ -59,9 +60,41 @@ var VideoPlayerCore = React.createClass({
     var video = this.refs.video;
     video.playbackRate = rate;
   },
+  requestFullScreen() {
+    var elem = this.refs.player;
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.msRequestFullscreen) {
+      elem.msRequestFullscreen();
+    } else if (elem.mozRequestFullScreen) {
+      elem.mozRequestFullScreen();
+    } else if (elem.webkitRequestFullscreen) {
+      elem.webkitRequestFullscreen();
+    }
+  },
+  exitFullScreen() {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    }
+  },
+  toggleFullScreen() {
+    if(this.state.isFullScreen) {
+      this.exitFullScreen();
+      this.setState({isFullScreen: false});
+    } else {
+      this.requestFullScreen();
+      this.setState({isFullScreen: true});
+    }
+  },
   render() {
     return (
-      <div className="player-core">
+      <div className="player-core" ref="player">
         <div className="player-video-container">
           <video
             className="player-video" src={this.props.src}
@@ -73,6 +106,7 @@ var VideoPlayerCore = React.createClass({
           duration={this.state.duration} currentTime={this.state.currentTime}
           togglePause={this.togglePause} isPlaying={this.state.isPlaying}
           seekToTime={this.seekToTime} setPlaybackRate={this.setPlaybackRate}
+          isFullScreen={this.state.isFullScreen} toggleFullScreen={this.toggleFullScreen}
         />
       </div>
     );

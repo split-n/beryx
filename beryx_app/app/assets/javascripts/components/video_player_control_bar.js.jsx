@@ -8,7 +8,9 @@ var VideoPlayerControlBar = React.createClass({
     isPlaying: React.PropTypes.bool.isRequired,
     togglePause: React.PropTypes.func.isRequired,
     seekToTime: React.PropTypes.func.isRequired,
-    setPlaybackRate: React.PropTypes.func.isRequired
+    setPlaybackRate: React.PropTypes.func.isRequired,
+    isFullScreen: React.PropTypes.bool.isRequired,
+    toggleFullScreen: React.PropTypes.func.isRequired
   },
   _zeroPad(val, dig) {
     return ("0".repeat(dig) + val).slice(-dig);
@@ -77,6 +79,20 @@ var VideoPlayerControlBar = React.createClass({
       >{options} </select>
     );
   },
+  _renderFullScreenButton() {
+
+    var iconClasses;
+    if(this.props.isFullScreen) {
+      iconClasses = "glyphicon glyphicon-resize-small";
+    } else {
+      iconClasses = "glyphicon glyphicon-fullscreen";
+    }
+    return (
+     <button className="btn" onClick={this.props.toggleFullScreen}>
+       <span className={iconClasses}/>
+     </button>
+    );
+  },
   render() {
     return (
       <div className="player-controller">
@@ -88,6 +104,7 @@ var VideoPlayerControlBar = React.createClass({
           {this._renderPlaybackRateSelects()}
           <span className="player-controller-display-time">
             {this._getCurrent()}/{this._getDuration()}</span>
+          {this._renderFullScreenButton()}
         </div>
       </div>
     );
