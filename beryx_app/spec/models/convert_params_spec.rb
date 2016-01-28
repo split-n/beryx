@@ -32,7 +32,6 @@ describe ConvertParams::EncodeAvcAacHls do
     }
     context "valid params/args" do
       include_context "valid command args"
-
       let(:params_hash) { { audio_kbps: 128, video_kbps: 1024, height: 720 } }
 
       it { should include "ffmpeg" }
@@ -41,6 +40,22 @@ describe ConvertParams::EncodeAvcAacHls do
       it { should include "#{params_hash[:audio_kbps]}k" }
       it { should include "#{params_hash[:video_kbps]}k" }
       it { should include "#{params_hash[:height]}" }
+      it { should include "fast" }
+      it { should_not include "tune" }
+    end
+
+    context "valid params/args extra" do
+      include_context "valid command args"
+      let(:params_hash) { { audio_kbps: 128, video_kbps: 1024, height: 720, preset: "slow", tune: "animation" } }
+
+      it { should include "ffmpeg" }
+      it { should include src_file }
+      it { should include dest_file }
+      it { should include "#{params_hash[:audio_kbps]}k" }
+      it { should include "#{params_hash[:video_kbps]}k" }
+      it { should include "#{params_hash[:height]}" }
+      it { should include "#{params_hash[:preset]}" }
+      it { should include "#{params_hash[:tune]}" }
     end
 
     context "invalid params" do

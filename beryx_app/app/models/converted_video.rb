@@ -60,7 +60,6 @@ class ConvertedVideo < ActiveRecord::Base
         end
       end
 
-
       c_video = video.converted_videos.create(
           param_class: param.class.name, param_json: param.to_json,
           converted_dir_path: converted_dir_path,
