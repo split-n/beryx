@@ -61,12 +61,14 @@ var VideoPlayerCore = React.createClass({
   },
   render() {
     return (
-      <div>
-        <video
-          id="playing-video" src={this.props.src}
-          preload="none" controls="controls"
-          ref="video"
-        />
+      <div className="player-core">
+        <div className="player-video-container">
+          <video
+            className="player-video" src={this.props.src}
+            preload="none" controls="controls"
+            ref="video"
+          />
+        </div>
         <VideoPlayerControlBar
           duration={this.state.duration} currentTime={this.state.currentTime}
           togglePause={this.togglePause} isPlaying={this.state.isPlaying}
