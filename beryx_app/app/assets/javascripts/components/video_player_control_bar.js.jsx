@@ -79,6 +79,15 @@ var VideoPlayerControlBar = React.createClass({
       >{options} </select>
     );
   },
+  _renderSeekBar() {
+    return (
+      <div className="player-controller-seekbar">
+        <div className="player-controller-seekbar-fill">&nbsp;</div>
+
+      </div>
+    );
+
+  },
   _renderFullScreenButton() {
 
     var iconClasses;
@@ -99,6 +108,9 @@ var VideoPlayerControlBar = React.createClass({
         <div className="player-controller-left">
           {this._renderPlayButton()}
           {this._renderJumpButtons()}
+        </div>
+        <div className="player-controller-center">
+          {this._renderSeekBar()}
         </div>
         <div className="player-controller-right">
           {this._renderPlaybackRateSelects()}

@@ -8,6 +8,7 @@
   bottom: 50px;
   left: 0;
 }
+
 .player-video {
   display: block;
   width: 100%;
@@ -25,15 +26,26 @@
   width: 100%;
   background-color: #D6DCE4;
   font-size: 16px;
-}
 
-.player-controller-left, .player-controller-right {
+}
+.player-controller-left,
+.player-controller-center,
+.player-controller-right {
   display: table-cell;
   vertical-align: middle;
 }
+
+.player-controller-center {
+  display: inline-block;
+  top: 0;
+  bottom: 0;
+  margin: 50%
+}
+
 .player-controller-right {
   text-align: right;
 }
+
 
 .player-controller-play-button {
   margin-right: 1em;
@@ -45,4 +57,11 @@
   button {
     padding: 4px 8px;
   }
+}
+
+.player-controller-seekbar-fill {
+  display: inline-block;
+  background-color: aquamarine;
+  width: 100%;
+  height: 30px;
 }
