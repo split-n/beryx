@@ -82,7 +82,7 @@ class ConvertedVideo < ActiveRecord::Base
 
     FileUtils.mkdir_p(self.converted_dir_path)
 
-    param = Module.const_get(self.param_class).from_json(self.param_json)
+    param = Module.const_get(self.param_class).new(JSON.parse(self.param_json))
     command = param.to_command(self.video.path, self.converted_dir_path, self.converted_file_path)
 
     logger.info("[ConvertedVideo] video_id=#{self.video_id} convert command: #{command}")
