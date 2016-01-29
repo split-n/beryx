@@ -9,14 +9,56 @@ var VideoConvertSelect = React.createClass({
   },
   getInitialState() {
     return {
-      disableSelectButtons: false
+      disableSelectButtons: false,
+      loadingVideo: false
     };
   },
+  sendConvertRequest(params) {
+    $.ajax({
+      type: "POST",
+      url: `/videos/${this.props.videoId}/convert`,
+      data: JSON.stringify(params),
+      dataType: "json",
+      contentType:"application/json"
+    }).done((response) => {
+      var video_source_path = response.video_source_path;
+      this.waitUntilFound(video_source_path, () => {
+        this.props.onVideoSourceSupplied(video_source_path);
+      });
+    }).fail((error) => {
+      console.log(error);
+    });
+  },
+  waitUntilFound(url, callback) {
+    $.ajax({
+      type: "HEAD",
+      url: url
+    }).done((data, textStatus, jqXHR ) => {
+      switch(jqXHR.status) {
+      case 200:
+          callback();
+          break;
+      default:
+          console.log(jqXHR);
+          break;
+      }
+    }).fail((jqXHR) => {
+      switch(jqXHR.status) {
+      case 404:
+        setTimeout(() => {
+          console.log(`404 ${url}, retry in 3000ms`);
+          this.waitUntilFound(url, callback);
+        }, 3000);
+        break;
+      }
+    });
+  },
   onClickConvertMethod(method) {
-    this.setState({disableSelectButtons: true});
+    this.setState({disableSelectButtons: true, loadingVideo: true});
     var params;
     switch(method) {
     case "HLS_COPY":
+      params = {convert_method: "HLS_COPY"};
       break;
     case "HLS_720P_5M":
       break;
@@ -24,6 +66,7 @@ var VideoConvertSelect = React.createClass({
       break;
     }
 
+    this.sendConvertRequest(params)
   },
   render: function() {
     return (
