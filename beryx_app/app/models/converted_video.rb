@@ -27,7 +27,6 @@ class ConvertedVideo < ActiveRecord::Base
 
   class << self
     def convert_to_hls(video, param)
-      param = ConvertParams::CopyHls.new
       converted_dir_path =  CONVERTED_VIDEOS_FS_PATH + SecureRandom.hex
       converted_file_path = converted_dir_path + "playlist.m3u8"
 
@@ -43,7 +42,7 @@ class ConvertedVideo < ActiveRecord::Base
     end
 
     def convert_to(video, param, converted_dir_path, converted_file_path)
-      done_c_video = self.find_by(video: video, param_class: param.class.name, param_json: param.to_json)
+      done_c_video = self.find_by(video: video, param_class: param.class.name, param_json: param.as_json)
       if done_c_video
         if done_c_video.fail?
           done_c_video.destroy
@@ -53,7 +52,7 @@ class ConvertedVideo < ActiveRecord::Base
       end
 
       c_video = video.converted_videos.create(
-          param_class: param.class.name, param_json: param.to_json,
+          param_class: param.class.name, param_json: param.as_json,
           converted_dir_path: converted_dir_path,
           converted_file_path: converted_file_path, job_status: :building,
           last_played: Time.now
