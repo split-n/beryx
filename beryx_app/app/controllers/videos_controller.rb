@@ -21,18 +21,25 @@ class VideosController < ApplicationController
   end
 
   def convert
-    video_id = params[:video_id]
+    begin
+      data = JSON.parse(request.body.read)
+    rescue
+      render json: {error: "request body is invalid"}, status: 400
+      return
+    end
+
+    video_id = params[:id]
     video = Video.find_by(id: video_id)
     if video.nil?
       render json: {error: "video_id is invalid"}, status: 400
       return
     end
 
-    case params[:convert_method]
+    case data["convert_method"]
       when "HLS_COPY"
         converted_video = ConvertedVideo.convert_to_copy_hls(video)
       when "HLS_AVC_AAC_ENCODE"
-        converted_video = ConvertedVideo.convert_to_encode_avc_aac_hls(video, params[:convert_params])
+        converted_video = ConvertedVideo.convert_to_encode_avc_aac_hls(video, data["convert_params"])
       else
         render json: {error: "convert_method is invalid"}, status: 400
         return
@@ -42,7 +49,6 @@ class VideosController < ApplicationController
       render json: {error: "convert_params is invalid"}, status: 400
       return
     end
-
 
     response = {
       video_source_path: converted_video.file_url_path

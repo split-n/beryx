@@ -56,6 +56,7 @@ RSpec.configure do |config|
   # config.filter_gems_from_backtrace("gem name")
 
   config.include ControllerSpecHelper, type: :controller
+  config.include RequestSpecHelper, type: :request
   config.include FeatureSpecHelper, type: :feature
 
   config.before(:each) do
