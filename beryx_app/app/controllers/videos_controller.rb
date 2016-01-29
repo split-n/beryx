@@ -37,18 +37,20 @@ class VideosController < ApplicationController
 
     case data["convert_method"]
       when "HLS_COPY"
-        converted_video = ConvertedVideo.convert_to_copy_hls(video)
+        convert_params = ConvertParams::CopyHls.new
       when "HLS_AVC_AAC_ENCODE"
-        converted_video = ConvertedVideo.convert_to_encode_avc_aac_hls(video, data["convert_params"])
+        convert_params = ConvertParams::EncodeAvcAacHls.new(data["convert_params"])
       else
         render json: {error: "convert_method is invalid"}, status: 400
         return
     end
 
-    if converted_video.invalid?
+    if convert_params.invalid?
       render json: {error: "convert_params is invalid"}, status: 400
       return
     end
+
+    converted_video = ConvertedVideo.convert_to_hls(video, convert_params)
 
     response = {
       video_source_path: converted_video.file_url_path

@@ -35,6 +35,36 @@ RSpec.describe "Videos", type: :request do
         it { subject; expect(response.body).to include "m3u8" }
       end
 
+      context "HLS_AVC_AAC_ENCODE" do
+
+        subject { post "/videos/#{video.id}/convert", request_body  }
+        context "params missing" do
+          let(:request_body) {
+            JSON.generate({
+              convert_method: "HLS_AVC_AAC_ENCODE",
+              convert_params: {
+                  video_kbps: 1000
+              }})
+          }
+          it { subject; expect(response.status).to eq 400 }
+          it { subject; expect(response.body).to include "convert_params is invalid" }
+        end
+
+        context "valid convert params" do
+          let(:request_body) {
+            JSON.generate({
+              convert_method: "HLS_AVC_AAC_ENCODE",
+              convert_params: {
+                  video_kbps: 1000, audio_kbps: 128,
+                  height: 480, preset: "fast"
+              }})
+          }
+          it { subject; expect(response.status).to eq 200 }
+          it { subject; expect(response.body).to include "m3u8" }
+        end
+
+      end
+
     end
   end
 end
