@@ -60,10 +60,45 @@ var VideoConvertSelect = React.createClass({
     case "HLS_COPY":
       params = {convert_method: "HLS_COPY"};
       break;
-    case "HLS_720P_5M":
+    case "HLS_1080P_8M":
+      params = {
+        convert_method: "HLS_AVC_AAC_ENCODE",
+        convert_params: {
+          video_kbps: 8000-192, audio_kbps: 192,
+          height: 1080, preset: "veryfast"
+        }
+      };
       break;
     case "HLS_720P_3M":
+      params = {
+        convert_method: "HLS_AVC_AAC_ENCODE",
+        convert_params: {
+          video_kbps: 3000-160, audio_kbps: 160,
+          height: 720, preset: "fast"
+        }
+      };
       break;
+    case "HLS_720P_1M":
+      params = {
+        convert_method: "HLS_AVC_AAC_ENCODE",
+        convert_params: {
+          video_kbps: 1000-100, audio_kbps: 128,
+          height: 720, preset: "fast"
+        }
+      };
+      break;
+    case "HLS_360P_500K":
+      params = {
+        convert_method: "HLS_AVC_AAC_ENCODE",
+        convert_params: {
+          video_kbps: 500-56, audio_kbps: 56,
+          height: 360, preset: "fast",
+          he_aac: true
+        }
+      };
+      break;
+    default:
+        console.log("invalid method");
     }
 
     this.sendConvertRequest(params)
@@ -78,11 +113,17 @@ var VideoConvertSelect = React.createClass({
               onClick={this.onClickConvertMethod.bind(this, "HLS_COPY")}
                 >HLS no convert</button></li>
             <li><button className="btn" disabled={this.state.disableSelectButtons && "disabled"}
-              onClick={this.onClickConvertMethod.bind(this, "HLS_720P_5M")}
-                >HLS 720p 5Mbps</button></li>
+              onClick={this.onClickConvertMethod.bind(this, "HLS_1080P_8M")}
+            >HLS 1080p 8Mbps veryfast</button></li>
             <li><button className="btn" disabled={this.state.disableSelectButtons && "disabled"}
               onClick={this.onClickConvertMethod.bind(this, "HLS_720P_3M")}
                 >HLS 720p 3Mbps</button></li>
+            <li><button className="btn" disabled={this.state.disableSelectButtons && "disabled"}
+              onClick={this.onClickConvertMethod.bind(this, "HLS_720P_1M")}
+                >HLS 720p 1Mbps</button></li>
+            <li><button className="btn" disabled={this.state.disableSelectButtons && "disabled"}
+                        onClick={this.onClickConvertMethod.bind(this, "HLS_360P_500K")}
+            >HLS 360p 500Kbps</button></li>
           </ul>
         </div>
     );
