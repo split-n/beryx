@@ -3,6 +3,10 @@ module ConvertParams
     include ActiveModel::Model
     include ActiveModel::Validations::Callbacks
 
+    def as_json
+      super(only: [])
+    end
+
     class << self
       def define_property(*props)
         attr_accessor *props
