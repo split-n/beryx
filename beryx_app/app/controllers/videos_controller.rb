@@ -18,6 +18,9 @@ class VideosController < ApplicationController
 
   def show
     @video = Video.find(params[:id])
+    if !@video.path_exist? || @video.deleted?
+      raise ActiveRecord::RecordNotFound
+    end
   end
 
   def convert
