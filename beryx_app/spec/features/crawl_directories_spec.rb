@@ -33,6 +33,34 @@ RSpec.feature "CrawlDirectories", type: :feature do
     end
   end
 
+  describe "create new" do
+    let(:user) { FG.create(:user_admin) }
+    before { log_in_as(user) }
+
+    it "can register new directory" do
+      path = "/valid/abc/"
+      allow(Dir).to receive(:exist?).with(path).and_return(true)
+
+      expect {
+        visit new_crawl_directory_path
+        fill_in "crawl_directory_path", with: path
+        click_button "Create Crawl directory"
+      }.to change{CrawlDirectory.active.count}.by(1)
+    end
+
+    it "can't register dup directory, show errors" do
+      existed = FG.create(:crawl_directory)
+      allow(Dir).to receive(:exist?).with(existed.path).and_return(true)
+
+      expect {
+        visit new_crawl_directory_path
+        fill_in "crawl_directory_path", with: existed.path
+        click_button "Create Crawl directory"
+      }.not_to change{CrawlDirectory.active.count}
+      expect(page).to have_content "Path duplicated"
+    end
+  end
+
   describe "/crawl_directories/:id" do
     context "with normal user" do
       let!(:user) { FG.create(:user) }
