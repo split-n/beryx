@@ -21,8 +21,9 @@ RSpec.describe VideosController, type: :controller do
 
   describe "#show" do
     context "not logged" do
+      let(:video) { FG.create(:video) }
       it "redirected to login" do
-        get :index
+        get :show, id: video.id
         expect(response).to redirect_to login_path
       end
     end
@@ -31,28 +32,27 @@ RSpec.describe VideosController, type: :controller do
       let(:user) { FG.create(:user) }
       before { log_in_as(user) }
 
-      context "valid video" do
+      context "with video" do
         let(:video) { FG.create(:video) }
         subject { get :show, id: video.id }
-        it { subject; expect(response).to render_template :show }
+
+        context "valid" do
+          it { subject; expect(response).to render_template :show }
+        end
+
+        context "mark as deleted" do
+          before { video.mark_as_deleted }
+          it { expect{subject}.to raise_error(ActiveRecord::RecordNotFound) }
+        end
+
+        context "file is deleted" do
+          before { allow(File).to receive(:exist?).with(video.path).and_return(false) }
+          it { expect{subject}.to raise_error(ActiveRecord::RecordNotFound) }
+        end
       end
 
       context "not found video_id" do
         subject { get :show, id: 45516 }
-        it { expect{subject}.to raise_error(ActiveRecord::RecordNotFound) }
-      end
-
-      context "mark as deleted video" do
-        let(:video) { FG.create(:video) }
-        before { video.mark_as_deleted }
-        subject { get :show, id: video.id }
-        it { expect{subject}.to raise_error(ActiveRecord::RecordNotFound) }
-      end
-
-      context "video file is deleted" do
-        let(:video) { FG.create(:video) }
-        before { allow(File).to receive(:exist?).with(video.path).and_return(false) }
-        subject { get :show, id: video.id }
         it { expect{subject}.to raise_error(ActiveRecord::RecordNotFound) }
       end
     end
