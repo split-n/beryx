@@ -3,15 +3,12 @@ module ConvertParams
     include ActiveModel::Model
     include ActiveModel::Validations::Callbacks
 
-    def as_json
-      super(only: [])
-    end
 
     class << self
-      def define_property(*props)
+      def define_attr(*props)
         attr_accessor *props
-        define_method("as_json") do
-          super(only: props.map(&:to_s))
+        define_method("attributes") do
+          props.map{|s| [s.to_s, nil]}.to_h
         end
       end
     end
@@ -30,15 +27,19 @@ module ConvertParams
     X264_PRESETS = %w(ultrafast superfast veryfast faster fast medium slow slower veryslow placebo)
     X264_TUNES = %w(film animation grain stillimage psnr ssim fastdecode zerolatency)
 
-    define_property :video_kbps, :audio_kbps, :width, :height, :preset, :tune, :he_aac
+    define_attr :video_kbps, :audio_kbps, :width, :height, :preset, :tune, :he_aac
     validates :video_kbps, presence: true, numericality: { only_integer: true }
     validates :audio_kbps, presence: true, numericality: { only_integer: true }
     validates :height, presence: true, numericality: { only_integer: true }
     validates :preset, presence: true, inclusion: { in: X264_PRESETS }
     validates :tune, inclusion: { in: X264_TUNES }, allow_nil: true
+    validates :he_aac, inclusion: { in: [true, false] }
 
-    before_validation do
+
+    def initialize(*)
+      super
       @preset ||= "fast"
+      @he_aac = false if @he_aac.nil?
       true
     end
 
