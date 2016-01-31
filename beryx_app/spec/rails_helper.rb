@@ -56,6 +56,7 @@ RSpec.configure do |config|
   # config.filter_gems_from_backtrace("gem name")
 
   config.include ControllerSpecHelper, type: :controller
+  config.include RequestSpecHelper, type: :request
   config.include FeatureSpecHelper, type: :feature
 
   config.before(:each) do
@@ -63,6 +64,7 @@ RSpec.configure do |config|
     allow(File).to receive(:exist?).and_call_original
     allow(File).to receive(:stat).and_call_original
     allow(File).to receive(:size).and_call_original
+    allow(File).to receive(:mtime).and_call_original
   end
 
   config.before(:each) do |spec|

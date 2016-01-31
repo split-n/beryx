@@ -26,18 +26,9 @@ class ConvertedVideo < ActiveRecord::Base
   enum job_status: { building: 0, queued: 1, running: 2, done: 3, fail: 4 }
 
   class << self
-    def convert_to_copy_hls(video)
-      param = ConvertParams::CopyHls.new
+    def convert_to_hls(video, param)
       converted_dir_path =  CONVERTED_VIDEOS_FS_PATH + SecureRandom.hex
       converted_file_path = converted_dir_path + "playlist.m3u8"
-
-      convert_to(video, param, converted_dir_path, converted_file_path)
-    end
-
-    def convert_to_copy_faststart_mp4(video)
-      param = ConvertParams::CopyFastStartMp4.new
-      converted_dir_path =  CONVERTED_VIDEOS_FS_PATH + SecureRandom.hex
-      converted_file_path = converted_dir_path + "play.mp4"
 
       convert_to(video, param, converted_dir_path, converted_file_path)
     end
@@ -51,7 +42,8 @@ class ConvertedVideo < ActiveRecord::Base
     end
 
     def convert_to(video, param, converted_dir_path, converted_file_path)
-      done_c_video = self.find_by(video: video, param_class: param.class.name, param_json: param.to_json)
+      param_json = JSON.generate(param.as_json)
+      done_c_video = self.find_by(video: video, param_class: param.class.name, param_json: param_json)
       if done_c_video
         if done_c_video.fail?
           done_c_video.destroy
@@ -60,9 +52,8 @@ class ConvertedVideo < ActiveRecord::Base
         end
       end
 
-
       c_video = video.converted_videos.create(
-          param_class: param.class.name, param_json: param.to_json,
+          param_class: param.class.name, param_json: param_json,
           converted_dir_path: converted_dir_path,
           converted_file_path: converted_file_path, job_status: :building,
           last_played: Time.now
@@ -82,7 +73,7 @@ class ConvertedVideo < ActiveRecord::Base
 
     FileUtils.mkdir_p(self.converted_dir_path)
 
-    param = Module.const_get(self.param_class).from_json(self.param_json)
+    param = Module.const_get(self.param_class).new(JSON.parse(self.param_json))
     command = param.to_command(self.video.path, self.converted_dir_path, self.converted_file_path)
 
     logger.info("[ConvertedVideo] video_id=#{self.video_id} convert command: #{command}")

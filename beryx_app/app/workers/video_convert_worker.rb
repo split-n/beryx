@@ -1,7 +1,7 @@
 class VideoConvertWorker
   include Sidekiq::Worker
   sidekiq_options queue: :video_convert,
-                  retry: 5
+                  retry: 1
 
   def perform(converted_video_id)
     cv = ConvertedVideo.find(converted_video_id)
