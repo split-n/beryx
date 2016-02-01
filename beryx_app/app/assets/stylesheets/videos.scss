@@ -32,7 +32,7 @@
   display: table;
   width: 100%;
   background-color: #D6DCE4;
-  font-size: 16px;
+  font-size: 15px;
 }
 
 .player-controller-left,
@@ -43,7 +43,7 @@
 }
 
 .player-controller-left {
-  width: 200px;
+  width: 180px;
 }
 
 .player-controller-center {
@@ -57,19 +57,31 @@
 }
 
 .player-controller-play-button {
-  margin-right: 1em;
-  padding: 4px 10px;
+  margin-right: 6px;
 }
 
 .player-controller-jump-buttons {
   display: inline;
   button {
-    padding: 4px 8px;
+    padding: 4px 6px;
   }
 }
 .player-controller-seekbar {
-  -webkit-appearance: none;
-  width: 100%;
-  background-color: seashell;
+  appearance: none;
+  background-color: #0F7EB3;
+  height: 10px;
+  &::-webkit-slider-thumb, {
+    appearance: none;
+    height: 26px;
+    width: 10px;
+    background-color: white;
+  }
+
+  &::-moz-range-thumb {
+    appearance: none;
+    height: 26px;
+    width: 10px;
+    background-color: white;
+  }
 }
 
