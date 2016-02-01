@@ -7,11 +7,13 @@
 }
 
 .player-core {
+  $controller-height: 44px;
+
   .player-video-container {
     position: absolute;
     top: 0;
     right: 0;
-    bottom: 50px;
+    bottom: $controller-height;
     left: 0;
 
     .player-video {
@@ -23,7 +25,7 @@
 
   .player-controller {
     position: absolute;
-    height: 50px;
+    height: $controller-height;
     right: 0;
     bottom: 0;
     left: 0;
@@ -83,6 +85,14 @@
     .player-controller-right {
       width: 200px;
       text-align: right;
+
+      .player-controller-select-rate {
+        margin-right: 5px;
+      }
+      .player-controller-display-time {
+        margin-right: 5px;
+
+      }
     }
   }
 }
