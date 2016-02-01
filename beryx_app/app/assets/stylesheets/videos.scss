@@ -7,81 +7,88 @@
 }
 
 .player-core {
-}
+  .player-video-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 50px;
+    left: 0;
 
-.player-video-container {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 50px;
-  left: 0;
-}
-.player-video {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.player-controller {
-  position: absolute;
-  height: 50px;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  padding: 2px 8px;
-  display: table;
-  width: 100%;
-  background-color: #D6DCE4;
-  font-size: 15px;
-}
-
-.player-controller-left,
-.player-controller-center,
-.player-controller-right {
-  display: table-cell;
-  vertical-align: middle;
-}
-
-.player-controller-left {
-  width: 180px;
-}
-
-.player-controller-center {
-  padding-left: 12px;
-  padding-right: 12px;
-}
-
-.player-controller-right {
-  width: 200px;
-  text-align: right;
-}
-
-.player-controller-play-button {
-  margin-right: 6px;
-}
-
-.player-controller-jump-buttons {
-  display: inline;
-  button {
-    padding: 4px 6px;
-  }
-}
-.player-controller-seekbar {
-  appearance: none;
-  background-color: #0F7EB3;
-  height: 10px;
-  &::-webkit-slider-thumb, {
-    appearance: none;
-    height: 26px;
-    width: 10px;
-    background-color: white;
+    .player-video {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
   }
 
-  &::-moz-range-thumb {
-    appearance: none;
-    height: 26px;
-    width: 10px;
-    background-color: white;
+  .player-controller {
+    position: absolute;
+    height: 50px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 2px 8px;
+    display: table;
+    width: 100%;
+    background-color: #D6DCE4;
+    font-size: 15px;
+
+    .player-controller-left,
+    .player-controller-center,
+    .player-controller-right {
+      display: table-cell;
+      vertical-align: middle;
+    }
+
+    .player-controller-left {
+      width: 180px;
+
+      .player-controller-play-button {
+        margin-right: 6px;
+      }
+
+      .player-controller-jump-buttons {
+        display: inline;
+        button {
+          padding: 4px 6px;
+        }
+      }
+    }
+
+    .player-controller-center {
+      padding-left: 12px;
+      padding-right: 12px;
+
+      .player-controller-seekbar {
+        appearance: none;
+        background-color: #0F7EB3;
+        height: 10px;
+        &::-webkit-slider-thumb, {
+          appearance: none;
+          height: 26px;
+          width: 10px;
+          background-color: white;
+        }
+
+        &::-moz-range-thumb {
+          appearance: none;
+          height: 26px;
+          width: 10px;
+          background-color: white;
+        }
+      }
+
+    }
+
+    .player-controller-right {
+      width: 200px;
+      text-align: right;
+    }
   }
 }
+
+
+
+
+
 
