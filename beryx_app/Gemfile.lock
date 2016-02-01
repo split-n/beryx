@@ -248,6 +248,7 @@ PLATFORMS
 
 DEPENDENCIES
   annotate
+  autoprefixer-rails
   bcrypt
   bootstrap-sass (~> 3.3.6)
   capybara (~> 2.5.0)
