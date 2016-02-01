@@ -7,21 +7,29 @@ shared_context "valid command args" do
 end
 
 describe ConvertParams::CopyHls do
-  describe "#to_command" do
-    let(:params) { ConvertParams::CopyHls.new(params_hash) }
-    subject {
-      params.to_command(src_file, dest_dir, dest_file)
-    }
-    context "valid params/args" do
-      include_context "valid command args"
+  let(:params) { ConvertParams::CopyHls.new(params_hash) }
+  context "valid params/args" do
+    include_context "valid command args"
+    let(:params_hash) { {} }
 
-      let(:params_hash) { {} }
+    describe "#to_command" do
+      subject {
+        params.to_command(src_file, dest_dir, dest_file)
+      }
 
       it { should include "ffmpeg" }
       it { should include src_file }
       it { should include dest_file }
     end
+
+    describe "#as_json" do
+      before { params.valid? }
+      subject { params.as_json }
+      it { expect(subject.symbolize_keys).to eq({}) }
+    end
+
   end
+
 end
 
 describe ConvertParams::EncodeAvcAacHls do
@@ -45,6 +53,7 @@ describe ConvertParams::EncodeAvcAacHls do
     end
 
     describe "#as_json" do
+      before { params.valid? }
       subject { params.as_json }
       let(:expected_hash) {
         hash = params_hash.deep_dup
@@ -81,6 +90,7 @@ describe ConvertParams::EncodeAvcAacHls do
     end
 
     describe "#as_json" do
+      before { params.valid? }
       subject { params.as_json }
       it { expect(subject.symbolize_keys).to eq params_hash }
     end
