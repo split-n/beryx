@@ -80,7 +80,6 @@ var VideoPlayerControlBar = React.createClass({
     );
   },
   _renderFullScreenButton() {
-
     var iconClasses;
     if(this.props.isFullScreen) {
       iconClasses = "glyphicon glyphicon-resize-small";
@@ -93,12 +92,24 @@ var VideoPlayerControlBar = React.createClass({
      </button>
     );
   },
+  _onSeekBarMoved() {
+    this.props.seekToTime(this.refs.seekbar.value);
+  },
+  componentWillUpdate() {
+    this.refs.seekbar.value = this.props.currentTime;
+  },
   render() {
     return (
       <div className="player-controller">
         <div className="player-controller-left">
           {this._renderPlayButton()}
           {this._renderJumpButtons()}
+        </div>
+        <div className="player-controller-center">
+          <input type="range" className="player-controller-seekbar"
+             ref="seekbar" max={this.props.duration}
+             onChange={this._onSeekBarMoved}
+          />
         </div>
         <div className="player-controller-right">
           {this._renderPlaybackRateSelects()}

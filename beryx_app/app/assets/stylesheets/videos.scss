@@ -35,11 +35,24 @@
   font-size: 16px;
 }
 
-.player-controller-left, .player-controller-right {
+.player-controller-left,
+.player-controller-center,
+.player-controller-right {
   display: table-cell;
   vertical-align: middle;
 }
+
+.player-controller-left {
+  width: 200px;
+}
+
+.player-controller-center {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
 .player-controller-right {
+  width: 200px;
   text-align: right;
 }
 
@@ -54,3 +67,9 @@
     padding: 4px 8px;
   }
 }
+.player-controller-seekbar {
+  -webkit-appearance: none;
+  width: 100%;
+  background-color: seashell;
+}
+
