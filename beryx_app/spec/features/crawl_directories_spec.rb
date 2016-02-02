@@ -17,7 +17,7 @@ RSpec.feature "CrawlDirectories", type: :feature do
 
       it "can get page and empty list" do
         visit crawl_directories_path
-        expect(page).not_to have_content "Destroy"
+        expect(page).not_to have_css "td"
         expect(page).to have_content "Crawl Directories"
       end
 
@@ -39,7 +39,7 @@ RSpec.feature "CrawlDirectories", type: :feature do
 
       expect {
         visit new_crawl_directory_path
-        fill_in "crawl_directory_path", with: path
+        fill_in "crawl_directory[path]", with: path
         click_button "Create Crawl directory"
       }.to change{CrawlDirectory.active.count}.by(1)
     end
@@ -50,7 +50,7 @@ RSpec.feature "CrawlDirectories", type: :feature do
 
       expect {
         visit new_crawl_directory_path
-        fill_in "crawl_directory_path", with: existed.path
+        fill_in "crawl_directory[path]", with: existed.path
         click_button "Create Crawl directory"
       }.not_to change{CrawlDirectory.active.count}
       expect(page).to have_content "Path duplicated"
@@ -86,8 +86,7 @@ RSpec.feature "CrawlDirectories", type: :feature do
         cd.crawl_job_status = :running
         cd.save!
         visit crawl_directory_path(cd)
-        expect(page).to have_content "Job running"
-        expect(page).to have_css "button[disabled]"
+        expect(page).to have_content "job running"
       end
     end
   end
