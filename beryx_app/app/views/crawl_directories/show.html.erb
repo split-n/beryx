@@ -1,16 +1,44 @@
-<p id="notice"><%= notice %></p>
-<p><%= @crawl_directory.path %></p>
-<p>
-  <%= form_tag  queue_crawl_crawl_directory_path(@crawl_directory) do %>
+<div class="container">
+  <p id="notice"><%= notice %></p>
+  <h1>Show crawl directory</h1>
+  <table class="table table-bordered">
+    <tr>
+      <th>path</th>
+      <td><%= @crawl_directory.path %></td>
+    </tr>
+    <tr>
+      <th>active videos</th>
+      <td><%= @crawl_directory.videos.active.count %></td>
+    </tr>
+    <tr>
+      <th>deleted videos</th>
+      <td><%= @crawl_directory.videos.deleted.count %></td>
+    </tr>
+    <tr>
+      <th>crawl status</th>
       <% case(@crawl_directory.crawl_job_status)
-         when "not_running" %>
-          <%= button_tag "Execute crawl" %>
+           when "not_running" %>
+          <td>not running</td>
+      <% when "queued" %>
+          <td>job queued</td>
+      <% when "running" %>
+          <td>job running</td>
+      <% else raise %>
+      <% end %>
+    </tr>
+  </table>
+  <p>
+    <%= form_tag  queue_crawl_crawl_directory_path(@crawl_directory) do %>
+        <% case(@crawl_directory.crawl_job_status)
+             when "not_running" %>
+            <%= button_tag "Execute crawl", class: "btn btn-primary" %>
         <% when "queued" %>
-          <%= button_tag "Job queued", disabled: true %>
+            <%= button_tag "Job queued", disabled: true %>
         <% when "running" %>
-          <%= button_tag "Job running", disabled: true %>
+            <%= button_tag "Job running", disabled: true %>
         <% else raise %>
         <% end %>
-  <% end %>
-</p>
-<%= link_to 'Back', crawl_directories_path %>
+    <% end %>
+  </p>
+  <%= link_to 'Back', crawl_directories_path, class: "btn btn-primary" %>
+</div>
