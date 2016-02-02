@@ -10,7 +10,8 @@ var VideoPlayerCore = React.createClass({
       duration: 0,
       currentTime: 0,
       isPlaying: false,
-      isFullScreen: false
+      isFullScreen: false,
+      volume: 0.5
     };
   },
   componentDidMount() {
@@ -18,6 +19,8 @@ var VideoPlayerCore = React.createClass({
     video.addEventListener("timeupdate", this.onTimeUpdate);
     video.addEventListener("play", this.onPlay);
     video.addEventListener("pause", this.onPause);
+    video.addEventListener("volumechange", this.onVolumeChange);
+    this.onVolumeChange();
 
     var hasHlsNativeSupport = !!document.createElement("video")
       .canPlayType("application/vnd.apple.mpegURL");
@@ -37,6 +40,7 @@ var VideoPlayerCore = React.createClass({
     video.removeEventListener("timeupdate", this.onTimeUpdate);
     video.removeEventListener("play", this.onPlay);
     video.removeEventListener("pause", this.onPause);
+    video.removeEventListener("volumechange", this.onVolumeChange);
   },
   onTimeUpdate() {
     var video = this.refs.video;
@@ -47,6 +51,15 @@ var VideoPlayerCore = React.createClass({
   },
   onPause() {
     this.setState({isPlaying: false});
+  },
+  onVolumeChange() {
+    this.setState({volume: this.refs.video.volume});
+    this.forceUpdate();
+  },
+  changeVolume(volume) {
+    this.refs.video.volume = volume;
+    this.setState({volume: volume});
+    this.forceUpdate();
   },
   togglePause() {
     var video = this.refs.video;
@@ -104,9 +117,11 @@ var VideoPlayerCore = React.createClass({
         </div>
         <VideoPlayerControlBar
           duration={this.state.duration} currentTime={this.state.currentTime}
+          volume={this.state.volume}
           togglePause={this.togglePause} isPlaying={this.state.isPlaying}
           seekToTime={this.seekToTime} setPlaybackRate={this.setPlaybackRate}
           isFullScreen={this.state.isFullScreen} toggleFullScreen={this.toggleFullScreen}
+          changeVolume={this.changeVolume}
         />
       </div>
     );
