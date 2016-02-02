@@ -83,7 +83,7 @@
     }
 
     .player-controller-right {
-      width: 200px;
+      width: 180px;
       text-align: right;
 
       .player-controller-select-rate {
@@ -92,6 +92,31 @@
       .player-controller-display-time {
         margin-right: 5px;
 
+      }
+
+      .player-controller-misc-menu {
+        $height: 180px;
+        position: absolute;
+        top: -$height;
+        right: 10px;
+        height: $height;
+        width: 180px;
+        border-radius: 10px;
+        padding: 10px;
+        background-color: rgb(206, 228, 255);
+        border: 4px solid rgb(79, 111, 232);
+        text-align: left;
+
+        .player-controller-volume-button {
+          padding: 4px 6px;
+
+        }
+
+        .player-controller-volume-bar {
+          display: inline;
+          width: 110px;
+          margin-left: 10px;
+        }
       }
     }
   }
