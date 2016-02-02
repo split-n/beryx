@@ -27,18 +27,8 @@
       <% end %>
     </tr>
   </table>
-  <p>
-    <%= form_tag  queue_crawl_crawl_directory_path(@crawl_directory) do %>
-        <% case(@crawl_directory.crawl_job_status)
-             when "not_running" %>
-            <%= button_tag "Execute crawl", class: "btn btn-primary" %>
-        <% when "queued" %>
-            <%= button_tag "Job queued", disabled: true %>
-        <% when "running" %>
-            <%= button_tag "Job running", disabled: true %>
-        <% else raise %>
-        <% end %>
-    <% end %>
-  </p>
+  <% if @crawl_directory.crawl_job_status == "not_running" %>
+    <p><%= button_tag "Execute crawl", class: "btn btn-primary" %></p>
+  <% end %>
   <%= link_to 'Back', crawl_directories_path, class: "btn btn-primary" %>
 </div>
