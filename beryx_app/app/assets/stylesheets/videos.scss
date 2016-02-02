@@ -1,9 +1,22 @@
-.convert-method-list > li{
-  margin-bottom: 10px;
+.videos-page {
+  .videos-search-form {
+    text-align: center;
+    .videos-search-input {
+      width: 80%;
+      font-size: 20px;
+    }
+  }
+
 }
 
-.convert-video-name {
-  font-size: 1em;
+.video-convert-page {
+  .convert-method-list > li{
+    margin-bottom: 10px;
+  }
+
+  .convert-video-name {
+    font-size: 1em;
+  }
 }
 
 .player-core {
