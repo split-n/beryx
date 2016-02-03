@@ -3,6 +3,8 @@ Rails.application.routes.draw do
 
   get '/videos/:id', to: "videos#show"
   post '/videos/:id/convert', to: "videos#convert"
+  get '/videos/:id/play_history', to: "play_histories#show"
+  post '/videos/:id/play_history', to: "play_histories#create"
 
   resources :crawl_directories, only: [:index, :show, :new, :create, :destroy] do
     member do

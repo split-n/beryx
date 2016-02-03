@@ -14,7 +14,9 @@ var VideoPlayer = React.createClass({
   },
   render: function() {
     if(this.state.videoFilePath) {
-      return <VideoPlayerCore src={this.state.videoFilePath} />;
+      return <VideoPlayerCore
+        src={this.state.videoFilePath}
+        videoId={this.props.videoId} />;
     } else {
       return (
         <VideoConvertSelect

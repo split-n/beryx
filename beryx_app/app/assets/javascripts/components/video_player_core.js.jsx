@@ -3,7 +3,8 @@
 
 var VideoPlayerCore = React.createClass({
   propTypes: {
-    src: React.PropTypes.string.isRequired
+    src: React.PropTypes.string.isRequired,
+    videoId: React.PropTypes.number.isRequired
   },
   getInitialState() {
     return {
@@ -34,6 +35,7 @@ var VideoPlayerCore = React.createClass({
         });
       }
     }
+    window.addEventListener("beforeunload", this.sendCurrentTime);
   },
   componentWillUnmount() {
     var video = this.refs.video;
@@ -41,6 +43,15 @@ var VideoPlayerCore = React.createClass({
     video.removeEventListener("play", this.onPlay);
     video.removeEventListener("pause", this.onPause);
     video.removeEventListener("volumechange", this.onVolumeChange);
+    window.removeEventListener("beforeunload", this.sendCurrentTime);
+  },
+  sendCurrentTime() {
+    $.ajax({
+      url: `/videos/${this.props.videoId}/play_history`,
+      type: "POST",
+      dataType: "json",
+      data: { position: this.state.currentTime.toFixed() }
+    }); // ignore response
   },
   onTimeUpdate() {
     var video = this.refs.video;
