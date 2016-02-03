@@ -7,11 +7,12 @@ RSpec.describe PlayHistory, type: :model do
       let(:user) { FG.create(:user) }
 
       context "first time" do
-        subject { PlayHistory.destroy_and_create(user.id, video.id, position) }
+        subject { PlayHistory.create_or_update(user.id, video.id, position) }
         context "valid posittion" do
           let(:position) { 3 }
           it { should be_valid }
           it { expect{subject}.to change{PlayHistory.count}.by(1) }
+          it { expect(subject.position).to eq position }
         end
 
         context "position is over video duration" do
@@ -30,13 +31,14 @@ RSpec.describe PlayHistory, type: :model do
       end
 
       context "second time" do
-        before { PlayHistory.destroy_and_create(user.id, video.id, position) }
-        subject { PlayHistory.destroy_and_create(user.id, video.id, position2) }
+        before { PlayHistory.create_or_update(user.id, video.id, position) }
+        subject { PlayHistory.create_or_update(user.id, video.id, position2) }
         context "valid position" do
           let(:position) { 4 }
           let(:position2) { 2 }
           it { should be_valid }
           it { expect{subject}.not_to change{PlayHistory.count} }
+          it { expect(subject.position).to eq position2 }
         end
 
         context "second create's duration wrong" do
@@ -44,6 +46,7 @@ RSpec.describe PlayHistory, type: :model do
           let(:position2) { -1 }
           it { should_not be_valid }
           it { expect{subject}.not_to change{PlayHistory.count} }
+          it { expect(subject.reload.position).to eq position }
         end
       end
     end

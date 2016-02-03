@@ -31,10 +31,14 @@ class PlayHistory < ActiveRecord::Base
   validates_uniqueness_of :user_id, scope: :video_id
 
   class << self
-    def destroy_and_create(user_id, video_id, position)
+    def create_or_update(user_id, video_id, position)
       existed = self.find_by(user_id: user_id, video_id: video_id)
-      existed&.destroy
-      self.create(user_id: user_id, video_id: video_id, position: position)
+      if existed
+        existed.update(position: position)
+        existed
+      else
+        self.create(user_id: user_id, video_id: video_id, position: position)
+      end
     end
   end
 

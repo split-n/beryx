@@ -6,7 +6,7 @@ class PlayHistoriesController < ApplicationController
   end
 
   def create
-    play_history = PlayHistory.destroy_and_create(current_user.id, params[:id], params[:position])
+    play_history = PlayHistory.create_or_update(current_user.id, params[:id], params[:position])
 
     if play_history.valid?
       render json: play_history.as_json
