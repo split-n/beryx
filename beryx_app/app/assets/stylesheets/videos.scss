@@ -3,7 +3,11 @@
     text-align: center;
     .videos-search-input {
       width: 80%;
+      max-width: 500px;
       font-size: 20px;
+    }
+    .videos-search-submit {
+      position: absolute;
     }
   }
 

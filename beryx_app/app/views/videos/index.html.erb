@@ -3,7 +3,7 @@
   <h1><%= link_to "Videos", root_path %></h1>
   <%= search_form_for @ransack, url: root_path, html: {class: "videos-search-form"} do |f| %>
       <%= f.text_field :normalized_file_name_cont_all, class: "videos-search-input" %>
-      <%= f.submit class: "btn btn-success" %>
+      <%= f.submit class: "btn btn-success videos-search-submit" %>
   <% end %>
   <p><%= @ransack.result.count %> videos found.</p>
   <table class="table table-bordered table-hover table-striped table-responsive">
