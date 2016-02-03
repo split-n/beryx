@@ -34,6 +34,7 @@ class Video < ActiveRecord::Base
   VIDEO_EXTS = %w(.mp4 .mkv) # temp
   belongs_to :crawl_directory
   has_many :converted_videos, dependent: :destroy
+  has_many :play_histories, dependent: :destroy
   validates :crawl_directory, presence: true
   validates :path, presence: true
   validate :path_should_exists, if: -> { path.present? }, on: :create
