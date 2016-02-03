@@ -11,8 +11,9 @@
 #
 # Indexes
 #
-#  index_play_histories_on_user_id   (user_id)
-#  index_play_histories_on_video_id  (video_id)
+#  index_play_histories_on_user_id               (user_id)
+#  index_play_histories_on_video_id              (video_id)
+#  index_play_histories_on_video_id_and_user_id  (video_id,user_id) UNIQUE
 #
 # Foreign Keys
 #
@@ -27,6 +28,15 @@ class PlayHistory < ActiveRecord::Base
   validates :user, presence: true
   validates :position, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validate :position_should_not_over_duration
+  validates_uniqueness_of :user_id, scope: :video_id
+
+  class << self
+    def destroy_and_create(user_id, video_id, position)
+      existed = self.find_by(user_id: user_id, video_id: video_id)
+      existed&.destroy
+      self.create(user_id: user_id, video_id: video_id, position: position)
+    end
+  end
 
 
   def position_should_not_over_duration
