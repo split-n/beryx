@@ -8,7 +8,6 @@ gem 'bcrypt'
 gem 'parallel'
 gem 'ransack', '~> 1.7.0'
 gem 'kaminari'
-gem 'kaminari-bootstrap', '~> 3.0.1'
 gem 'sidekiq', '~> 4.0.1'
 gem 'sidekiq-unique-jobs', '~> 4.0.13'
 gem 'whenever', require: false
