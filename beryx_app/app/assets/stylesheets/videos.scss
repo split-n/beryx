@@ -26,6 +26,24 @@
 .player-core {
   $controller-height: 44px;
 
+  .player-prev-position-bar {
+    position: absolute;
+    width: 100%;
+    background: #55c6c5;
+    z-index: 10;
+    font-size: 18px;
+    text-align: center;
+
+    p {
+      margin-top: 7px;
+      margin-bottom: 7px;
+    }
+
+    button {
+      margin-left: 14px;
+    }
+  }
+
   .player-video-container {
     position: absolute;
     top: 0;

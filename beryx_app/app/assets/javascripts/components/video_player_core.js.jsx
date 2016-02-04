@@ -4,7 +4,8 @@
 var VideoPlayerCore = React.createClass({
   propTypes: {
     src: React.PropTypes.string.isRequired,
-    videoId: React.PropTypes.number.isRequired
+    videoId: React.PropTypes.number.isRequired,
+    prevPosition: React.PropTypes.number
   },
   getInitialState() {
     return {
@@ -12,7 +13,8 @@ var VideoPlayerCore = React.createClass({
       currentTime: 0,
       isPlaying: false,
       isFullScreen: false,
-      volume: 0.5
+      volume: 0.5,
+      prevPositionBarDone: false
     };
   },
   componentDidMount() {
@@ -116,9 +118,30 @@ var VideoPlayerCore = React.createClass({
       this.setState({isFullScreen: true});
     }
   },
+  playFromPrevPosition() {
+    this.setState({ prevPositionBarDone: true });
+    this.seekToTime(this.props.prevPosition);
+  },
+  disappearPrevPositionBar() {
+    this.setState({ prevPositionBarDone: true });
+  },
+  _renderPlayFromHistory() {
+    if(this.props.prevPosition && !this.state.prevPositionBarDone) {
+      return (
+        <div className="player-prev-position-bar">
+          <p>
+            Start playing from {this.props.prevPosition}?
+            <button className="btn" onClick={this.playFromPrevPosition}>Yes</button>
+            <button className="btn" onClick={this.disappearPrevPositionBar}>No</button>
+          </p>
+        </div>
+      );
+    }
+  },
   render() {
     return (
       <div className="player-core" ref="player">
+        {this._renderPlayFromHistory()}
         <div className="player-video-container">
           <video
             className="player-video" src={this.props.src}
