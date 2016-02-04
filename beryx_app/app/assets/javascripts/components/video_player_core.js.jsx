@@ -32,9 +32,6 @@ var VideoPlayerCore = React.createClass({
         var hls = new Hls();
         hls.loadSource(location.protocol + "//" + location.host + this.props.src);
         hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, function () {
-          video.play();
-        });
       }
     }
     window.addEventListener("beforeunload", this.sendCurrentTime);
@@ -132,7 +129,7 @@ var VideoPlayerCore = React.createClass({
         <div className="player-prev-position-bar">
           <p>
             Start playing from {pos}?
-            <button className="btn" onClick={this.playFromPrevPosition}>Yes</button>
+            <button className="btn btn-primary" onClick={this.playFromPrevPosition}>Yes</button>
             <button className="btn" onClick={this.disappearPrevPositionBar}>No</button>
           </p>
         </div>
@@ -146,7 +143,6 @@ var VideoPlayerCore = React.createClass({
         <div className="player-video-container">
           <video
             className="player-video" src={this.props.src}
-            preload="none" controls="controls"
             ref="video"
           />
         </div>
