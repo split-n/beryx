@@ -1,7 +1,12 @@
 class PlayHistoriesController < ApplicationController
   before_action :ensure_logged_user
   def show
-    play_histories = current_user.play_histories.where(video_id: params[:id]).order(created_at: :desc)
+    play_history = current_user.play_histories.find_by(video_id: params[:id])
+    if play_history
+      render json: play_history.as_json
+    else
+      render json: { error: "not found" }, status: 404
+    end
 
   end
 
