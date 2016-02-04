@@ -140,9 +140,17 @@ var VideoPlayerCore = React.createClass({
       );
     }
   },
+  _onClickOverlay(e) {
+    if(this.state.isMiscMenuOpened) {
+      this.setState({ isMiscMenuOpened: false });
+    } else {
+      e.preventDefault();
+    }
+  },
   render() {
     return (
       <div className="player-core" ref="player">
+        <div className="player-overlay" onClick={this._onClickOverlay} style={this.state.isMiscMenuOpened ? {} : {display:"none"} }></div>
         {this._renderPlayFromHistory()}
         <div className="player-video-container">
           <video
