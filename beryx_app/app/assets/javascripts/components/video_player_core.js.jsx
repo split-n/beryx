@@ -1,4 +1,4 @@
-/*global React:false, Hls:false, VideoPlayerControlBar:false */
+/*global React:false, Hls:false, VideoPlayerControlBar:false, BeryxUtil:false */
 /*exported VideoPlayerCore */
 
 var VideoPlayerCore = React.createClass({
@@ -127,10 +127,11 @@ var VideoPlayerCore = React.createClass({
   },
   _renderPlayFromHistory() {
     if(this.props.prevPosition && !this.state.prevPositionBarDone) {
+      var pos = BeryxUtil.secToTime(this.props.prevPosition);
       return (
         <div className="player-prev-position-bar">
           <p>
-            Start playing from {this.props.prevPosition}?
+            Start playing from {pos}?
             <button className="btn" onClick={this.playFromPrevPosition}>Yes</button>
             <button className="btn" onClick={this.disappearPrevPositionBar}>No</button>
           </p>

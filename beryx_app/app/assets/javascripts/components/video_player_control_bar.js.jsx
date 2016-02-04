@@ -1,4 +1,4 @@
-/*global React:false */
+/*global React:false, BeryxUtil:false */
 /*exported VideoPlayerControlBar */
 
 var VideoPlayerControlBar = React.createClass({
@@ -18,24 +18,11 @@ var VideoPlayerControlBar = React.createClass({
     return {isMiscMenuOpened: false};
 
   },
-  _zeroPad(val, dig) {
-    return ("0".repeat(dig) + val).slice(-dig);
-  },
-  _secToTime(sec) {
-    var m = Math.floor(sec / 60);
-    var s = Math.floor(sec % 60);
-    var mDig = 2;
-    var sDig = 2;
-    if (m >= 100) {
-      mDig = 3;
-    }
-    return `${this._zeroPad(m, mDig)}:${this._zeroPad(s, sDig)}`;
-  },
   _getCurrent() {
-    return this._secToTime(this.props.currentTime);
+    return BeryxUtil.secToTime(this.props.currentTime);
   },
   _getDuration() {
-    return this._secToTime(this.props.duration);
+    return BeryxUtil.secToTime(this.props.duration);
   },
   _renderPlayButton() {
     var classes;
