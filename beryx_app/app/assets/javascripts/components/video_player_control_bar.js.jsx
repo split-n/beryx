@@ -12,11 +12,9 @@ var VideoPlayerControlBar = React.createClass({
     setPlaybackRate: React.PropTypes.func.isRequired,
     isFullScreen: React.PropTypes.bool.isRequired,
     toggleFullScreen: React.PropTypes.func.isRequired,
-    changeVolume: React.PropTypes.func.isRequired
-  },
-  getInitialState() {
-    return {isMiscMenuOpened: false};
-
+    changeVolume: React.PropTypes.func.isRequired,
+    isMiscMenuOpened: React.PropTypes.bool.isRequired,
+    toggleMiscMenu: React.PropTypes.func.isRequired
   },
   _getCurrent() {
     return BeryxUtil.secToTime(this.props.currentTime);
@@ -86,7 +84,7 @@ var VideoPlayerControlBar = React.createClass({
     );
   },
   _renderMiscMenu() {
-    var menuStyle = { display:  this.state.isMiscMenuOpened ? "block" : "none" };
+    var menuStyle = { display:  this.props.isMiscMenuOpened ? "block" : "none" };
     var volumeButtonClasses;
     if(this.props.volume === 0) {
       volumeButtonClasses = "glyphicon glyphicon-volume-off";
@@ -112,9 +110,6 @@ var VideoPlayerControlBar = React.createClass({
   },
   _onVolumeBarMoved() {
     this.props.changeVolume(this.refs.volumebar.value / 100);
-  },
-  _toggleMiscMenu() {
-    this.setState({isMiscMenuOpened: !this.state.isMiscMenuOpened});
   },
   _toggleMute() {
     if(this.props.volume === 0) {
@@ -148,7 +143,7 @@ var VideoPlayerControlBar = React.createClass({
           <span className="player-controller-display-time">
             {this._getCurrent()}/{this._getDuration()}</span>
           <button className="btn player-controller-misc-button"
-            onClick={this._toggleMiscMenu}
+            onClick={this.props.toggleMiscMenu}
           >
             <span className="glyphicon glyphicon-option-vertical"
             />

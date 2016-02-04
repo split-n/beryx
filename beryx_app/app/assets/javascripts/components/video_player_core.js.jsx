@@ -14,7 +14,8 @@ var VideoPlayerCore = React.createClass({
       isPlaying: false,
       isFullScreen: false,
       volume: 0.5,
-      prevPositionBarDone: false
+      prevPositionBarDone: false,
+      isMiscMenuOpened: false
     };
   },
   componentDidMount() {
@@ -122,6 +123,9 @@ var VideoPlayerCore = React.createClass({
   disappearPrevPositionBar() {
     this.setState({ prevPositionBarDone: true });
   },
+  toggleMiscMenu() {
+    this.setState({ isMiscMenuOpened: !this.state.isMiscMenuOpened });
+  },
   _renderPlayFromHistory() {
     if(this.props.prevPosition && !this.state.prevPositionBarDone) {
       var pos = BeryxUtil.secToTime(this.props.prevPosition);
@@ -152,7 +156,8 @@ var VideoPlayerCore = React.createClass({
           togglePause={this.togglePause} isPlaying={this.state.isPlaying}
           seekToTime={this.seekToTime} setPlaybackRate={this.setPlaybackRate}
           isFullScreen={this.state.isFullScreen} toggleFullScreen={this.toggleFullScreen}
-          changeVolume={this.changeVolume}
+          changeVolume={this.changeVolume} toggleMiscMenu={this.toggleMiscMenu}
+          isMiscMenuOpened={this.state.isMiscMenuOpened}
         />
       </div>
     );
