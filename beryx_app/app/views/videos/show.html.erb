@@ -1,2 +1,3 @@
+<%= provide(:title, "Play #{@video.file_name}") %>
 <%= javascript_include_tag "https://cdnjs.cloudflare.com/ajax/libs/hls.js/0.4.6/hls.min.js" %>
 <%= react_component('VideoPlayer', videoName: @video.file_name, videoId: @video.id ) %>

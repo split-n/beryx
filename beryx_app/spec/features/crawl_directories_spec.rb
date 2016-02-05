@@ -18,7 +18,7 @@ RSpec.feature "CrawlDirectories", type: :feature do
       it "can get page and empty list" do
         visit crawl_directories_path
         expect(page).not_to have_css "td"
-        expect(page).to have_content "Crawl Directories"
+        expect(page).to have_content "Crawl directories"
       end
 
       it "can get list with item" do

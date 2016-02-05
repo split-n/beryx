@@ -33,5 +33,7 @@ module BeryxApp
     end
 
     config.autoload_paths += %W(#{config.root}/spec/helpers)
+
+    config.react.addons = true
   end
 end

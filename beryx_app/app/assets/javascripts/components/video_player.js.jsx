@@ -10,11 +10,25 @@ var VideoPlayer = React.createClass({
     return {};
   },
   onVideoSourceSupplied(path) {
-    this.setState({videoFilePath: path});
+    $.ajax({
+      type: "GET",
+      url: `/videos/${this.props.videoId}/play_history`,
+      dataType: "json"
+    }).done( (response) => {
+      this.setState({
+        videoFilePath: path,
+        prevPosition: response.position
+      });
+    }).fail( () => {
+        this.setState({videoFilePath: path});
+    });
   },
   render: function() {
     if(this.state.videoFilePath) {
-      return <VideoPlayerCore src={this.state.videoFilePath} />;
+      return <VideoPlayerCore
+        src={this.state.videoFilePath}
+        prevPosition={this.state.prevPosition}
+        videoId={this.props.videoId} />;
     } else {
       return (
         <VideoConvertSelect

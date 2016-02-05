@@ -12,6 +12,7 @@
 
 class User < ActiveRecord::Base
   attr_readonly :login_id
+  has_many :play_histories, dependent: :destroy
   validates :login_id, presence: true,
              length: { minimum: 3, maximum: 20 },
              format: { with: /\A\w{3,20}\z/ },

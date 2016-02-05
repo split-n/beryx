@@ -8,7 +8,6 @@ gem 'bcrypt'
 gem 'parallel'
 gem 'ransack', '~> 1.7.0'
 gem 'kaminari'
-gem 'kaminari-bootstrap', '~> 3.0.1'
 gem 'sidekiq', '~> 4.0.1'
 gem 'sidekiq-unique-jobs', '~> 4.0.13'
 gem 'whenever', require: false
@@ -19,7 +18,6 @@ gem 'uglifier', '>= 1.3.0'
 gem 'coffee-rails', '~> 4.1.0'
 
 gem 'jquery-rails'
-gem 'turbolinks'
 gem 'jbuilder', '~> 2.0'
 gem 'sdoc', '~> 0.4.0', group: :doc
 gem 'react-rails', '~> 1.5.0'
@@ -33,6 +31,7 @@ group :development, :test do
   gem 'capybara', "~> 2.5.0"
   gem 'spring'
   gem 'database_cleaner'
+  gem 'fuubar'
 end
 
 group :development do

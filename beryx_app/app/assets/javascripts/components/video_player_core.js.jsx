@@ -1,9 +1,44 @@
-/*global React:false, Hls:false, VideoPlayerControlBar:false */
-/*exported VideoPlayerCore */
+/*global React:false, Hls:false, VideoPlayerControlBar:false, BeryxUtil:false */
+/*exported VideoPlayerCore, PlayFromPreviousBar */
+
+var PlayFromPreviousBar = React.createClass({
+  propTypes: {
+    prevPosition: React.PropTypes.number.isRequired,
+    seekToTime: React.PropTypes.func.isRequired
+  },
+  getInitialState() {
+    return { done: false };
+  },
+  onClickYes() {
+    this.setState({done: true});
+    this.props.seekToTime(this.props.prevPosition);
+  },
+  onClickNo() {
+    this.setState({done: true});
+  },
+  render() {
+    if(this.state.done) {
+      return null;
+    }
+    var pos = BeryxUtil.secToTime(this.props.prevPosition);
+    return (
+      <div className="player-prev-position-bar">
+        <p>
+          Start playing from {pos}?
+          <button className="btn btn-primary" onClick={this.onClickYes}>Yes</button>
+          <button className="btn" onClick={this.onClickNo}>No</button>
+        </p>
+      </div>
+    );
+  }
+});
+
 
 var VideoPlayerCore = React.createClass({
   propTypes: {
-    src: React.PropTypes.string.isRequired
+    src: React.PropTypes.string.isRequired,
+    videoId: React.PropTypes.number.isRequired,
+    prevPosition: React.PropTypes.number
   },
   getInitialState() {
     return {
@@ -11,7 +46,9 @@ var VideoPlayerCore = React.createClass({
       currentTime: 0,
       isPlaying: false,
       isFullScreen: false,
-      volume: 0.5
+      volume: 0.5,
+      donePositionBar: false,
+      isMiscMenuOpened: false
     };
   },
   componentDidMount() {
@@ -29,11 +66,9 @@ var VideoPlayerCore = React.createClass({
         var hls = new Hls();
         hls.loadSource(location.protocol + "//" + location.host + this.props.src);
         hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, function () {
-          video.play();
-        });
       }
     }
+    window.addEventListener("beforeunload", this.sendCurrentTime);
   },
   componentWillUnmount() {
     var video = this.refs.video;
@@ -41,6 +76,15 @@ var VideoPlayerCore = React.createClass({
     video.removeEventListener("play", this.onPlay);
     video.removeEventListener("pause", this.onPause);
     video.removeEventListener("volumechange", this.onVolumeChange);
+    window.removeEventListener("beforeunload", this.sendCurrentTime);
+  },
+  sendCurrentTime() {
+    $.ajax({
+      url: `/videos/${this.props.videoId}/play_history`,
+      type: "POST",
+      dataType: "json",
+      data: { position: this.state.currentTime.toFixed() }
+    }); // ignore response
   },
   onTimeUpdate() {
     var video = this.refs.video;
@@ -105,14 +149,32 @@ var VideoPlayerCore = React.createClass({
       this.setState({isFullScreen: true});
     }
   },
+  toggleMiscMenu() {
+    this.setState({ isMiscMenuOpened: !this.state.isMiscMenuOpened });
+  },
+  _onClickOverlay(e) {
+    if(this.state.isMiscMenuOpened) {
+      this.setState({ isMiscMenuOpened: false });
+    } else {
+      e.preventDefault();
+    }
+  },
+  _onClickVideo() {
+    this.togglePause();
+  },
   render() {
     return (
       <div className="player-core" ref="player">
+        <div className="player-overlay" onClick={this._onClickOverlay} style={this.state.isMiscMenuOpened ? {} : {display:"none"} }></div>
+        { (this.props.prevPosition) ?
+          <PlayFromPreviousBar
+            prevPosition={this.props.prevPosition}
+            seekToTime={this.seekToTime}
+          /> : null }
         <div className="player-video-container">
           <video
             className="player-video" src={this.props.src}
-            preload="none" controls="controls"
-            ref="video"
+            ref="video" onClick={this._onClickVideo}
           />
         </div>
         <VideoPlayerControlBar
@@ -121,7 +183,8 @@ var VideoPlayerCore = React.createClass({
           togglePause={this.togglePause} isPlaying={this.state.isPlaying}
           seekToTime={this.seekToTime} setPlaybackRate={this.setPlaybackRate}
           isFullScreen={this.state.isFullScreen} toggleFullScreen={this.toggleFullScreen}
-          changeVolume={this.changeVolume}
+          changeVolume={this.changeVolume} toggleMiscMenu={this.toggleMiscMenu}
+          isMiscMenuOpened={this.state.isMiscMenuOpened}
         />
       </div>
     );

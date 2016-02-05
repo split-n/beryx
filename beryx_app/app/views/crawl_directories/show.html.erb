@@ -1,3 +1,4 @@
+<%= provide(:title, "Crawl directory #{@crawl_directory.path}") %>
 <div class="container">
   <p id="notice"><%= notice %></p>
   <h1>Show crawl directory</h1>
@@ -27,18 +28,10 @@
       <% end %>
     </tr>
   </table>
-  <p>
+  <% if @crawl_directory.crawl_job_status == "not_running" %>
     <%= form_tag  queue_crawl_crawl_directory_path(@crawl_directory) do %>
-        <% case(@crawl_directory.crawl_job_status)
-             when "not_running" %>
-            <%= button_tag "Execute crawl", class: "btn btn-primary" %>
-        <% when "queued" %>
-            <%= button_tag "Job queued", disabled: true %>
-        <% when "running" %>
-            <%= button_tag "Job running", disabled: true %>
-        <% else raise %>
-        <% end %>
+      <p><%= button_tag "Execute crawl", class: "btn btn-primary" %></p>
     <% end %>
-  </p>
+  <% end %>
   <%= link_to 'Back', crawl_directories_path, class: "btn btn-primary" %>
 </div>

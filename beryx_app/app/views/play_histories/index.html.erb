@@ -1,0 +1,30 @@
+<%= provide(:title, "Play histories") %>
+<div class="container-fluid">
+  <h1>Listing Play histories</h1>
+    <div>
+      <table class="table table-bordered table-striped table-hover table-responsive">
+        <thead>
+        <tr>
+          <th>Title</th>
+          <th>Duration</th>
+          <th>Last position</th>
+          <th>Last watch date</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <% @play_histories.each do |ph|
+           video = ph.video
+        %>
+            <tr>
+              <td><%= link_to video.file_name, video_path(video.id) %></td>
+              <td><%= to_hms video.duration %></td>
+              <td><%= to_hms ph.position %></td>
+              <td><%= pp_file_timestamp ph.updated_at %></td>
+            </tr>
+        <% end %>
+        </tbody>
+      </table>
+      <%= paginate @play_histories %>
+    </div>
+</div>
