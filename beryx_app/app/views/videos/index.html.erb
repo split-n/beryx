@@ -1,4 +1,6 @@
+<%= provide(:title, "Videos") %>
 <div class="container-fluid videos-page">
+
   <%= link_to "Logout", logout_path, method: :delete, class: "btn btn-danger pull-right" %>
   <%= link_to "Play histories", play_histories_path, class: "btn pull-right" %>
   <h1><%= link_to "Videos", root_path %></h1>
