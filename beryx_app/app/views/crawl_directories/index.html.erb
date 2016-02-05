@@ -1,7 +1,7 @@
 <%= provide(:title, "Crawl directories") %>
 <div class="container">
   <p id="notice"><%= notice %></p>
-  <h1>Listing Crawl Directories</h1>
+  <h1>Crawl directories</h1>
   <div class="row">
     <div class="col-sm-10 col-sm-offset-1 col-md-8 col-md-offset-2">
       <table class="table table-bordered table-hover">
@@ -9,7 +9,6 @@
         <tr>
           <th>Path</th>
           <th>Videos</th>
-          <th>Show</th>
           <th>Destroy</th>
         </tr>
         </thead>
@@ -17,9 +16,8 @@
         <tbody>
         <% @crawl_directories.each do |crawl_directory| %>
             <tr>
-              <td><%= crawl_directory.path %></td>
+              <td><%= link_to crawl_directory.path, crawl_directory %></td>
               <td><%= crawl_directory.videos.active.count %></td>
-              <td><%= link_to 'Show', crawl_directory, class: "btn btn-primary"%></td>
               <td><%= link_to 'Destroy', crawl_directory, method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-danger" %></td>
             </tr>
         <% end %>
