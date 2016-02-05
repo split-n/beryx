@@ -149,9 +149,6 @@ var VideoPlayerCore = React.createClass({
       this.setState({isFullScreen: true});
     }
   },
-  disappearPrevPositionBar() {
-    this.setState({ showPrevPositionBar: false });
-  },
   toggleMiscMenu() {
     this.setState({ isMiscMenuOpened: !this.state.isMiscMenuOpened });
   },
@@ -161,6 +158,9 @@ var VideoPlayerCore = React.createClass({
     } else {
       e.preventDefault();
     }
+  },
+  _onClickVideo() {
+    this.togglePause();
   },
   render() {
     return (
@@ -174,7 +174,7 @@ var VideoPlayerCore = React.createClass({
         <div className="player-video-container">
           <video
             className="player-video" src={this.props.src}
-            ref="video"
+            ref="video" onClick={this._onClickVideo}
           />
         </div>
         <VideoPlayerControlBar
