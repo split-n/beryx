@@ -1,5 +1,38 @@
 /*global React:false, Hls:false, VideoPlayerControlBar:false, BeryxUtil:false */
-/*exported VideoPlayerCore */
+/*exported VideoPlayerCore, PlayFromPreviousBar */
+
+var PlayFromPreviousBar = React.createClass({
+  propTypes: {
+    prevPosition: React.PropTypes.number.isRequired,
+    seekToTime: React.PropTypes.func.isRequired
+  },
+  getInitialState() {
+    return { done: false };
+  },
+  onClickYes() {
+    this.setState({done: true});
+    this.props.seekToTime(this.props.prevPosition);
+  },
+  onClickNo() {
+    this.setState({done: true});
+  },
+  render() {
+    if(this.state.done) {
+      return null;
+    }
+    var pos = BeryxUtil.secToTime(this.props.prevPosition);
+    return (
+      <div className="player-prev-position-bar">
+        <p>
+          Start playing from {pos}?
+          <button className="btn btn-primary" onClick={this.onClickYes}>Yes</button>
+          <button className="btn" onClick={this.onClickNo}>No</button>
+        </p>
+      </div>
+    );
+  }
+});
+
 
 var VideoPlayerCore = React.createClass({
   propTypes: {
@@ -14,7 +47,7 @@ var VideoPlayerCore = React.createClass({
       isPlaying: false,
       isFullScreen: false,
       volume: 0.5,
-      prevPositionBarDone: false,
+      donePositionBar: false,
       isMiscMenuOpened: false
     };
   },
@@ -116,29 +149,11 @@ var VideoPlayerCore = React.createClass({
       this.setState({isFullScreen: true});
     }
   },
-  playFromPrevPosition() {
-    this.setState({ prevPositionBarDone: true });
-    this.seekToTime(this.props.prevPosition);
-  },
   disappearPrevPositionBar() {
-    this.setState({ prevPositionBarDone: true });
+    this.setState({ showPrevPositionBar: false });
   },
   toggleMiscMenu() {
     this.setState({ isMiscMenuOpened: !this.state.isMiscMenuOpened });
-  },
-  _renderPlayFromHistory() {
-    if(this.props.prevPosition && !this.state.prevPositionBarDone) {
-      var pos = BeryxUtil.secToTime(this.props.prevPosition);
-      return (
-        <div className="player-prev-position-bar">
-          <p>
-            Start playing from {pos}?
-            <button className="btn btn-primary" onClick={this.playFromPrevPosition}>Yes</button>
-            <button className="btn" onClick={this.disappearPrevPositionBar}>No</button>
-          </p>
-        </div>
-      );
-    }
   },
   _onClickOverlay(e) {
     if(this.state.isMiscMenuOpened) {
@@ -151,7 +166,11 @@ var VideoPlayerCore = React.createClass({
     return (
       <div className="player-core" ref="player">
         <div className="player-overlay" onClick={this._onClickOverlay} style={this.state.isMiscMenuOpened ? {} : {display:"none"} }></div>
-        {this._renderPlayFromHistory()}
+        { (this.props.prevPosition) ?
+          <PlayFromPreviousBar
+            prevPosition={this.props.prevPosition}
+            seekToTime={this.seekToTime}
+          /> : null }
         <div className="player-video-container">
           <video
             className="player-video" src={this.props.src}
