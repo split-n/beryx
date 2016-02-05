@@ -75,7 +75,7 @@
     padding: 2px 8px;
     display: table;
     width: 100%;
-    background-color: #D6DCE4;
+    background-color: #CACCDA;
     font-size: 15px;
 
     .player-controller-left,
@@ -147,8 +147,8 @@
         z-index: 200;
         border-radius: 10px;
         padding: 10px;
-        background-color: rgb(206, 228, 255);
-        border: 4px solid rgb(79, 111, 232);
+        background-color: #E6F3FF;
+        border: 2px solid rgb(79, 111, 232);
         text-align: left;
 
         .player-controller-volume-button {
@@ -160,6 +160,16 @@
           display: inline;
           width: 110px;
           margin-left: 10px;
+        }
+
+        .player-controller-select-rate {
+          margin-top: 5px;
+        }
+
+        .player-controller-volume-button,
+        .player-controller-volume-bar,
+        .player-controller-select-rate {
+          background-color: #FFF5E7;
         }
       }
     }
