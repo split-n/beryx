@@ -1,5 +1,14 @@
 class PlayHistoriesController < ApplicationController
   before_action :ensure_logged_user
+
+  def index
+    @play_histories = current_user.play_histories
+                          .eager_load(:video)
+                          .merge(Video.active)
+                          .order(updated_at: :desc)
+                          .page(params[:page])
+  end
+
   def show
     play_history = current_user.play_histories.find_by(video_id: params[:id])
     if play_history

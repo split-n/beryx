@@ -1,5 +1,6 @@
 <div class="container-fluid videos-page">
   <%= link_to "Logout", logout_path, method: :delete, class: "btn btn-danger pull-right" %>
+  <%= link_to "Play histories", play_histories_path, class: "btn pull-right" %>
   <h1><%= link_to "Videos", root_path %></h1>
   <%= search_form_for @ransack, url: root_path, html: {class: "videos-search-form"} do |f| %>
       <%= f.text_field :normalized_file_name_cont_all, class: "videos-search-input" %>

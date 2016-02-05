@@ -6,6 +6,8 @@ Rails.application.routes.draw do
   get '/videos/:id/play_history', to: "play_histories#show"
   post '/videos/:id/play_history', to: "play_histories#create"
 
+  get '/play_histories', to: "play_histories#index"
+
   resources :crawl_directories, only: [:index, :show, :new, :create, :destroy] do
     member do
       post "queue_crawl" => "crawl_directories#queue_crawl"
