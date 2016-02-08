@@ -11,6 +11,12 @@ RSpec.feature "Videos", type: :feature do
   context "with normal user" do
     let(:user) { FG.create(:user) }
     before { log_in_as(user) }
+
+    it "not renders link to crawl directories" do
+      visit root_path
+      expect(page).not_to have_content "Crawl directories"
+    end
+
     it "can get empty list" do
       visit root_path
       expect(page).to have_content "Videos"
@@ -48,6 +54,16 @@ RSpec.feature "Videos", type: :feature do
       end
 
       expect(page).to have_content "#{match_videos.count} videos found"
+    end
+  end
+
+  context "with admin user" do
+    let(:user) { FG.create(:user_admin) }
+    before { log_in_as(user) }
+
+    it "renders link to crawl directories" do
+      visit root_path
+      expect(page).to have_content "Crawl directories"
     end
   end
 end
