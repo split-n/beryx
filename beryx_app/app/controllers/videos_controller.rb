@@ -14,6 +14,8 @@ class VideosController < ApplicationController
     @ransack.sorts = 'file_timestamp desc' if @ransack.sorts.empty?
 
     @videos = @ransack.result.page(params[:page])
+
+    render layout: 'application_with_header'
   end
 
   def show
