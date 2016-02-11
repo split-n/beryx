@@ -20,9 +20,10 @@ RSpec.describe ConvertedVideo, type: :model do
     context "already queued" do
       it {
         cv1 = ConvertedVideo.convert_to(video, ConvertParams::CopyHls.new, dst_dir, dst_file)
+        expect(ConvertedVideo.count).to eq 1
         cv2 = ConvertedVideo.convert_to(video, ConvertParams::CopyHls.new, dst_dir, dst_file)
         expect(ConvertedVideo.count).to eq 1
-        expect(cv1).to eq cv2
+        expect(cv1.last_played).to be < cv2.last_played
       }
     end
   end

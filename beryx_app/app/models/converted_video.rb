@@ -48,6 +48,7 @@ class ConvertedVideo < ActiveRecord::Base
         if done_c_video.fail?
           done_c_video.destroy
         else
+          done_c_video.update_played_time
           return done_c_video
         end
       end
@@ -65,6 +66,11 @@ class ConvertedVideo < ActiveRecord::Base
       c_video.save!
       c_video
     end
+  end
+
+  def update_played_time
+    self.last_played = Time.current
+    save!
   end
 
   def run_convert
