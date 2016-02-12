@@ -1,6 +1,8 @@
 Rails.application.routes.draw do
   root 'videos#index'
 
+  resource :user, only: [:show]
+
   get '/videos/:id', to: "videos#show"
   post '/videos/:id/convert', to: "videos#convert"
   get '/videos/:id/play_history', to: "play_histories#show"
