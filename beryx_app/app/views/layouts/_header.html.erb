@@ -11,7 +11,7 @@
     </ul>
 
     <ul class="nav navbar-nav navbar-right">
-      <li><p class="navbar-text">ID: <%= current_user.login_id %></p></li>
+      <li><%= link_to "ID: #{current_user.login_id}", user_path %></li>
       <li><%= link_to "Logout", logout_path, method: :delete %></li>
     </ul>
   </div>
