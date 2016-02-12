@@ -12,13 +12,17 @@ module SessionsHelper
     current_user.present?
   end
 
+  def admin_user?
+    current_user&.admin?
+  end
+
   def logout
     session.delete(:user_id)
     @current_user = nil
   end
 
   def ensure_admin_user
-    redirect_to login_path unless current_user&.admin?
+    redirect_to login_path unless admin_user?
   end
 
   def ensure_logged_user

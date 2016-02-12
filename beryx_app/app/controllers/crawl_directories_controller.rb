@@ -2,6 +2,8 @@ class CrawlDirectoriesController < ApplicationController
   before_action :ensure_admin_user
   before_action :set_crawl_directory, only: [:show, :destroy, :queue_crawl]
 
+  layout 'application_with_header'
+
   def index
     @crawl_directories = CrawlDirectory.active
   end

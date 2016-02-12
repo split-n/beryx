@@ -7,6 +7,7 @@ class PlayHistoriesController < ApplicationController
                           .merge(Video.active)
                           .order(updated_at: :desc)
                           .page(params[:page])
+    render layout: 'application_with_header'
   end
 
   def show

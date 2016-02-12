@@ -1,0 +1,15 @@
+<%= provide(:title, "User #{@user.login_id}") %>
+<div class="container">
+  <h1>Show user</h1>
+  <table class="table table-bordered">
+    <tr>
+      <th>login_id</th>
+      <td><%= @user.login_id %></td>
+    </tr>
+    <tr>
+      <th>admin?</th>
+      <td><%= @user.admin? %></td>
+    </tr>
+  </table>
+  <%= link_to 'Back', crawl_directories_path, class: "btn btn-primary" %>
+</div>
