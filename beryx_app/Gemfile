@@ -32,6 +32,7 @@ group :development, :test do
   gem 'spring'
   gem 'database_cleaner'
   gem 'fuubar'
+  gem 'rails-controller-testing'
 end
 
 group :development do
