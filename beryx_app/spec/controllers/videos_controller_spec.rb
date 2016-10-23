@@ -4,7 +4,7 @@ RSpec.describe VideosController, type: :controller do
   describe "#index" do
     context "not logged" do
       it "redirected to login" do
-        get :index
+        get :index, params: {}
         expect(response).to redirect_to login_path
       end
     end
@@ -13,7 +13,7 @@ RSpec.describe VideosController, type: :controller do
       let(:user) { FG.create(:user) }
       it "can get" do
         log_in_as(user)
-        get :index
+        get :index, params: {}
         expect(response).to render_template :index
       end
     end
@@ -23,7 +23,7 @@ RSpec.describe VideosController, type: :controller do
     context "not logged" do
       let(:video) { FG.create(:video) }
       it "redirected to login" do
-        get :show, id: video.id
+        get :show, params: {id: video.id}
         expect(response).to redirect_to login_path
       end
     end
@@ -34,7 +34,7 @@ RSpec.describe VideosController, type: :controller do
 
       context "with video" do
         let(:video) { FG.create(:video) }
-        subject { get :show, id: video.id }
+        subject { get :show, params: {id: video.id} }
 
         context "valid" do
           it { subject; expect(response).to render_template :show }
@@ -52,7 +52,7 @@ RSpec.describe VideosController, type: :controller do
       end
 
       context "not found video_id" do
-        subject { get :show, id: 45516 }
+        subject { get :show, params: {id: 45516} }
         it { expect{subject}.to raise_error(ActiveRecord::RecordNotFound) }
       end
     end

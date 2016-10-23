@@ -57,7 +57,7 @@ RSpec.describe "PlayHistories", type: :request do
       context "correct request" do
         let(:position) { 3 }
         let(:request_body) { { position: position } }
-        subject { post "/videos/#{video.id}/play_history", request_body }
+        subject { post "/videos/#{video.id}/play_history", params: request_body }
         it { expect{subject}.to change{PlayHistory.count}.by(1) }
         it { subject; expect(response.status).to eq 200 }
       end

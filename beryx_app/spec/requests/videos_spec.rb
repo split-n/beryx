@@ -23,21 +23,21 @@ RSpec.describe "Videos", type: :request do
 
       context "video not found" do
         let(:request_body) { JSON.generate({convert_method: "HLS_COPY"}) }
-        subject { post "/videos/60515/convert", request_body  }
+        subject { post "/videos/60515/convert", params: request_body  }
         it { subject; expect(response.status).to eq 400 }
         it { subject; expect(response.body).to include "video_id is invalid" }
       end
 
       context "HLS_COPY" do
         let(:request_body) { JSON.generate({convert_method: "HLS_COPY"}) }
-        subject { post "/videos/#{video.id}/convert", request_body  }
+        subject { post "/videos/#{video.id}/convert", params: request_body  }
         it { subject; expect(response.status).to eq 200 }
         it { subject; expect(response.body).to include "m3u8" }
       end
 
       context "HLS_AVC_AAC_ENCODE" do
 
-        subject { post "/videos/#{video.id}/convert", request_body  }
+        subject { post "/videos/#{video.id}/convert", params: request_body  }
         context "params missing" do
           let(:request_body) {
             JSON.generate({

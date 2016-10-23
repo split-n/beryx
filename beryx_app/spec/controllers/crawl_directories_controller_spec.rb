@@ -25,7 +25,7 @@ RSpec.describe CrawlDirectoriesController, type: :controller do
 
   describe "#index" do
     subject {
-      get :index
+      get :index, params: {}
     }
 
     context "not logged" do
@@ -51,7 +51,7 @@ RSpec.describe CrawlDirectoriesController, type: :controller do
 
     context "invalid id" do
       subject {
-        get :show, id: 5005
+        get :show, params: {id: 5005}
       }
 
       context "not logged" do
@@ -73,7 +73,7 @@ RSpec.describe CrawlDirectoriesController, type: :controller do
     context "with crawl directory" do
       let(:cd) { FG.create(:crawl_directory) }
       subject {
-        get :show, id: cd.id
+        get :show, params: {id: cd.id}
       }
 
       context "not logged" do
