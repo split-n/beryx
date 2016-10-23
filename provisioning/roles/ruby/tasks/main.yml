@@ -2,7 +2,7 @@
 # vim:ft=ansible
 - name: install rbenv deps
   apt: name={{ item }} state=latest update_cache=yes
-  sudo: yes
+  become: yes
   with_items:
     - autoconf
     - bison

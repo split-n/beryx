@@ -2,21 +2,21 @@
 # vim:ft=ansible
 - name: Install PostgreSQL
   apt: name={{ item }} state=latest update_cache=yes
-  sudo: true
+  become: true
   with_items:
     - postgresql
     - postgresql-contrib
     - python-psycopg2
     - libpq-dev
 - name: Pg user exists
-  sudo: yes
-  sudo_user: postgres
+  become: yes
+  become_user: postgres
   postgresql_user:
     name={{ pg_db_user }}
     password={{ pg_db_password }}
     role_attr_flags=NOSUPERUSER,CREATEDB
 - name: Pg config
-  sudo: yes
+  become: yes
   lineinfile: 
     dest=/etc/postgresql/9.5/main/postgresql.conf
     line="random_page_cost = 1.4"

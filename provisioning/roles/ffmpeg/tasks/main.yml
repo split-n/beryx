@@ -1,13 +1,13 @@
 ---
 - name: set ld path
-  sudo: yes
+  become: yes
   lineinfile: 
     dest="/etc/ld.so.conf"
     line="include /usr/local/lib"
 - name: install ffmpeg dependency
   apt: name={{ item }} state=present update_cache=true
-  sudo: yes
-  with_items: ffmpeg_deps
+  become: yes
+  with_items: '{{ffmpeg_deps}}'
 
 - name: clone latest fdk-aac
   git: >
@@ -35,7 +35,7 @@
     creates: "{{ ffmpeg_src_dir }}/fdk-aac/libfdk-aac.la"
     
 - name: install fdk-aac
-  sudo: yes
+  become: yes
   shell: checkinstall --pkgname=fdk-aac --pkgversion=$(date +%s) -y
   args:
     chdir: "{{ ffmpeg_src_dir }}/fdk-aac"
@@ -51,7 +51,7 @@
     creates: "{{ ffmpeg_src_dir }}/ffmpeg/ffmpeg"
 
 - name: install ffmpeg
-  sudo: yes
+  become: yes
   shell: |
      checkinstall --pkgversion=$(date +%s) -y
   args:

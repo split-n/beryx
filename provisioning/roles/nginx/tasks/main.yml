@@ -2,4 +2,4 @@
 # vim:ft=ansible
 - name: Install nginx
   apt: name=nginx state=latest update_cache=yes
-  sudo: true
+  become: true

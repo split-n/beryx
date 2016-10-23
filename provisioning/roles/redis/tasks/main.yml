@@ -2,4 +2,4 @@
 # vim:ft=ansible
 - name: Install redis
   apt: name=redis-server state=latest update_cache=yes
-  sudo: true
+  become: true
